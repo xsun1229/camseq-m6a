@@ -1,7 +1,7 @@
-name: "camseq-m6a"
+name: camseq-m6a
 output_dir: ../docs
 navbar:
-  title: "camseq-m6a"
+  title: camseq-m6a
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fab fa-github
+    text: Source code
+    href: https://github.com/xsun1229/camseq-m6a
 output:
   workflowr::wflow_html:
     toc: yes
