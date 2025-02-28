@@ -1,0 +1,59 @@
+---
+title: "Tools and references"
+author: "XSun"
+date: "2025-02-26"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Tools 
+
+- gffread: https://github.com/gpertea/gffread
+
+installed in `/project/xinhe/xsun/software/GffRead/`
+
+- hisat2-3n: https://github.com/DaehwanKimLab/hisat2/tree/hisat-3n 
+
+installed in `/project/xinhe/xsun/software/hisat/`
+
+-  CutSeq: https://github.com/y9c/cutseq
+
+`pip install cutseq`
+
+- UMICollapse: https://github.com/Daniel-Liu-c0deb0t/UMICollapse
+
+# Prepare gene/genome reference
+
+## genome.fa and gene.fa downloading
+
+We downloaded the genome fa file and known gene gtf file using: 
+
+```{shell}
+wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.knownGene.gtf.gz
+```
+
+Then, we generated gene fa file using the files above:
+
+```{shell}
+gunzip hg38.fa.gz
+gunzip hg38.knownGene.gtf.gz
+
+/project/xinhe/xsun/software/GffRead/gffread/gffread hg38.knownGene.gtf -g hg38.fa -w genes.fa
+```
+
+## gene index and genome index
+
+gene.fa file is storaged in `/project/xinhe/xsun/camseq/data_ref/gene_index/gene.hg38.fa.gz`
+
+genome.fa file is storaged in `/project/xinhe/xsun/camseq/data_ref/genome_index/genome.hg38.fa.gz`
+
+Run the following commands for gene and genome accordingly. When using 4cores 30G, Gene took 20mins, genome took 40mins
+
+```{shell}
+module load samtools 
+samtools faidx genes.hg38.fa
+
+/project/xinhe/xsun/software/hisat/hisat-3n/hisat-3n-build -p 4 --base-change T,C genes.hg38.fa gene.hg38
+```

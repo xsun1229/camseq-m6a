@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="XSun" />
+
+<meta name="date" content="2025-02-26" />
+
+<title>trimming</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.22/datatables.js"></script>
+<link href="site_libs/dt-core-1.11.3/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.11.3/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.11.3/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">camseq-m6a</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/xsun1229/camseq-m6a">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">trimming</h1>
+<h4 class="author">XSun</h4>
+<h4 class="date">2025-02-26</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-02-28
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>camseq-m6a/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20250226code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20250226)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20250226code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20250226)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree4720c09daf5f84d33c696e1d248805a7844bbe4ctargetblank4720c09a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/4720c09daf5f84d33c696e1d248805a7844bbe4c" target="_blank">4720c09</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree4720c09daf5f84d33c696e1d248805a7844bbe4ctargetblank4720c09a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/xsun1229/camseq-m6a/tree/4720c09daf5f84d33c696e1d248805a7844bbe4c" target="_blank">4720c09</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Untracked files:
+    Untracked:  analysis/mapping.Rmd
+    Untracked:  analysis/tool_ref.Rmd
+    Untracked:  analysis/trimming.Rmd
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(jsonlite)
+library(dplyr)
+library(gridExtra)
+library(ggplot2)
+library(grid) </code></pre>
+<div id="commands" class="section level1">
+<h1>Commands</h1>
+<pre class="shell"><code>
+# Define the JSON report file
+JSON_REPORT=&quot;report_reads/trimming/241217AVITI-He-lab-24JX-12-1-4.json&quot;
+echo &quot;JSON report will be saved to: $JSON_REPORT&quot;
+
+# Define input and output files
+INPUT_R1=&quot;raw_reads/241217AVITI-He-lab-24JX-12-1-4_R1.fastq.gz&quot;
+INPUT_R2=&quot;raw_reads/241217AVITI-He-lab-24JX-12-1-4_R2.fastq.gz&quot;
+OUTPUT_R1=&quot;intermediate/trimming/trimmed_reads/PE/241217AVITI-He-lab-24JX-12-1-4_R1.fq.gz&quot;
+OUTPUT_R2=&quot;intermediate/trimming/trimmed_reads/PE/241217AVITI-He-lab-24JX-12-1-4_R2.fq.gz&quot;
+DISCARDED_R1=&quot;intermediate/trimming/discarded_reads/241217AVITI-He-lab-24JX-12-1-4_R1.fq.gz&quot;
+DISCARDED_R2=&quot;intermediate/trimming/discarded_reads/241217AVITI-He-lab-24JX-12-1-4_R2.fq.gz&quot;
+
+    cutadapt \
+        -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
+        -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+        -j 8 \
+        -m 20 \
+        -o &quot;$OUTPUT_R1&quot; \
+        -p &quot;$OUTPUT_R2&quot; \
+        --too-short-output &quot;$DISCARDED_R1&quot; \
+        --too-short-paired-output &quot;$DISCARDED_R2&quot; \
+        --json=&quot;$JSON_REPORT&quot; \
+        &quot;$INPUT_R1&quot; &quot;$INPUT_R2&quot;
+</code></pre>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<pre class="r"><code>json_folder &lt;- &quot;/project/xinhe/xsun/camseq/report_reads/trimming&quot;
+
+# List all JSON files in the folder
+json_files &lt;- list.files(json_folder, pattern = &quot;*.json&quot;, full.names = TRUE)
+
+# Initialize an empty list to store results
+results &lt;- list()
+
+# Loop through each JSON file
+for (file in json_files) {
+  # Read the JSON file
+  json_data &lt;- fromJSON(file)
+  
+  # Extract general statistics
+  sample_name &lt;- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  total_reads &lt;- json_data$read_counts$input
+  reads_too_short &lt;- json_data$read_counts$filtered$too_short
+  reads_written &lt;- json_data$read_counts$output
+  reads_with_adapters_R1 &lt;- json_data$read_counts$read1_with_adapter
+  reads_with_adapters_R2 &lt;- json_data$read_counts$read2_with_adapter
+  total_basepairs_input &lt;- json_data$basepair_counts$input
+  total_basepairs_output &lt;- json_data$basepair_counts$output
+  
+  # Store the results in a data frame
+  results[[sample_name]] &lt;- data.frame(
+    Sample = sample_name,
+    Total_Reads = total_reads,
+    Reads_Too_Short = reads_too_short,
+    Reads_Written = reads_written,
+    Reads_With_Adapters_R1 = reads_with_adapters_R1,
+    Reads_With_Adapters_R2 = reads_with_adapters_R2,
+    Total_Basepairs_Input = total_basepairs_input,
+    Total_Basepairs_Output = total_basepairs_output
+  )
+}
+
+# Combine results into a single data frame
+results_df &lt;- do.call(rbind, results)
+
+rownames(results_df) &lt;- seq(1:nrow(results_df))
+
+DT::datatable(results_df,caption = htmltools::tags$caption(style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Trimming summary&#39;),options = list(pageLength = 10) )</code></pre>
+<div id="htmlwidget-72df6e256503a04e505c" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-72df6e256503a04e505c">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Trimming summary<\/caption>","data":[["1","2","3","4","5","6","7","8"],["241217AVITI-He-lab-24JX-12-1-1","241217AVITI-He-lab-24JX-12-1-2","241217AVITI-He-lab-24JX-12-1-3","241217AVITI-He-lab-24JX-12-1-4","241217AVITI-He-lab-24JX-12-1-5","241217AVITI-He-lab-24JX-12-1-6","241217AVITI-He-lab-24JX-12-1-7","241217AVITI-He-lab-24JX-12-1-8"],[31576825,14993439,9605844,9778834,4779198,5972392,16607901,14752736],[548325,116067,680478,773669,243876,718465,573910,319735],[31028500,14877372,8925366,9005165,4535322,5253927,16033991,14433001],[8836375,4124470,1134139,1276721,1078081,1943223,4647482,4129691],[8263512,4005079,1086879,1271074,1095862,1877509,4524519,4073524],[5115445650,2428937118,1556146728,1584171108,774230076,967527504,2690479962,2389943232],[4659482942,2267957006,1430475218,1438289806,706629760,797099245,2373425690,2164784756]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sample<\/th>\n      <th>Total_Reads<\/th>\n      <th>Reads_Too_Short<\/th>\n      <th>Reads_Written<\/th>\n      <th>Reads_With_Adapters_R1<\/th>\n      <th>Reads_With_Adapters_R2<\/th>\n      <th>Total_Basepairs_Input<\/th>\n      <th>Total_Basepairs_Output<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="read-counts-summary" class="section level2">
+<h2>Read Counts Summary</h2>
+<pre class="r"><code>p &lt;- list()
+for (file in json_files){
+  
+  json_data &lt;- fromJSON(file)
+  
+  sample_name &lt;- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name &lt;- gsub(pattern = &quot;241217AVITI-He-lab-24JX-&quot;,replacement = &quot;&quot;,x =sample_name)
+  
+  read_counts &lt;- data.frame(
+    Category = c(&quot;Input&quot;, &quot;Output&quot;, &quot;Too Short&quot;),
+    Count = c(
+      json_data$read_counts$input,
+      json_data$read_counts$output,
+      json_data$read_counts$filtered$too_short
+    )
+  )
+  
+  # Bar plot
+  p[[length(p)+1]] &lt;- ggplot(read_counts, aes(x = Category, y = Count)) +
+    geom_col(fill = &quot;skyblue&quot;) +
+    geom_text(aes(label = scales::comma(Count)), vjust = -0.5) +
+    labs(title = sample_name , y = &quot;Count&quot;) +
+    scale_y_continuous(labels = scales::comma)
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(&quot;Read Counts Before/After Trimming&quot;, gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/trimming.Rmd/unnamed-chunk-4-1.png" width="1536" style="display: block; margin: auto;" /></p>
+</div>
+<div id="adapter-detection" class="section level2">
+<h2>Adapter Detection</h2>
+<pre class="r"><code>p &lt;- list()
+for (file in json_files){
+  
+  json_data &lt;- fromJSON(file)
+  
+  sample_name &lt;- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name &lt;- gsub(pattern = &quot;241217AVITI-He-lab-24JX-&quot;,replacement = &quot;&quot;,x =sample_name)
+  
+  adapter_counts &lt;- data.frame(
+    Read = c(&quot;Read 1&quot;, &quot;Read 2&quot;),
+    Count = c(
+      json_data$read_counts$read1_with_adapter,
+      json_data$read_counts$read2_with_adapter
+    )
+  )
+  
+  # Bar plot
+  p[[length(p)+1]] &lt;- ggplot(adapter_counts, aes(x = Read, y = Count)) +
+    geom_col(fill = &quot;salmon&quot;) +
+    geom_text(aes(label = scales::comma(Count)), vjust = -0.5) +
+    labs(title = sample_name , y = &quot;Count&quot;) 
+    #labs(title = &quot;Reads Containing Adapters&quot;, y = &quot;Count&quot;)
+  
+  
+}
+
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(&quot;Reads Containing Adapters&quot;, gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/trimming.Rmd/unnamed-chunk-5-1.png" width="1536" style="display: block; margin: auto;" /></p>
+</div>
+<div id="trimmed-length-distribution" class="section level2">
+<h2>Trimmed Length Distribution</h2>
+<p>The expected count is a theoretical prediction of random adapter
+matches:</p>
+<p><span class="math display">\[
+\text{Expected Count} = \text{Total Reads} \times P(\text{Random Match})
+\]</span></p>
+<p>Where: - <span class="math inline">\(\text{Total Reads}\)</span> is
+the total number of reads in the dataset. - <span
+class="math inline">\(P(\text{Random Match})\)</span> is the probability
+of a random sequence matching the adapter.</p>
+<ul>
+<li>If the blue line is much higher than the red line at certain
+lengths, it indicates true adapter trimming at those lengths.</li>
+<li>If the blue and red lines overlap, it suggests that the trimming at
+those lengths is likely due to random chance, not adapter presence.</li>
+</ul>
+<pre class="r"><code>p1 &lt;- list()
+p2 &lt;- list()
+for (file in json_files){
+  
+  json_data &lt;- fromJSON(file)
+  
+  sample_name &lt;- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name &lt;- gsub(pattern = &quot;241217AVITI-He-lab-24JX-&quot;,replacement = &quot;&quot;,x =sample_name)
+  
+  process_trimmed &lt;- function(adapter_data) {
+    df &lt;- adapter_data$three_prime_end$trimmed_lengths[[1]]
+    df$total_observed &lt;- sapply(df$counts, function(x) sum(unlist(x)))
+    df$len &lt;- as.numeric(df$len)
+    df
+  }
+  
+  # Process Read 1 and Read 2
+  trimmed_read1 &lt;- process_trimmed(json_data$adapters_read1)
+  trimmed_read2 &lt;- process_trimmed(json_data$adapters_read2)
+  
+  # Plot for Read 1
+  p1[[length(p1)+1]] &lt;- ggplot(trimmed_read1, aes(x = len)) +
+    geom_line(aes(y = total_observed, color = &quot;Observed&quot;), linewidth = 1) +
+    geom_line(aes(y = expect, color = &quot;Expected&quot;), linewidth = 1, linetype = &quot;dashed&quot;) +
+    #labs(title = &quot;Trimmed Length Distribution (Read 1)&quot;, x = &quot;Length&quot;, y = &quot;Count&quot;) +
+    labs(title = sample_name, x = &quot;Length&quot;, y = &quot;Count&quot;) +
+    scale_color_manual(values = c(&quot;Observed&quot; = &quot;blue&quot;, &quot;Expected&quot; = &quot;red&quot;)) +
+    theme_minimal()
+  
+  p2[[length(p2)+1]] &lt;- ggplot(trimmed_read2, aes(x = len)) +
+    geom_line(aes(y = total_observed, color = &quot;Observed&quot;), linewidth = 1) +
+    geom_line(aes(y = expect, color = &quot;Expected&quot;), linewidth = 1, linetype = &quot;dashed&quot;) +
+    #labs(title = &quot;Trimmed Length Distribution (Read 2)&quot;, x = &quot;Length&quot;, y = &quot;Count&quot;) +
+    labs(title = sample_name, x = &quot;Length&quot;, y = &quot;Count&quot;) +
+    scale_color_manual(values = c(&quot;Observed&quot; = &quot;blue&quot;, &quot;Expected&quot; = &quot;red&quot;)) +
+    theme_minimal()
+
+}
+
+combined1 &lt;- arrangeGrob(
+  grobs = p1,
+  nrow = 2,
+  top = textGrob(&quot;Trimmed Length Distribution (Read 1)&quot;, gp = gpar(fontsize = 14))
+)
+grid.draw(combined1)</code></pre>
+<p><img src="figure/trimming.Rmd/unnamed-chunk-6-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>combined2 &lt;- arrangeGrob(
+  grobs = p2,
+  nrow = 2,
+  top = textGrob(&quot;Trimmed Length Distribution (Read 2)&quot;, gp = gpar(fontsize = 14))
+)
+grid.draw(combined2)</code></pre>
+<p><img src="figure/trimming.Rmd/unnamed-chunk-7-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.3.13-el7-x86_64/lib/libopenblas_haswellp-r0.3.13.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] grid      stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+[1] ggplot2_3.5.1  gridExtra_2.3  dplyr_1.1.4    jsonlite_1.8.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.12       highr_0.9         pillar_1.9.0      compiler_4.2.0   
+ [5] bslib_0.3.1       later_1.3.0       jquerylib_0.1.4   git2r_0.30.1     
+ [9] workflowr_1.7.0   tools_4.2.0       digest_0.6.29     gtable_0.3.0     
+[13] evaluate_0.15     lifecycle_1.0.4   tibble_3.2.1      pkgconfig_2.0.3  
+[17] rlang_1.1.2       cli_3.6.1         rstudioapi_0.13   crosstalk_1.2.0  
+[21] yaml_2.3.5        xfun_0.41         fastmap_1.1.0     withr_2.5.0      
+[25] stringr_1.5.1     knitr_1.39        htmlwidgets_1.5.4 generics_0.1.2   
+[29] fs_1.5.2          vctrs_0.6.5       sass_0.4.1        DT_0.22          
+[33] rprojroot_2.0.3   tidyselect_1.2.0  glue_1.6.2        R6_2.5.1         
+[37] fansi_1.0.3       rmarkdown_2.25    farver_2.1.0      magrittr_2.0.3   
+[41] scales_1.3.0      promises_1.2.0.1  htmltools_0.5.2   colorspace_2.0-3 
+[45] httpuv_1.6.5      labeling_0.4.2    utf8_1.2.2        stringi_1.7.6    
+[49] munsell_0.5.0    </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

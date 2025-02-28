@@ -1,0 +1,255 @@
+---
+title: "trimming"
+author: "XSun"
+date: "2025-02-26"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+```{r message=F, warning=F}
+
+library(jsonlite)
+library(dplyr)
+library(gridExtra)
+library(ggplot2)
+library(grid) 
+
+```
+
+
+# Commands
+
+```{shell}
+
+# Define the JSON report file
+JSON_REPORT="report_reads/trimming/241217AVITI-He-lab-24JX-12-1-4.json"
+echo "JSON report will be saved to: $JSON_REPORT"
+
+# Define input and output files
+INPUT_R1="raw_reads/241217AVITI-He-lab-24JX-12-1-4_R1.fastq.gz"
+INPUT_R2="raw_reads/241217AVITI-He-lab-24JX-12-1-4_R2.fastq.gz"
+OUTPUT_R1="intermediate/trimming/trimmed_reads/PE/241217AVITI-He-lab-24JX-12-1-4_R1.fq.gz"
+OUTPUT_R2="intermediate/trimming/trimmed_reads/PE/241217AVITI-He-lab-24JX-12-1-4_R2.fq.gz"
+DISCARDED_R1="intermediate/trimming/discarded_reads/241217AVITI-He-lab-24JX-12-1-4_R1.fq.gz"
+DISCARDED_R2="intermediate/trimming/discarded_reads/241217AVITI-He-lab-24JX-12-1-4_R2.fq.gz"
+
+    cutadapt \
+        -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
+        -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+        -j 8 \
+        -m 20 \
+        -o "$OUTPUT_R1" \
+        -p "$OUTPUT_R2" \
+        --too-short-output "$DISCARDED_R1" \
+        --too-short-paired-output "$DISCARDED_R2" \
+        --json="$JSON_REPORT" \
+        "$INPUT_R1" "$INPUT_R2"
+
+```
+
+
+# Results
+
+## Summary
+
+```{r}
+json_folder <- "/project/xinhe/xsun/camseq/report_reads/trimming"
+
+# List all JSON files in the folder
+json_files <- list.files(json_folder, pattern = "*.json", full.names = TRUE)
+
+# Initialize an empty list to store results
+results <- list()
+
+# Loop through each JSON file
+for (file in json_files) {
+  # Read the JSON file
+  json_data <- fromJSON(file)
+  
+  # Extract general statistics
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  total_reads <- json_data$read_counts$input
+  reads_too_short <- json_data$read_counts$filtered$too_short
+  reads_written <- json_data$read_counts$output
+  reads_with_adapters_R1 <- json_data$read_counts$read1_with_adapter
+  reads_with_adapters_R2 <- json_data$read_counts$read2_with_adapter
+  total_basepairs_input <- json_data$basepair_counts$input
+  total_basepairs_output <- json_data$basepair_counts$output
+  
+  # Store the results in a data frame
+  results[[sample_name]] <- data.frame(
+    Sample = sample_name,
+    Total_Reads = total_reads,
+    Reads_Too_Short = reads_too_short,
+    Reads_Written = reads_written,
+    Reads_With_Adapters_R1 = reads_with_adapters_R1,
+    Reads_With_Adapters_R2 = reads_with_adapters_R2,
+    Total_Basepairs_Input = total_basepairs_input,
+    Total_Basepairs_Output = total_basepairs_output
+  )
+}
+
+# Combine results into a single data frame
+results_df <- do.call(rbind, results)
+
+rownames(results_df) <- seq(1:nrow(results_df))
+
+DT::datatable(results_df,caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Trimming summary'),options = list(pageLength = 10) )
+```
+
+## Read Counts Summary
+
+
+```{r fig.height=8, fig.width=16}
+
+p <- list()
+for (file in json_files){
+  
+  json_data <- fromJSON(file)
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  
+  read_counts <- data.frame(
+    Category = c("Input", "Output", "Too Short"),
+    Count = c(
+      json_data$read_counts$input,
+      json_data$read_counts$output,
+      json_data$read_counts$filtered$too_short
+    )
+  )
+  
+  # Bar plot
+  p[[length(p)+1]] <- ggplot(read_counts, aes(x = Category, y = Count)) +
+    geom_col(fill = "skyblue") +
+    geom_text(aes(label = scales::comma(Count)), vjust = -0.5) +
+    labs(title = sample_name , y = "Count") +
+    scale_y_continuous(labels = scales::comma)
+  
+  
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("Read Counts Before/After Trimming", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+## Adapter Detection
+
+```{r fig.height=8, fig.width=16}
+
+p <- list()
+for (file in json_files){
+  
+  json_data <- fromJSON(file)
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  
+  adapter_counts <- data.frame(
+    Read = c("Read 1", "Read 2"),
+    Count = c(
+      json_data$read_counts$read1_with_adapter,
+      json_data$read_counts$read2_with_adapter
+    )
+  )
+  
+  # Bar plot
+  p[[length(p)+1]] <- ggplot(adapter_counts, aes(x = Read, y = Count)) +
+    geom_col(fill = "salmon") +
+    geom_text(aes(label = scales::comma(Count)), vjust = -0.5) +
+    labs(title = sample_name , y = "Count") 
+    #labs(title = "Reads Containing Adapters", y = "Count")
+  
+  
+}
+
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("Reads Containing Adapters", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+## Trimmed Length Distribution
+
+The expected count is a theoretical prediction of random adapter matches:
+
+$$
+\text{Expected Count} = \text{Total Reads} \times P(\text{Random Match})
+$$
+
+Where:
+- \(\text{Total Reads}\) is the total number of reads in the dataset.
+- \(P(\text{Random Match})\) is the probability of a random sequence matching the adapter.
+
+- If the blue line is much higher than the red line at certain lengths, it indicates true adapter trimming at those lengths.
+- If the blue and red lines overlap, it suggests that the trimming at those lengths is likely due to random chance, not adapter presence.
+
+```{r fig.height=8, fig.width=16}
+
+p1 <- list()
+p2 <- list()
+for (file in json_files){
+  
+  json_data <- fromJSON(file)
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  
+  process_trimmed <- function(adapter_data) {
+    df <- adapter_data$three_prime_end$trimmed_lengths[[1]]
+    df$total_observed <- sapply(df$counts, function(x) sum(unlist(x)))
+    df$len <- as.numeric(df$len)
+    df
+  }
+  
+  # Process Read 1 and Read 2
+  trimmed_read1 <- process_trimmed(json_data$adapters_read1)
+  trimmed_read2 <- process_trimmed(json_data$adapters_read2)
+  
+  # Plot for Read 1
+  p1[[length(p1)+1]] <- ggplot(trimmed_read1, aes(x = len)) +
+    geom_line(aes(y = total_observed, color = "Observed"), linewidth = 1) +
+    geom_line(aes(y = expect, color = "Expected"), linewidth = 1, linetype = "dashed") +
+    #labs(title = "Trimmed Length Distribution (Read 1)", x = "Length", y = "Count") +
+    labs(title = sample_name, x = "Length", y = "Count") +
+    scale_color_manual(values = c("Observed" = "blue", "Expected" = "red")) +
+    theme_minimal()
+  
+  p2[[length(p2)+1]] <- ggplot(trimmed_read2, aes(x = len)) +
+    geom_line(aes(y = total_observed, color = "Observed"), linewidth = 1) +
+    geom_line(aes(y = expect, color = "Expected"), linewidth = 1, linetype = "dashed") +
+    #labs(title = "Trimmed Length Distribution (Read 2)", x = "Length", y = "Count") +
+    labs(title = sample_name, x = "Length", y = "Count") +
+    scale_color_manual(values = c("Observed" = "blue", "Expected" = "red")) +
+    theme_minimal()
+
+}
+
+combined1 <- arrangeGrob(
+  grobs = p1,
+  nrow = 2,
+  top = textGrob("Trimmed Length Distribution (Read 1)", gp = gpar(fontsize = 14))
+)
+grid.draw(combined1)
+```
+
+```{r fig.height=8, fig.width=16}
+combined2 <- arrangeGrob(
+  grobs = p2,
+  nrow = 2,
+  top = textGrob("Trimmed Length Distribution (Read 2)", gp = gpar(fontsize = 14))
+)
+grid.draw(combined2)
+
+```

@@ -1,0 +1,157 @@
+---
+title: "mapping"
+author: "XSun"
+date: "2025-02-27"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+# commands
+
+```{r warning=F, message=FALSE}
+library(ggplot2)
+library(tidyr)
+```
+
+
+```
+  # Step 1: Gene Mapping 
+ /project/xinhe/xsun/software/hisat/hisat-3n/hisat-3n \
+    --index data_ref/gene_index/gene.hg38 \
+    -p 16 \
+    --summary-file "${REPORT_DIR}/${SAMPLE}.genes.summary" \
+    --new-summary \
+    -q \
+    -1 "${TRIMED_READS}/${SAMPLE}_R1.fq.gz" \
+    -2 "${TRIMED_READS}/${SAMPLE}_R2.fq.gz" \
+    --base-change A,G \
+    --directional-mapping \
+    $([ "$SPLICE_GENOME" = true ] && echo "--pen-noncansplice 20 --min-intronlen 20 --max-intronlen 20" || echo "--no-spliced-alignment") \
+    --avoid-pseudogene \
+    --no-softclip \
+    --np 0 \          # Sets the penalty for having an N (unknown base) in the read or reference. --np 0 means no penalty is applied for Ns
+    --rdg 5,3 \         # Sets the reference gap open and extension penalties.
+    --rfg 5,3 \        # Sets the read gap open and extension penalties. These penalties discourage alignments with gaps in the read. Higher values make it less likely for the aligner to introduce gaps in the read
+    --sp 9,3 \         # Sets the soft-clipping penalties.
+    --mp 3,1 \         # Sets the mismatch penalty. These penalties discourage mismatches in the alignment. Higher values make the aligner prefer matches over mismatches.
+    --score-min L,-3,-0.75 | #  Sets the minimum score function for accepting an alignment.
+    samtools view -@ 16 -O BAM -o "${INTERMEDIATE_GENES_MAPPING_PE}/${SAMPLE}.bam"
+
+
+
+# Step 2: Gene Alignment Filtering
+  samtools view \
+    -h \
+    -f 2 \
+    -F 4 \
+    -@ 16 \
+    -U "${INTERMEDIATE_GENES_UNMAPPED_PE}/${SAMPLE}.bam" \
+    "${INTERMEDIATE_GENES_MAPPING_PE}/${SAMPLE}.bam" \
+    | samtools sort \
+      -@ 16 \
+      -m 3G \
+      -O BAM \
+      -o "${INTERMEDIATE_GENES_BAM}/${SAMPLE}.bam"
+  
+  echo "Gene Alignment Filtering done"
+  
+  # Step 3: Extract Unmapped Reads
+  samtools fastq \
+    -1 "${INTERMEDIATE_GENES_UNMAPPED_PE}/${SAMPLE}_R1.fq.gz" \
+    -2 "${INTERMEDIATE_GENES_UNMAPPED_PE}/${SAMPLE}_R2.fq.gz" \
+    -n \
+    "${INTERMEDIATE_GENES_UNMAPPED_PE}/${SAMPLE}.bam"
+
+  echo "Extracting Unmapped Reads done"
+  echo "Finished processing sample: $SAMPLE"
+```
+
+
+# Mapping results
+
+## Gene mapping
+
+```{r}
+library(tidyverse)
+
+parse_hisat_summary <- function(file) {
+  content <- readLines(file)
+  
+  # Extract metrics using regular expressions
+  metrics <- list(
+    sample = str_remove(basename(file), "\\.genes\\.summary$"),
+    total_pairs = as.numeric(str_extract(content[str_detect(content, "Total pairs")], "\\d+")),
+    aligned_0_pct = as.numeric(str_extract(content[str_detect(content, "Aligned concordantly or discordantly 0 time")], "\\d+\\.\\d+")),
+    aligned_1_pct = as.numeric(str_extract(content[str_detect(content, "Aligned concordantly 1 time")], "\\d+\\.\\d+")),
+    aligned_gt1_pct = as.numeric(str_extract(content[str_detect(content, "Aligned concordantly >1 times")], "\\d+\\.\\d+")),
+    aligned_discordant_pct = as.numeric(str_extract(content[str_detect(content, "Aligned discordantly 1 time")], "\\d+\\.\\d+")),
+    overall_alignment = as.numeric(str_extract(content[str_detect(content, "Overall alignment rate")], "\\d+\\.\\d+"))
+  )
+  
+  return(as.data.frame(metrics))
+}
+```
+
+```{r}
+
+files <- list.files(pattern = "\\.genes\\.summary$", full.names = TRUE,path = "/project/xinhe/xsun/camseq/report_reads/mapping/")
+
+# Combine all files into one data frame
+alignment_stats_gene <- map_df(files, parse_hisat_summary)
+
+ggplot(alignment_stats_gene, aes(x = sample, y = overall_alignment)) +
+  geom_col(fill = "steelblue") +
+  labs(title = "Overall Alignment Rates -- gene", y = "Alignment Rate (%)", x = "Sample") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Genome mappings
+
+```{r}
+
+files <- list.files(pattern = "\\.genome\\.summary$", full.names = TRUE,path = "/project/xinhe/xsun/camseq/report_reads/mapping/")
+
+# Combine all files into one data frame
+alignment_stats_genome <- map_df(files, parse_hisat_summary)
+
+
+ggplot(alignment_stats_genome, aes(x = sample, y = overall_alignment)) +
+  geom_col(fill = "steelblue") +
+  labs(title = "Overall Alignment Rates -- genome", y = "Alignment Rate (%)", x = "Sample") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Combining gene and genome
+
+```{r}
+
+alignment_stats_gg <- data.frame(sample = gsub(x=alignment_stats_gene$sample,pattern = ".genome.summary",replacement = ""), overall_alignment_gene = alignment_stats_gene$overall_alignment,
+                                 overall_alignment_genome = alignment_stats_genome$overall_alignment)
+
+alignment_stats_gg$overall_alignment_genome <- (100 - alignment_stats_gg$overall_alignment_gene)*alignment_stats_gg$overall_alignment_genome/100
+
+alignment_stats_gg$unmapped <- 100 - (alignment_stats_gg$overall_alignment_genome + alignment_stats_gg$overall_alignment_gene)
+
+
+alignment_stats_long <- pivot_longer(alignment_stats_gg, 
+                                     cols = c(overall_alignment_gene, overall_alignment_genome, unmapped), 
+                                     names_to = "category", 
+                                     values_to = "value")
+alignment_stats_long$category <- factor(alignment_stats_long$category, 
+                                       levels = c("unmapped", "overall_alignment_genome", "overall_alignment_gene"))
+
+ggplot(alignment_stats_long, aes(x = sample, y = value, fill = category)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Alignment Statistics by Sample",
+       x = "Sample",
+       y = "Percentage",
+       fill = "Category") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
