@@ -52,6 +52,14 @@ DISCARDED_R2="intermediate/trimming/discarded_reads/241217AVITI-He-lab-24JX-12-1
 
 # Results
 
+## QC before trimming
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_raw.html
+
+## QC after trimming
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_aftertrimming.html
+
 ## Summary
 
 ```{r}

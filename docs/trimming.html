@@ -448,10 +448,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -544,15 +544,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree4720c09daf5f84d33c696e1d248805a7844bbe4ctargetblank4720c09a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree8c2aff5cdd256595892f36032d9929c759867aedtargetblank8c2aff5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/4720c09daf5f84d33c696e1d248805a7844bbe4c" target="_blank">4720c09</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/8c2aff5cdd256595892f36032d9929c759867aed" target="_blank">8c2aff5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree4720c09daf5f84d33c696e1d248805a7844bbe4ctargetblank4720c09a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree8c2aff5cdd256595892f36032d9929c759867aedtargetblank8c2aff5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -562,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/4720c09daf5f84d33c696e1d248805a7844bbe4c" target="_blank">4720c09</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/8c2aff5cdd256595892f36032d9929c759867aed" target="_blank">8c2aff5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -576,13 +576,8 @@ depends on. Below is the status of the Git repository when the results
 were generated:
 </p>
 <pre><code>
-Untracked files:
-    Untracked:  analysis/mapping.Rmd
-    Untracked:  analysis/tool_ref.Rmd
-    Untracked:  analysis/trimming.Rmd
-
 Unstaged changes:
-    Modified:   analysis/index.Rmd
+    Modified:   analysis/trimming.Rmd
 
 </code></pre>
 <p>
@@ -597,10 +592,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/trimming.Rmd</code>) and HTML
+(<code>docs/trimming.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/analysis/trimming.Rmd" target="_blank">8c2aff5</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-02-28
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/8c2aff5cdd256595892f36032d9929c759867aed/docs/trimming.html" target="_blank">8c2aff5</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-02-28
+</td>
+<td>
+update
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -640,6 +699,18 @@ DISCARDED_R2=&quot;intermediate/trimming/discarded_reads/241217AVITI-He-lab-24JX
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
+<div id="qc-before-trimming" class="section level2">
+<h2>QC before trimming</h2>
+<p><a
+href="https://xsun1229.github.io/camseq-m6a/multiqc_report_raw.html"
+class="uri">https://xsun1229.github.io/camseq-m6a/multiqc_report_raw.html</a></p>
+</div>
+<div id="qc-after-trimming" class="section level2">
+<h2>QC after trimming</h2>
+<p><a
+href="https://xsun1229.github.io/camseq-m6a/multiqc_report_aftertrimming.html"
+class="uri">https://xsun1229.github.io/camseq-m6a/multiqc_report_aftertrimming.html</a></p>
+</div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
 <pre class="r"><code>json_folder &lt;- &quot;/project/xinhe/xsun/camseq/report_reads/trimming&quot;
@@ -723,6 +794,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/trimming.Rmd/unnamed-chunk-4-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/docs/figure/trimming.Rmd/unnamed-chunk-4-1.png" target="_blank">8c2aff5</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-02-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="adapter-detection" class="section level2">
 <h2>Adapter Detection</h2>
@@ -760,6 +868,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/trimming.Rmd/unnamed-chunk-5-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/docs/figure/trimming.Rmd/unnamed-chunk-5-1.png" target="_blank">8c2aff5</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-02-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="trimmed-length-distribution" class="section level2">
 <h2>Trimmed Length Distribution</h2>
@@ -824,6 +969,43 @@ combined1 &lt;- arrangeGrob(
 )
 grid.draw(combined1)</code></pre>
 <p><img src="figure/trimming.Rmd/unnamed-chunk-6-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/docs/figure/trimming.Rmd/unnamed-chunk-6-1.png" target="_blank">8c2aff5</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-02-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>combined2 &lt;- arrangeGrob(
   grobs = p2,
   nrow = 2,
@@ -831,6 +1013,43 @@ grid.draw(combined1)</code></pre>
 )
 grid.draw(combined2)</code></pre>
 <p><img src="figure/trimming.Rmd/unnamed-chunk-7-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/docs/figure/trimming.Rmd/unnamed-chunk-7-1.png" target="_blank">8c2aff5</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-02-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -868,9 +1087,9 @@ loaded via a namespace (and not attached):
 [29] fs_1.5.2          vctrs_0.6.5       sass_0.4.1        DT_0.22          
 [33] rprojroot_2.0.3   tidyselect_1.2.0  glue_1.6.2        R6_2.5.1         
 [37] fansi_1.0.3       rmarkdown_2.25    farver_2.1.0      magrittr_2.0.3   
-[41] scales_1.3.0      promises_1.2.0.1  htmltools_0.5.2   colorspace_2.0-3 
-[45] httpuv_1.6.5      labeling_0.4.2    utf8_1.2.2        stringi_1.7.6    
-[49] munsell_0.5.0    </code></pre>
+[41] whisker_0.4       scales_1.3.0      promises_1.2.0.1  htmltools_0.5.2  
+[45] colorspace_2.0-3  httpuv_1.6.5      labeling_0.4.2    utf8_1.2.2       
+[49] stringi_1.7.6     munsell_0.5.0    </code></pre>
 </div>
 </div>
 </div>
