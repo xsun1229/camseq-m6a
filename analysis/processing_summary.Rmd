@@ -1,0 +1,275 @@
+---
+title: "Summary after processing"
+author: "XSun"
+date: "2025-03-03"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+```{r}
+library(ggplot2)
+library(data.table)
+library(tidyr)
+```
+
+# ```{r fig.height=8, fig.width=16}
+# 
+# stat_folder <- "/project/xinhe/xsun/camseq/data/workspace/internal_files/aligned_bam/stat/"
+# stat_files_gc_detail <- list.files(stat_folder, pattern = "*gc_metrics", full.names = TRUE)
+# stat_files_gc_summary <- list.files(stat_folder, pattern = "*gc_summary", full.names = TRUE)
+# 
+# p <- list()
+# for (i in 1:length(stat_files_gc_detail)){
+#   
+#   file_gc_detail <- stat_files_gc_detail[i]
+#   file_gc_summary <- stat_files_gc_summary[i]
+#   
+#   sample_name <- tools::file_path_sans_ext(basename(file_gc_detail))  # Get sample name from file name
+#   sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+#   sample_name <- gsub(pattern = ".gc_metrics",replacement = "",x =sample_name)
+#   
+#   detailed <- read.delim(file_gc_detail, 
+#                      comment.char = "#", 
+#                      stringsAsFactors = FALSE)
+#   
+#   p[[length(p)+1]] <- ggplot(detailed, aes(x = GC, y = NORMALIZED_COVERAGE)) +
+#   geom_line(color = "steelblue", linewidth = 1) +
+#   geom_point(color = "navy", size = 1.5) +
+#   labs(title = sample_name,
+#        x = "GC Percentage",
+#        y = "Normalized Coverage") +
+#   theme_minimal() +
+#   theme(plot.title = element_text(hjust = 0.5, face = "bold")) +
+#   scale_x_continuous(breaks = seq(0, 100, 10))
+#   
+#   
+#   summary <- read.delim(file_gc_summary, 
+#                      comment.char = "#", 
+#                      stringsAsFactors = FALSE)
+#   
+#   summary_long <- summary %>%
+#   select(starts_with("GC_NC")) %>%
+#   pivot_longer(cols = everything(), 
+#               names_to = "GC_Bin", 
+#               values_to = "Normalized_Coverage") %>%
+#   mutate(GC_Bin = gsub("GC_NC_", "", GC_Bin),
+#          GC_Bin = gsub("_", "-", GC_Bin))
+#   
+# }
+# 
+# combined <- arrangeGrob(
+#   grobs = p,
+#   nrow = 2,
+#   top = textGrob("GC Bias Profile", gp = gpar(fontsize = 14))
+# )
+# grid.draw(combined)
+# 
+# ```
+
+
+
+## Alignment Statistics
+
+```{r fig.height=8, fig.width=16}
+
+stat_folder <- "/project/xinhe/xsun/camseq/data/workspace/internal_files/aligned_bam/stat/"
+stat_files <- list.files(stat_folder, pattern = "*flagstat", full.names = TRUE)
+
+p <- list()
+for (file in stat_files){
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  sample_name <- gsub(pattern = ".genome",replacement = "",x =sample_name)
+  
+  flagstat_lines <- readLines(file) 
+  flagstat_data <- data.frame(
+  Metric = c("Total Reads", "Mapped Reads", "Properly Paired", "Duplicates"),
+  Value = c(
+    as.numeric(gsub(" .*", "", flagstat_lines[1])),        # Total reads
+    as.numeric(gsub(" .*", "", flagstat_lines[7])),        # Mapped reads
+    as.numeric(gsub(" .*", "", flagstat_lines[11])),       # Properly paired
+    as.numeric(gsub(" .*", "", flagstat_lines[4]))         # Duplicates
+    )
+  )
+  
+  flagstat_data$Metric <- factor(flagstat_data$Metric,
+                              levels = c("Total Reads", "Mapped Reads", 
+                                       "Properly Paired", "Duplicates"))
+
+  p[[length(p)+1]] <- ggplot(flagstat_data, aes(x = Metric, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity") +
+  labs(title = sample_name, y = "Count") +
+  theme_minimal()
+  
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("Alignment Statistics", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+
+## Insert Size Distribution
+
+```{r fig.height=8, fig.width=16}
+
+stat_folder <- "/project/xinhe/xsun/camseq/data/workspace/internal_files/aligned_bam/stat/"
+stat_files <- list.files(stat_folder, pattern = "*insert_metrics.txt", full.names = TRUE)
+
+p <- list()
+for (file in stat_files){
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  sample_name <- gsub(pattern = ".insert_metrics",replacement = "",x =sample_name)
+  
+  insert_size <- read.table(file, 
+                          skip = 10, header = TRUE, comment.char = "#", nrows = 1000)
+  
+  p[[length(p)+1]] <- ggplot(insert_size, aes(x = insert_size, y = All_Reads.fr_count)) +
+                      geom_bar(stat = "identity", fill = "purple") +
+                      labs(x = "Insert Size (bp)", y = "Frequency", title = sample_name)
+  
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("Insert Size Distribution", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+## Reads per Chromosome
+
+```{r fig.height=8, fig.width=32}
+
+stat_folder <- "/project/xinhe/xsun/camseq/data/workspace/internal_files/aligned_bam/stat/"
+stat_files <- list.files(stat_folder, pattern = "*chrom_counts.txt", full.names = TRUE)
+
+p <- list()
+for (file in stat_files){
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  sample_name <- gsub(pattern = ".genome.chrom_counts",replacement = "",x =sample_name)
+  
+  chrom_counts <- read.table(file, 
+                          col.names = c("chr", "length", "mapped", "unmapped"))
+  
+  chrom_counts <- chrom_counts[!grepl("_", chrom_counts$chr), ]
+  # chrom_counts <- chrom_counts[chrom_counts$chr %in% c(1:22),]
+  # chrom_counts <- chrom_counts[order(as.numeric(chrom_counts$chr), decreasing = F),]
+  # chrom_counts$chr <- factor(chrom_counts$chr,levels = c(1:22))
+  
+  # p[[length(p)+1]] <- ggplot(chrom_counts, aes(x = chr, y = mapped)) +
+  #                     geom_bar(stat = "identity") +
+  #                     labs(x = "Chromosome", y = "Read Counts", title = sample_name) +
+  #                     theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+  p[[length(p)+1]] <- ggplot(chrom_counts, aes(x = reorder(chr,-mapped), y = mapped)) +
+                      geom_bar(stat = "identity") +
+                      labs(x = "Chromosome", y = "Read Counts", title = sample_name) +
+                      theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("Reads per Chromosome", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+## MAPQ Distribution
+
+```{r fig.height=8, fig.width=16}
+
+stat_folder <- "/project/xinhe/xsun/camseq/data/workspace/internal_files/aligned_bam/stat/"
+stat_files <- list.files(stat_folder, pattern = "*mapq_dist.txt", full.names = TRUE)
+
+p <- list()
+for (file in stat_files){
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  sample_name <- gsub(pattern = "genome.mapq_dist",replacement = "",x =sample_name)
+  
+  mapq <- read.table(file, col.names = c("Count", "MAPQ"))
+  
+  mapq$MAPQ <- factor(mapq$MAPQ, levels = c(1, 60), labels = c("1", "60"))
+  
+  p[[length(p)+1]] <- ggplot(mapq, aes(x = MAPQ, y = Count)) +
+  geom_bar(stat = "identity", fill = "darkgreen", width = 0.6) +  # Adjust width
+  labs(
+    title = sample_name,
+    x = "Mapping Quality",
+    y = "Count"
+  ) +
+  theme_minimal()
+  
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("MAPQ Distribution", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+
+## Read Length Distribution
+
+```{r fig.height=8, fig.width=16}
+
+stat_folder <- "/project/xinhe/xsun/camseq/data/workspace/internal_files/aligned_bam/stat/"
+stat_files <- list.files(stat_folder, pattern = "*read_lengths.txt", full.names = TRUE)
+
+p <- list()
+for (file in stat_files){
+  
+  sample_name <- tools::file_path_sans_ext(basename(file))  # Get sample name from file name
+  sample_name <- gsub(pattern = "241217AVITI-He-lab-24JX-",replacement = "",x =sample_name)
+  sample_name <- gsub(pattern = "genome.read_lengths",replacement = "",x =sample_name)
+  
+ 
+  read_lengths <- read.table(file, col.names = c("Count", "Length"))
+
+
+  p[[length(p)+1]] <- ggplot(read_lengths, aes(x = Length, y = Count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = sample_name, x = "Read Length (bp)", y = "Count")
+  
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob("Read Length Distribution", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+
+
+gc_bias <- read.table("sample.gc_bias.txt", skip = 6, header = TRUE, comment.char = "#")
+
+ggplot(gc_bias, aes(x = GC, y = NORMALIZED_COVERAGE)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", color = "red") +
+  labs(title = "GC Bias", x = "GC%", y = "Normalized Coverage") +
+  geom_hline(yintercept = 1, linetype = "dashed")

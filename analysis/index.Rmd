@@ -10,8 +10,4 @@ editor_options:
 
 # Processing raw data
 
-[Tools and references](https://xsun1229.github.io/camseq-m6a/tool_ref.html)
-
-[Trimming](https://xsun1229.github.io/camseq-m6a/trimming.html)
-
-[Mapping](https://xsun1229.github.io/camseq-m6a/mapping.html)
+[QC](https://xsun1229.github.io/camseq-m6a/QC.html)

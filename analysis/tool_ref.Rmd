@@ -55,5 +55,5 @@ Run the following commands for gene and genome accordingly. When using 4cores 30
 module load samtools 
 samtools faidx genes.hg38.fa
 
-/project/xinhe/xsun/software/hisat/hisat-3n/hisat-3n-build -p 4 --base-change T,C genes.hg38.fa gene.hg38
+/project/xinhe/xsun/software/hisat/hisat-3n/hisat-3n-build -p 4 --base-change A,G genes.hg38.fa gene.hg38
 ```

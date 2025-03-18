@@ -1,0 +1,180 @@
+---
+title: "Quality Control"
+author: "XSun"
+date: "2025-03-17"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+```{r message=F, warning=F}
+
+library(jsonlite)
+library(dplyr)
+library(gridExtra)
+library(ggplot2)
+library(grid) 
+library(stringr)
+
+
+# Function to extract numeric values using regex
+extract_value <- function(pattern) {
+  line <- str_subset(lines, pattern)
+  as.numeric(str_extract(line, "\\d+"))
+}
+```
+
+# Sample info 
+
+| Sample Name |         | i7 Index Sequence   |         | i5 Index Sequence   | i5 reverse complement | Index Cat no | Species            | Library type (DNA or RNA, mutation or not) | ng/ul | data      |
+|-------------|---------|---------------------|---------|---------------------|-----------------------|--------------|--------------------|--------------------------------------------|-------|-----------|
+| 12-1-1      | 701     | ATTACTCG            | 501     | TATAGCCT            | AGGCTATA              | NEB#E7600    | 18-QTL treatment   | CAM-seq (A to G)                           | 0.246 | 490,332   |
+| 12-1-2      | 702     | TCCGGAGA            | 501     | TATAGCCT            | AGGCTATA              | NEB#E7600    | 28-QTL treatment   | CAM-seq (A to G)                           | 0.376 | 2,367,054 |
+| 12-1-3      | 713     | TTCCTCCT            | 509     | TTGCTTGC            | GCAAGCAA              | NEB#E7780    | 18-QTL untreatment | CAM-seq (A to G)                           | 0.824 | 1,590,686 |
+| 12-1-4      | 714     | TGCTTGCT            | 509     | TTGCTTGC            | GCAAGCAA              | NEB#E7780    | 28-QTL untreatment | CAM-seq (A to G)                           | 1.03  | 1,898,213 |
+| 12-1-5      | 715     | GGTGATGA            | 509     | TTGCTTGC            | GCAAGCAA              | NEB#E7780    | 18-QTL untreatment | CAM-seq (A to G)                           | 0.268 | 272,739   |
+| 12-1-6      | 716     | AACCTACG            | 509     | TTGCTTGC            | GCAAGCAA              | NEB#E7780    | 28-QTL untreatment | CAM-seq (A to G)                           | <0.1  | 659,559   |
+| 12-1-7      | 721&724 | AAGGCGTA & AATCCAGC | 515&516 | TGTGGCAT & ACTACGGA | ATGCCACA & TCCGTAGT   | NEB#E7780    | 18-QTL treatment   | CAM-seq (A to G)                           | 0.25  | 870,124   |
+| 12-1-8      | 722     | CTGATGAG            | 515&516 | TGTGGCAT & ACTACGGA | ATGCCACA & TCCGTAGT   | NEB#E7780    | 28-QTL treatment   | CAM-seq (A to G)                           | 0.29  | 960,388   |
+
+# Trimming
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_trimming.html
+
+
+```{r}
+json_folder <- "/project/xinhe/xsun/camseq/data/workspace/report_reads/trimming/"
+
+# List all JSON files in the folder
+json_files <- list.files(json_folder, pattern = "*.json", full.names = TRUE)
+
+avg_length_all <- c()
+for (file in json_files) {
+  # Read the JSON file
+  
+  json_data <- fromJSON(file)
+  
+  total_bases <- json_data$basepair_counts$output
+  output_reads <- json_data$read_counts$output
+  
+  avg_length <- round(total_bases / (output_reads * 2),digits = 4)  # Paired-end
+  sample <- extracted_pattern <- sub(".*24JX-([0-9-]+)_run1.*", "\\1", file)
+  
+  tmp <- c(sample, avg_length)
+  avg_length_all <- rbind(avg_length_all,tmp)
+  
+}
+
+rownames(avg_length_all) <- NULL
+colnames(avg_length_all) <- c("sample","avg_length/read")
+avg_length_all <- as.data.frame(avg_length_all )
+
+DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Average length after trimming'),options = list(pageLength = 10) )
+```
+
+# Mapping to genome
+
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_mapping.html
+
+
+# Deduplicating 
+
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_dedup.html
+
+
+# Aligned bam QC
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_aligned_bam.html
+
+# Mythelytion level
+
+Remove low-coverage sites
+
+```{r warning=F, message=F, fig.height=8, fig.width=16}
+
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
+files_countsites <- list.files(path = folder_countsites,pattern = "genome.tsv",full.names = T)
+
+p_me_dist <- list()
+p_cov_dist <- list()
+strand_bias_all <- c()
+for (file in files_countsites) {
+  
+  sample <- regmatches(basename(file),
+            regexpr("\\d+-\\d+-\\d+(?=\\.)", basename(file), perl = TRUE))
+  
+  df <- data.table::fread(file)
+  
+  # Calculate methylation and filter
+  df <- df %>%
+    mutate(
+      total = convertedBaseCount + unconvertedBaseCount,
+      methylation_pct = (unconvertedBaseCount / total) * 100
+    ) %>%
+    filter(total >= 10)   # Remove low-coverage sites
+  
+  if (nrow(df) > 0) {
+    strand_bias <- df %>%
+    group_by(strand) %>%
+    summarise(
+      mean_methylation = round(mean(methylation_pct, na.rm = TRUE),digits = 4),
+      n_sites_pass_filtering = n()
+    ) %>%
+    mutate(sample = sample) %>%          # Add sample column
+    select(sample, everything())         # Reorder columns (sample first)
+  }else{
+     strand_bias <- data.frame(sample = c(sample,sample),
+                               strand = c("+","-"),
+                               mean_methylation = c("no site passing filtering","no site passing filtering"),
+                               n_sites_pass_filtering = c("no site passing filtering","no site passing filtering"))
+    
+  }
+  
+  strand_bias_all <- rbind(strand_bias_all,strand_bias)
+  
+  p_me_dist[[sample]] <- ggplot(df, aes(x=methylation_pct)) +
+    geom_histogram(bins=30, fill="blue", alpha = 0.6) +
+    labs(x="Methylation (%)", y="Number of sites") +
+    ggtitle(sample) +
+    theme_minimal()
+  
+  p_cov_dist[[sample]] <- ggplot(df, aes(x=total)) +
+    geom_histogram(bins=50, fill="blue", alpha = 0.6) +
+    #xlim(-1, 100) +
+    labs(x="Total reads per site", y="Count") +
+    ggtitle(sample) +
+    theme_minimal()
+
+
+  
+  
+  
+}
+
+
+combined <- arrangeGrob(
+  grobs = p_me_dist,
+  nrow = 2,
+  top = textGrob("Methylation Distribution", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+```
+
+```{r warning=F, message=F, fig.height=8, fig.width=16}
+combined <- arrangeGrob(
+  grobs = p_cov_dist,
+  nrow = 2,
+  top = textGrob("Coverage Distribution", gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+
+DT::datatable(strand_bias_all,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Checking the strand bias '),options = list(pageLength = 10) )
+
+```
+
+
+

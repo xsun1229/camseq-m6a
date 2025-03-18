@@ -1,0 +1,84 @@
+---
+title: "Tools and references"
+author: "XSun"
+date: "2025-03-02"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Pipeline
+
+We used the pipeline downloaded here https://github.com/y9c/m6A-CAMseq
+
+Since caslake doesn't connected to the internet, we downloaded the docker image using 
+
+```
+apptainer pull camseq.sif docker://y9ch/camseq
+```
+
+Then we submitted the job using:  
+
+```
+#!/bin/bash
+
+#SBATCH --account=pi-xinhe
+#SBATCH --partition=caslake
+#SBATCH --mem=100G
+#SBATCH --cpus-per-task=24
+#SBATCH --output=out/pipeline.out
+#SBATCH --job-name=RNAseq_pipeline
+
+module load apptainer
+module load python
+
+
+apptainer run -B /project camseq.sif -c data.yaml -j 24
+```
+
+The `data.yaml` file is 
+
+
+```
+# project specific parameters including data and reference
+workdir: workspace
+cores: 64
+
+# can be "ECLIP10", "ECLIP6", "TAKARAV3", "SACSEQV3", "STRANDED"
+libtype: STRANDED
+
+# by default, the pipeline will use the strandness information from the library
+# if the strandness is not available, set the strandness to `false`
+# strandness: true
+
+# by default, the pipeline will force remove the PCR duplicates based on the UMI
+# if UMI is not available, you can toggle the markdup to `false` to skip the PCR duplicate removal
+# markdup: true
+
+# TODO: if the genome index is not available, the pipeline will build it automatically
+genome_index: /project/xinhe/xsun/camseq/data/reference/genome/hisat2_tx_3n/GRCh38.release110
+
+reference:
+  genes:
+    - /project/xinhe/xsun/camseq/data/reference/gene/Human_rRNA_5S_250123.fa
+  genome:
+    -  /project/xinhe/xsun/camseq/data/reference/genome/GRCh38.release110.fa
+
+samples:
+  241217AVITI-He-lab-24JX-12-1-6:
+    - R1: raw_reads/241217AVITI-He-lab-24JX-12-1-6_R1.fastq.gz
+      R2: raw_reads/241217AVITI-He-lab-24JX-12-1-6_R2.fastq.gz
+```
+
+
+# Reference 
+
+The rRNA fa file and genome index files were shared by Yanming Chen, from Chuan's lab 
+
+The genome fa file GRCh38.release110.fa was downloaded from http://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/
+
+```
+wget http://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+```
+
+

@@ -448,10 +448,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -577,13 +577,14 @@ were generated:
 </p>
 <pre><code>
 Untracked files:
+    Untracked:  analysis/QC.Rmd
     Untracked:  analysis/processing_summary.Rmd
     Untracked:  analysis/tool_ref_final.Rmd
 
 Unstaged changes:
     Modified:   analysis/index.Rmd
     Modified:   analysis/tool_ref.Rmd
-    Modified:   analysis/trimming.Rmd
+    Deleted:    analysis/trimming.Rmd
 
 </code></pre>
 <p>
@@ -598,108 +599,10 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/trimming.Rmd</code>) and HTML
-(<code>docs/trimming.html</code>) files. If you’ve configured a remote
-Git repository (see <code>?wflow_git_remote</code>), click on the
-hyperlinks in the table below to view the files as they were in that
-past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/0aa2f2cd2da441c78eb47f661dcde689e42b23b9/analysis/trimming.Rmd" target="_blank">0aa2f2c</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/0aa2f2cd2da441c78eb47f661dcde689e42b23b9/docs/trimming.html" target="_blank">0aa2f2c</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/analysis/trimming.Rmd" target="_blank">8c2aff5</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/8c2aff5cdd256595892f36032d9929c759867aed/docs/trimming.html" target="_blank">8c2aff5</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-<td>
-update
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
@@ -911,6 +814,7 @@ class="uri">https://xsun1229.github.io/camseq-m6a/multiqc_report_aligned_bam.htm
 </div>
 <div id="mythelytion-level" class="section level1">
 <h1>Mythelytion level</h1>
+<p>Remove low-coverage sites</p>
 <pre class="r"><code>folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/&quot;
 files_countsites &lt;- list.files(path = folder_countsites,pattern = &quot;genome.tsv&quot;,full.names = T)
 
@@ -932,10 +836,24 @@ for (file in files_countsites) {
     ) %&gt;%
     filter(total &gt;= 10)   # Remove low-coverage sites
   
-  methy_mean_pct &lt;- round(mean(df$methylation_pct, na.rm=TRUE),digits=4)
-  methy_median_pct &lt;- round(median(df$methylation_pct, na.rm=TRUE),digits=4)
-  coverage_mean &lt;- round(mean(df$total, na.rm=TRUE),digits=4)
-  coverage_median &lt;- round(median(df$total, na.rm=TRUE),digits=4)
+  if (nrow(df) &gt; 0) {
+    strand_bias &lt;- df %&gt;%
+    group_by(strand) %&gt;%
+    summarise(
+      mean_methylation = round(mean(methylation_pct, na.rm = TRUE),digits = 4),
+      n_sites_pass_filtering = n()
+    ) %&gt;%
+    mutate(sample = sample) %&gt;%          # Add sample column
+    select(sample, everything())         # Reorder columns (sample first)
+  }else{
+     strand_bias &lt;- data.frame(sample = c(sample,sample),
+                               strand = c(&quot;+&quot;,&quot;-&quot;),
+                               mean_methylation = c(&quot;no site passing filtering&quot;,&quot;no site passing filtering&quot;),
+                               n_sites_pass_filtering = c(&quot;no site passing filtering&quot;,&quot;no site passing filtering&quot;))
+    
+  }
+  
+  strand_bias_all &lt;- rbind(strand_bias_all,strand_bias)
   
   p_me_dist[[sample]] &lt;- ggplot(df, aes(x=methylation_pct)) +
     geom_histogram(bins=30, fill=&quot;blue&quot;, alpha = 0.6) +
@@ -950,74 +868,30 @@ for (file in files_countsites) {
     ggtitle(sample) +
     theme_minimal()
 
-  strand_bias &lt;- df %&gt;%
-    group_by(strand) %&gt;%
-    summarise(
-      mean_methylation = round(mean(methylation_pct, na.rm = TRUE),digits = 4),
-      n_sites = n()
-    ) %&gt;%
-    mutate(sample = sample) %&gt;%          # Add sample column
-    select(sample, everything())         # Reorder columns (sample first)
+
   
-  strand_bias_all &lt;- rbind(strand_bias_all,strand_bias)
+  
   
 }
 
 
 combined &lt;- arrangeGrob(
-  grobs = p_cov_dist,
+  grobs = p_me_dist,
   nrow = 2,
   top = textGrob(&quot;Methylation Distribution&quot;, gp = gpar(fontsize = 14))
 )
 grid.draw(combined)</code></pre>
-<p><img src="figure/trimming.Rmd/unnamed-chunk-3-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC.Rmd/unnamed-chunk-3-1.png" width="1536" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>combined &lt;- arrangeGrob(
   grobs = p_cov_dist,
   nrow = 2,
   top = textGrob(&quot;Coverage Distribution&quot;, gp = gpar(fontsize = 14))
 )
 grid.draw(combined)</code></pre>
-<p><img src="figure/trimming.Rmd/unnamed-chunk-4-1.png" width="1536" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
-Past versions of unnamed-chunk-4-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-4-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/docs/figure/trimming.Rmd/unnamed-chunk-4-1.png" target="_blank">8c2aff5</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/QC.Rmd/unnamed-chunk-4-1.png" width="1536" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>DT::datatable(strand_bias_all,caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Checking the strand bias &#39;),options = list(pageLength = 10) )</code></pre>
 <div id="htmlwidget-c71357163c4076450eea" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Checking the strand bias <\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-4","12-1-5","12-1-5","12-1-6","12-1-7","12-1-7","12-1-8","12-1-8"],["+","-","+","-","+","+","-","-","+","-","+","-"],[2.1014,2.1099,2.0867,2.0883,0,0,1.0753,0,2.0939,2.1261,1.9957,1.9998],[76686,79746,149133,153216,6,32,93,26,80694,83504,136938,141991]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>strand<\/th>\n      <th>mean_methylation<\/th>\n      <th>n_sites<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Checking the strand bias <\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-3","12-1-3","12-1-4","12-1-5","12-1-5","12-1-6","12-1-7","12-1-7","12-1-8","12-1-8"],["+","-","+","-","+","-","+","+","-","-","+","-","+","-"],["2.1014","2.1099","2.0867","2.0883","no site passing filtering","no site passing filtering","0","0","1.0753","0","2.0939","2.1261","1.9957","1.9998"],["76686","79746","149133","153216","no site passing filtering","no site passing filtering","6","32","93","26","80694","83504","136938","141991"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>strand<\/th>\n      <th>mean_methylation<\/th>\n      <th>n_sites_pass_filtering<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1055,10 +929,9 @@ loaded via a namespace (and not attached):
 [29] generics_0.1.2    fs_1.5.2          vctrs_0.6.5       sass_0.4.1       
 [33] DT_0.22           rprojroot_2.0.3   tidyselect_1.2.0  data.table_1.14.2
 [37] glue_1.6.2        R6_2.5.1          fansi_1.0.3       rmarkdown_2.25   
-[41] farver_2.1.0      magrittr_2.0.3    whisker_0.4       scales_1.3.0     
-[45] promises_1.2.0.1  htmltools_0.5.2   colorspace_2.0-3  httpuv_1.6.5     
-[49] labeling_0.4.2    utf8_1.2.2        stringi_1.7.6     munsell_0.5.0    
-[53] R.oo_1.24.0      </code></pre>
+[41] farver_2.1.0      magrittr_2.0.3    scales_1.3.0      promises_1.2.0.1 
+[45] htmltools_0.5.2   colorspace_2.0-3  httpuv_1.6.5      labeling_0.4.2   
+[49] utf8_1.2.2        stringi_1.7.6     munsell_0.5.0     R.oo_1.24.0      </code></pre>
 </div>
 </div>
 
