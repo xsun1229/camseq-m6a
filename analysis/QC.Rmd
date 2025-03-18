@@ -38,10 +38,18 @@ extract_value <- function(pattern) {
 | 12-1-7      | 721&724 | AAGGCGTA & AATCCAGC | 515&516 | TGTGGCAT & ACTACGGA | ATGCCACA & TCCGTAGT   | NEB#E7780    | 18-QTL treatment   | CAM-seq (A to G)                           | 0.25  | 870,124   |
 | 12-1-8      | 722     | CTGATGAG            | 515&516 | TGTGGCAT & ACTACGGA | ATGCCACA & TCCGTAGT   | NEB#E7780    | 28-QTL treatment   | CAM-seq (A to G)                           | 0.29  | 960,388   |
 
+# Output from multiqc 
+
+## Pipeline output 
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_genome_all.html
+
+## QC for the aligned bam files
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_aligned_bam.html
+
+
 # Trimming
-
-https://xsun1229.github.io/camseq-m6a/multiqc_report_trimming.html
-
 
 ```{r}
 json_folder <- "/project/xinhe/xsun/camseq/data/workspace/report_reads/trimming/"
@@ -73,25 +81,10 @@ avg_length_all <- as.data.frame(avg_length_all )
 DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Average length after trimming'),options = list(pageLength = 10) )
 ```
 
-# Mapping to genome
-
-
-https://xsun1229.github.io/camseq-m6a/multiqc_report_mapping.html
-
-
-# Deduplicating 
-
-
-https://xsun1229.github.io/camseq-m6a/multiqc_report_dedup.html
-
-
-# Aligned bam QC
-
-https://xsun1229.github.io/camseq-m6a/multiqc_report_aligned_bam.html
 
 # Mythelytion level
 
-Remove low-coverage sites
+Remove low-coverage sites: reads less than 10
 
 ```{r warning=F, message=F, fig.height=8, fig.width=16}
 
@@ -147,10 +140,6 @@ for (file in files_countsites) {
     labs(x="Total reads per site", y="Count") +
     ggtitle(sample) +
     theme_minimal()
-
-
-  
-  
   
 }
 
