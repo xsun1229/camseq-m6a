@@ -97,24 +97,78 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pile
 
 file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
 file_list <- file_list[c(1,2,7,8)]
+
+# Process files and calculate totals
 combined_data <- map_df(file_list, ~{
-  # Extract sample name from filename
+  # Extract sample name
   sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
-    str_remove(".*241217AVITI-He-lab-24JX-") %>%  # Remove prefix
-    str_remove("^/+") %>%  # Remove leading slashes if present
-    str_remove("/+$")       # Remove trailing slashes if present
+    str_remove(".*241217AVITI-He-lab-24JX-") %>%
+    str_remove("^/+") %>%
+    str_remove("/+$")
   
-  read_tsv(.x) %>%
-    filter(motif != "motif") %>%  # Remove header remnants
+  # Read and process data
+  sample_data <- read_tsv(.x) %>% 
+    filter(motif != "motif") %>%
+    mutate(
+      motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3")
+    )
+  
+  total_reads <- sum(sample_data$count)
+  
+  sample_data %>%
     mutate(
       sample = sample_name,
-      percentage = (count / sum(count)) * 100
+      total_count = total_reads,
+      percentage = (count / total_reads) * 100
     ) %>%
-    select(sample, motif, percentage)
+    select(sample, motif, percentage, total_count)
 })
 
+# Create formatted labels ordered by total count
 combined_data <- combined_data %>%
-  mutate(motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3"))
+  mutate(
+    sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
+    sample_label = fct_reorder(sample_label, total_count)
+  )
+
+# Create visualization
+ggplot(combined_data, aes(x = percentage, y = sample_label)) +
+  geom_point(
+    aes(color = motif),
+    size = 3,
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    show.legend = FALSE
+  ) +
+  geom_text(
+    aes(label = motif, color = motif),
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    size = 3,
+    vjust = -1.5,
+    show.legend = FALSE
+  ) +
+  scale_color_igv(guide = "none") +
+  labs(
+    title = "Motif Distribution with Total Read Counts",
+    x = "Percentage (%)",
+    y = "Sample (Total site counts passing filter)",
+    caption = "-/+ represent strands"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_line(color = "grey90"),
+    axis.text.y = element_text(size = 9, face = "bold"),
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  )
+
 
 combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
 combined_data_gac<-  combined_data_gac %>%
@@ -131,46 +185,10 @@ combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
 combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
 aac_gac <- cbind(combined_data_gac,combined_data_aac)
 
+aac_gac <- aac_gac[,-which(colnames(aac_gac) %in% c("total_count","sample_label"))]
+
 DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
 
-
-# Create visualization
-ggplot(combined_data, aes(x = percentage, y = sample)) +
-  geom_point(
-    aes(color = motif),
-    size = 3,
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    show.legend = FALSE  # <--- This removes the point legend
-  ) +
-  geom_text(
-    aes(label = motif, color = motif),
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    size = 3,
-    vjust = -1.5,
-    show.legend = FALSE  # <--- This removes the text legend
-  ) +
-  scale_color_igv(guide = "none") +  # <--- Disables color scale legend
-  labs(
-    title = "Motif Percentage Distribution Across Samples",
-    x = "Percentage (%)",
-    y = "Sample",
-    caption = paste("-/+ represent strands")
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none",  # Ensures no residual legend elements
-    panel.grid.major.y = element_line(color = "grey90"),
-    axis.text = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, face = "bold")
-  )
 
 ```
 
@@ -186,24 +204,78 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pile
 
 file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
 file_list <- file_list[c(1,2,7,8)]
+
+# Process files and calculate totals
 combined_data <- map_df(file_list, ~{
-  # Extract sample name from filename
+  # Extract sample name
   sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
-    str_remove(".*241217AVITI-He-lab-24JX-") %>%  # Remove prefix
-    str_remove("^/+") %>%  # Remove leading slashes if present
-    str_remove("/+$")       # Remove trailing slashes if present
+    str_remove(".*241217AVITI-He-lab-24JX-") %>%
+    str_remove("^/+") %>%
+    str_remove("/+$")
   
-  read_tsv(.x) %>%
-    filter(motif != "motif") %>%  # Remove header remnants
+  # Read and process data
+  sample_data <- read_tsv(.x) %>% 
+    filter(motif != "motif") %>%
+    mutate(
+      motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3")
+    )
+  
+  total_reads <- sum(sample_data$count)
+  
+  sample_data %>%
     mutate(
       sample = sample_name,
-      percentage = (count / sum(count)) * 100
+      total_count = total_reads,
+      percentage = (count / total_reads) * 100
     ) %>%
-    select(sample, motif, percentage)
+    select(sample, motif, percentage, total_count)
 })
 
+# Create formatted labels ordered by total count
 combined_data <- combined_data %>%
-  mutate(motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3"))
+  mutate(
+    sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
+    sample_label = fct_reorder(sample_label, total_count)
+  )
+
+# Create visualization
+ggplot(combined_data, aes(x = percentage, y = sample_label)) +
+  geom_point(
+    aes(color = motif),
+    size = 3,
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    show.legend = FALSE
+  ) +
+  geom_text(
+    aes(label = motif, color = motif),
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    size = 3,
+    vjust = -1.5,
+    show.legend = FALSE
+  ) +
+  scale_color_igv(guide = "none") +
+  labs(
+    title = "Motif Distribution with Total Read Counts",
+    x = "Percentage (%)",
+    y = "Sample (Total site counts passing filter)",
+    caption = "-/+ represent strands"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_line(color = "grey90"),
+    axis.text.y = element_text(size = 9, face = "bold"),
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  )
+
 
 combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
 combined_data_gac<-  combined_data_gac %>%
@@ -220,46 +292,10 @@ combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
 combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
 aac_gac <- cbind(combined_data_gac,combined_data_aac)
 
+aac_gac <- aac_gac[,-which(colnames(aac_gac) %in% c("total_count","sample_label"))]
+
 DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
 
-
-# Create visualization
-ggplot(combined_data, aes(x = percentage, y = sample)) +
-  geom_point(
-    aes(color = motif),
-    size = 3,
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    show.legend = FALSE  # <--- This removes the point legend
-  ) +
-  geom_text(
-    aes(label = motif, color = motif),
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    size = 3,
-    vjust = -1.5,
-    show.legend = FALSE  # <--- This removes the text legend
-  ) +
-  scale_color_igv(guide = "none") +  # <--- Disables color scale legend
-  labs(
-    title = "Motif Percentage Distribution Across Samples",
-    x = "Percentage (%)",
-    y = "Sample",
-    caption = paste("-/+ represent strands")
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none",  # Ensures no residual legend elements
-    panel.grid.major.y = element_line(color = "grey90"),
-    axis.text = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, face = "bold")
-  )
 
 ```
 
@@ -276,24 +312,78 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pile
 
 file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
 file_list <- file_list[c(1,2,7,8)]
+
+# Process files and calculate totals
 combined_data <- map_df(file_list, ~{
-  # Extract sample name from filename
+  # Extract sample name
   sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
-    str_remove(".*241217AVITI-He-lab-24JX-") %>%  # Remove prefix
-    str_remove("^/+") %>%  # Remove leading slashes if present
-    str_remove("/+$")       # Remove trailing slashes if present
+    str_remove(".*241217AVITI-He-lab-24JX-") %>%
+    str_remove("^/+") %>%
+    str_remove("/+$")
   
-  read_tsv(.x) %>%
-    filter(motif != "motif") %>%  # Remove header remnants
+  # Read and process data
+  sample_data <- read_tsv(.x) %>% 
+    filter(motif != "motif") %>%
+    mutate(
+      motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3")
+    )
+  
+  total_reads <- sum(sample_data$count)
+  
+  sample_data %>%
     mutate(
       sample = sample_name,
-      percentage = (count / sum(count)) * 100
+      total_count = total_reads,
+      percentage = (count / total_reads) * 100
     ) %>%
-    select(sample, motif, percentage)
+    select(sample, motif, percentage, total_count)
 })
 
+# Create formatted labels ordered by total count
 combined_data <- combined_data %>%
-  mutate(motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3"))
+  mutate(
+    sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
+    sample_label = fct_reorder(sample_label, total_count)
+  )
+
+# Create visualization
+ggplot(combined_data, aes(x = percentage, y = sample_label)) +
+  geom_point(
+    aes(color = motif),
+    size = 3,
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    show.legend = FALSE
+  ) +
+  geom_text(
+    aes(label = motif, color = motif),
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    size = 3,
+    vjust = -1.5,
+    show.legend = FALSE
+  ) +
+  scale_color_igv(guide = "none") +
+  labs(
+    title = "Motif Distribution with Total Read Counts",
+    x = "Percentage (%)",
+    y = "Sample (Total site counts passing filter)",
+    caption = "-/+ represent strands"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_line(color = "grey90"),
+    axis.text.y = element_text(size = 9, face = "bold"),
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  )
+
 
 combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
 combined_data_gac<-  combined_data_gac %>%
@@ -310,45 +400,9 @@ combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
 combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
 aac_gac <- cbind(combined_data_gac,combined_data_aac)
 
+aac_gac <- aac_gac[,-which(colnames(aac_gac) %in% c("total_count","sample_label"))]
+
 DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
 
-
-# Create visualization
-ggplot(combined_data, aes(x = percentage, y = sample)) +
-  geom_point(
-    aes(color = motif),
-    size = 3,
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    show.legend = FALSE  # <--- This removes the point legend
-  ) +
-  geom_text(
-    aes(label = motif, color = motif),
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    size = 3,
-    vjust = -1.5,
-    show.legend = FALSE  # <--- This removes the text legend
-  ) +
-  scale_color_igv(guide = "none") +  # <--- Disables color scale legend
-  labs(
-    title = "Motif Percentage Distribution Across Samples",
-    x = "Percentage (%)",
-    y = "Sample",
-    caption = paste("-/+ represent strands")
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none",  # Ensures no residual legend elements
-    panel.grid.major.y = element_line(color = "grey90"),
-    axis.text = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, face = "bold")
-  )
 
 ```
