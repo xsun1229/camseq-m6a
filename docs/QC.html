@@ -410,7 +410,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-19
+<strong>Last updated:</strong> 2025-03-20
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -544,15 +544,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree41fce20bdc127abf666ad997691099779ecafe85targetblank41fce20a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree79335dc52a6a6112a8e0229d35276a68a183133ftargetblank79335dca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/41fce20bdc127abf666ad997691099779ecafe85" target="_blank">41fce20</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/79335dc52a6a6112a8e0229d35276a68a183133f" target="_blank">79335dc</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree41fce20bdc127abf666ad997691099779ecafe85targetblank41fce20a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree79335dc52a6a6112a8e0229d35276a68a183133ftargetblank79335dca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -562,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/41fce20bdc127abf666ad997691099779ecafe85" target="_blank">41fce20</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/79335dc52a6a6112a8e0229d35276a68a183133f" target="_blank">79335dc</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/79335dc52a6a6112a8e0229d35276a68a183133f/analysis/QC.Rmd" target="_blank">79335dc</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-19
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/79335dc52a6a6112a8e0229d35276a68a183133f/docs/QC.html" target="_blank">79335dc</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-19
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -977,6 +1011,11 @@ combined_data &lt;- combined_data %&gt;%
     sample_label = fct_reorder(sample_label, total_count)
   )
 
+combined_data &lt;- combined_data[nrow(combined_data):1, ]
+combined_data &lt;- combined_data %&gt;%
+  mutate(sample_label = factor(sample_label, 
+                              levels = unique(sample_label)))
+
 # Create visualization
 ggplot(combined_data, aes(x = percentage, y = sample_label)) +
   geom_point(
@@ -1039,6 +1078,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/79335dc52a6a6112a8e0229d35276a68a183133f/docs/figure/QC.Rmd/unnamed-chunk-3-1.png" target="_blank">79335dc</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-19
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/41fce20bdc127abf666ad997691099779ecafe85/docs/figure/QC.Rmd/unnamed-chunk-3-1.png" target="_blank">41fce20</a>
 </td>
 <td>
@@ -1082,7 +1132,7 @@ aac_gac &lt;- aac_gac[,-which(colnames(aac_gac) %in% c(&quot;total_count&quot;,&
 
 DT::datatable(aac_gac,caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Percentage for AAC,GAC motif&#39;),options = list(pageLength = 10) )</code></pre>
 <div id="htmlwidget-c71357163c4076450eea" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Percentage for AAC,GAC motif<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-7","12-1-7","12-1-8","12-1-8"],["+GAC","-GAC","+GAC","-GAC","+GAC","-GAC","+GAC","-GAC"],[14.8016534919138,15.5268692436,14.4525670111755,15.5281068817746,15.1434159061278,15.9713168187744,15.4167280585433,16.0011787240312],["30.3285227355138","-","29.9806738929502","-","31.1147327249022","-","31.4179067825745","-"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-7","12-1-7","12-1-8","12-1-8"],["+AAC","-AAC","+AAC","-AAC","+AAC","-AAC","+AAC","-AAC"],[7.04909710638915,2.13213430995721,7.71363750945299,2.14687841357869,6.84485006518905,2.01434159061278,7.96129856097441,2.25430970973921],["9.18123141634636","-","9.86051592303168","-","8.85919165580183","-","10.2156082707136","-"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>motif<\/th>\n      <th>percentage<\/th>\n      <th>total_per_sample<\/th>\n      <th>sample.1<\/th>\n      <th>motif.1<\/th>\n      <th>percentage.1<\/th>\n      <th>total_per_sample.1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Percentage for AAC,GAC motif<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-8","12-1-8","12-1-7","12-1-7","12-1-2","12-1-2","12-1-1","12-1-1"],["-GAC","+GAC","-GAC","+GAC","-GAC","+GAC","-GAC","+GAC"],[16.0011787240312,15.4167280585433,15.9713168187744,15.1434159061278,15.5281068817746,14.4525670111755,15.5268692436,14.8016534919138],["31.4179067825745","-","31.1147327249022","-","29.9806738929502","-","30.3285227355138","-"],["12-1-8","12-1-8","12-1-7","12-1-7","12-1-2","12-1-2","12-1-1","12-1-1"],["-AAC","+AAC","-AAC","+AAC","-AAC","+AAC","-AAC","+AAC"],[2.25430970973921,7.96129856097441,2.01434159061278,6.84485006518905,2.14687841357869,7.71363750945299,2.13213430995721,7.04909710638915],["10.2156082707136","-","8.85919165580183","-","9.86051592303168","-","9.18123141634636","-"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>motif<\/th>\n      <th>percentage<\/th>\n      <th>total_per_sample<\/th>\n      <th>sample.1<\/th>\n      <th>motif.1<\/th>\n      <th>percentage.1<\/th>\n      <th>total_per_sample.1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="cutoff-covarage-10-methelytion-level-20"
 class="section level2">
@@ -1127,6 +1177,14 @@ combined_data &lt;- combined_data %&gt;%
     sample_label = paste0(sample, &quot; (n=&quot;, format(total_count, big.mark = &quot;,&quot;, scientific = FALSE), &quot;)&quot;),
     sample_label = fct_reorder(sample_label, total_count)
   )
+
+combined_data &lt;- combined_data[nrow(combined_data):1, ]
+combined_data &lt;- combined_data %&gt;%
+  mutate(sample_label = factor(sample_label, 
+                              levels = unique(sample_label)))
+
+
+
 
 # Create visualization
 ggplot(combined_data, aes(x = percentage, y = sample_label)) +
@@ -1190,6 +1248,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/79335dc52a6a6112a8e0229d35276a68a183133f/docs/figure/QC.Rmd/unnamed-chunk-4-1.png" target="_blank">79335dc</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-19
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/41fce20bdc127abf666ad997691099779ecafe85/docs/figure/QC.Rmd/unnamed-chunk-4-1.png" target="_blank">41fce20</a>
 </td>
 <td>
@@ -1233,7 +1302,7 @@ aac_gac &lt;- aac_gac[,-which(colnames(aac_gac) %in% c(&quot;total_count&quot;,&
 
 DT::datatable(aac_gac,caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Percentage for AAC,GAC motif&#39;),options = list(pageLength = 10) )</code></pre>
 <div id="htmlwidget-4e8d7a94295e256b0a38" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4e8d7a94295e256b0a38">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Percentage for AAC,GAC motif<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-7","12-1-7","12-1-8","12-1-8"],["+GAC","-GAC","+GAC","-GAC","+GAC","-GAC","+GAC","-GAC"],[28.2799473453269,29.3769197016235,28.6776755325854,29.5726711206353,29.3465577596266,28.7631271878646,29.3362509117433,30.18234865062],["57.6568670469504","-","58.2503466532207","-","58.1096849474913","-","59.5185995623632","-"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-7","12-1-7","12-1-8","12-1-8"],["+AAC","-AAC","+AAC","-AAC","+AAC","-AAC","+AAC","-AAC"],[10.7503290917069,1.25054848617815,12.1013487961679,1.09668473465272,10.6767794632439,1.30299494360171,12.2684172137126,1.18161925601751],["12.000877577885","-","13.1980335308206","-","11.9797744068456","-","13.4500364697301","-"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>motif<\/th>\n      <th>percentage<\/th>\n      <th>total_per_sample<\/th>\n      <th>sample.1<\/th>\n      <th>motif.1<\/th>\n      <th>percentage.1<\/th>\n      <th>total_per_sample.1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-4e8d7a94295e256b0a38">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Percentage for AAC,GAC motif<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-8","12-1-8","12-1-7","12-1-7","12-1-2","12-1-2","12-1-1","12-1-1"],["-GAC","+GAC","-GAC","+GAC","-GAC","+GAC","-GAC","+GAC"],[30.18234865062,29.3362509117433,28.7631271878646,29.3465577596266,29.5726711206353,28.6776755325854,29.3769197016235,28.2799473453269],["59.5185995623632","-","58.1096849474913","-","58.2503466532207","-","57.6568670469504","-"],["12-1-8","12-1-8","12-1-7","12-1-7","12-1-2","12-1-2","12-1-1","12-1-1"],["-AAC","+AAC","-AAC","+AAC","-AAC","+AAC","-AAC","+AAC"],[1.18161925601751,12.2684172137126,1.30299494360171,10.6767794632439,1.09668473465272,12.1013487961679,1.25054848617815,10.7503290917069],["13.4500364697301","-","11.9797744068456","-","13.1980335308206","-","12.000877577885","-"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>motif<\/th>\n      <th>percentage<\/th>\n      <th>total_per_sample<\/th>\n      <th>sample.1<\/th>\n      <th>motif.1<\/th>\n      <th>percentage.1<\/th>\n      <th>total_per_sample.1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="cutoff-covarage-10-methelytion-level-30"
 class="section level2">
@@ -1278,6 +1347,11 @@ combined_data &lt;- combined_data %&gt;%
     sample_label = paste0(sample, &quot; (n=&quot;, format(total_count, big.mark = &quot;,&quot;, scientific = FALSE), &quot;)&quot;),
     sample_label = fct_reorder(sample_label, total_count)
   )
+
+combined_data &lt;- combined_data[nrow(combined_data):1, ]
+combined_data &lt;- combined_data %&gt;%
+  mutate(sample_label = factor(sample_label, 
+                              levels = unique(sample_label)))
 
 # Create visualization
 ggplot(combined_data, aes(x = percentage, y = sample_label)) +
@@ -1341,6 +1415,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/79335dc52a6a6112a8e0229d35276a68a183133f/docs/figure/QC.Rmd/unnamed-chunk-5-1.png" target="_blank">79335dc</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-19
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/41fce20bdc127abf666ad997691099779ecafe85/docs/figure/QC.Rmd/unnamed-chunk-5-1.png" target="_blank">41fce20</a>
 </td>
 <td>
@@ -1373,7 +1458,7 @@ aac_gac &lt;- aac_gac[,-which(colnames(aac_gac) %in% c(&quot;total_count&quot;,&
 
 DT::datatable(aac_gac,caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Percentage for AAC,GAC motif&#39;),options = list(pageLength = 10) )</code></pre>
 <div id="htmlwidget-5c1357f460f66bba8794" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5c1357f460f66bba8794">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Percentage for AAC,GAC motif<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-7","12-1-7","12-1-8","12-1-8"],["+GAC","-GAC","+GAC","-GAC","+GAC","-GAC","+GAC","-GAC"],[32.498307379824,34.2924847664184,33.160820394863,34.4067471727046,33.1364441819256,31.5711754282339,33.6147186147186,33.9177489177489],["66.7907921462424","-","67.5675675675676","-","64.7076196101595","-","67.5324675324675","-"],["12-1-1","12-1-1","12-1-2","12-1-2","12-1-7","12-1-7","12-1-8","12-1-8"],["+AAC","-AAC","+AAC","-AAC","+AAC","-AAC","+AAC","-AAC"],[11.5775220040623,0.880162491536899,12.6892850297106,0.76672417097949,10.8978145304194,0.915534554046072,12.8138528138528,0.735930735930736],["12.4576844955992","-","13.4560092006901","-","11.8133490844654","-","13.5497835497835","-"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>motif<\/th>\n      <th>percentage<\/th>\n      <th>total_per_sample<\/th>\n      <th>sample.1<\/th>\n      <th>motif.1<\/th>\n      <th>percentage.1<\/th>\n      <th>total_per_sample.1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-5c1357f460f66bba8794">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Percentage for AAC,GAC motif<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-8","12-1-8","12-1-7","12-1-7","12-1-2","12-1-2","12-1-1","12-1-1"],["-GAC","+GAC","-GAC","+GAC","-GAC","+GAC","-GAC","+GAC"],[33.9177489177489,33.6147186147186,31.5711754282339,33.1364441819256,34.4067471727046,33.160820394863,34.2924847664184,32.498307379824],["67.5324675324675","-","64.7076196101595","-","67.5675675675676","-","66.7907921462424","-"],["12-1-8","12-1-8","12-1-7","12-1-7","12-1-2","12-1-2","12-1-1","12-1-1"],["-AAC","+AAC","-AAC","+AAC","-AAC","+AAC","-AAC","+AAC"],[0.735930735930736,12.8138528138528,0.915534554046072,10.8978145304194,0.76672417097949,12.6892850297106,0.880162491536899,11.5775220040623],["13.5497835497835","-","11.8133490844654","-","13.4560092006901","-","12.4576844955992","-"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>motif<\/th>\n      <th>percentage<\/th>\n      <th>total_per_sample<\/th>\n      <th>sample.1<\/th>\n      <th>motif.1<\/th>\n      <th>percentage.1<\/th>\n      <th>total_per_sample.1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

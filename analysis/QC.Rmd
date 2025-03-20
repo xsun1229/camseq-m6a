@@ -131,6 +131,11 @@ combined_data <- combined_data %>%
     sample_label = fct_reorder(sample_label, total_count)
   )
 
+combined_data <- combined_data[nrow(combined_data):1, ]
+combined_data <- combined_data %>%
+  mutate(sample_label = factor(sample_label, 
+                              levels = unique(sample_label)))
+
 # Create visualization
 ggplot(combined_data, aes(x = percentage, y = sample_label)) +
   geom_point(
@@ -237,6 +242,14 @@ combined_data <- combined_data %>%
     sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
     sample_label = fct_reorder(sample_label, total_count)
   )
+
+combined_data <- combined_data[nrow(combined_data):1, ]
+combined_data <- combined_data %>%
+  mutate(sample_label = factor(sample_label, 
+                              levels = unique(sample_label)))
+
+
+
 
 # Create visualization
 ggplot(combined_data, aes(x = percentage, y = sample_label)) +
@@ -345,6 +358,11 @@ combined_data <- combined_data %>%
     sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
     sample_label = fct_reorder(sample_label, total_count)
   )
+
+combined_data <- combined_data[nrow(combined_data):1, ]
+combined_data <- combined_data %>%
+  mutate(sample_label = factor(sample_label, 
+                              levels = unique(sample_label)))
 
 # Create visualization
 ggplot(combined_data, aes(x = percentage, y = sample_label)) +
