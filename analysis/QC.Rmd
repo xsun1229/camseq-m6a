@@ -16,7 +16,8 @@ library(gridExtra)
 library(ggplot2)
 library(grid) 
 library(stringr)
-
+library(tidyverse)
+library(ggsci)
 
 # Function to extract numeric values using regex
 extract_value <- function(pattern) {
@@ -84,86 +85,270 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-
 
 # Mythelytion level
 
-Remove low-coverage sites: reads less than 10
+## cutoff: covarage = 10, methelytion level = 10%
 
-```{r warning=F, message=F, fig.height=8, fig.width=16}
+
+```{r warning=F, message=F, fig.height=5, fig.width=5}
+
+counts <- 10
+pct <- 10
 
 folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
-files_countsites <- list.files(path = folder_countsites,pattern = "genome.tsv",full.names = T)
 
-p_me_dist <- list()
-p_cov_dist <- list()
-strand_bias_all <- c()
-for (file in files_countsites) {
+file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
+file_list <- file_list[c(1,2,7,8)]
+combined_data <- map_df(file_list, ~{
+  # Extract sample name from filename
+  sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
+    str_remove(".*241217AVITI-He-lab-24JX-") %>%  # Remove prefix
+    str_remove("^/+") %>%  # Remove leading slashes if present
+    str_remove("/+$")       # Remove trailing slashes if present
   
-  sample <- regmatches(basename(file),
-            regexpr("\\d+-\\d+-\\d+(?=\\.)", basename(file), perl = TRUE))
-  
-  df <- data.table::fread(file)
-  
-  # Calculate methylation and filter
-  df <- df %>%
+  read_tsv(.x) %>%
+    filter(motif != "motif") %>%  # Remove header remnants
     mutate(
-      total = convertedBaseCount + unconvertedBaseCount,
-      methylation_pct = (unconvertedBaseCount / total) * 100
+      sample = sample_name,
+      percentage = (count / sum(count)) * 100
     ) %>%
-    filter(total >= 10)   # Remove low-coverage sites
-  
-  if (nrow(df) > 0) {
-    strand_bias <- df %>%
-    group_by(strand) %>%
-    summarise(
-      mean_methylation = round(mean(methylation_pct, na.rm = TRUE),digits = 4),
-      n_sites_pass_filtering = n()
-    ) %>%
-    mutate(sample = sample) %>%          # Add sample column
-    select(sample, everything())         # Reorder columns (sample first)
-  }else{
-     strand_bias <- data.frame(sample = c(sample,sample),
-                               strand = c("+","-"),
-                               mean_methylation = c("no site passing filtering","no site passing filtering"),
-                               n_sites_pass_filtering = c("no site passing filtering","no site passing filtering"))
-    
-  }
-  
-  strand_bias_all <- rbind(strand_bias_all,strand_bias)
-  
-  p_me_dist[[sample]] <- ggplot(df, aes(x=methylation_pct)) +
-    geom_histogram(bins=30, fill="blue", alpha = 0.6) +
-    labs(x="Methylation (%)", y="Number of sites") +
-    ggtitle(sample) +
-    theme_minimal()
-  
-  p_cov_dist[[sample]] <- ggplot(df, aes(x=total)) +
-    geom_histogram(bins=50, fill="blue", alpha = 0.6) +
-    #xlim(-1, 100) +
-    labs(x="Total reads per site", y="Count") +
-    ggtitle(sample) +
-    theme_minimal()
-  
-}
+    select(sample, motif, percentage)
+})
+
+combined_data <- combined_data %>%
+  mutate(motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3"))
+
+combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
+combined_data_gac<-  combined_data_gac %>%
+  group_by(sample) %>%
+  mutate(total_per_sample = sum(percentage)) %>%
+  ungroup()  # Optional: removes grouping
+combined_data_aac <- combined_data[combined_data$motif %in% c("+AAC","-AAC"),]
+combined_data_aac <- combined_data_aac %>%
+  group_by(sample) %>%
+  mutate(total_per_sample = sum(percentage)) %>%
+  ungroup()  # Optional: removes grouping
+
+combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
+combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
+aac_gac <- cbind(combined_data_gac,combined_data_aac)
+
+DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
 
 
-combined <- arrangeGrob(
-  grobs = p_me_dist,
-  nrow = 2,
-  top = textGrob("Methylation Distribution", gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+# Create visualization
+ggplot(combined_data, aes(x = percentage, y = sample)) +
+  geom_point(
+    aes(color = motif),
+    size = 3,
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    show.legend = FALSE  # <--- This removes the point legend
+  ) +
+  geom_text(
+    aes(label = motif, color = motif),
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    size = 3,
+    vjust = -1.5,
+    show.legend = FALSE  # <--- This removes the text legend
+  ) +
+  scale_color_igv(guide = "none") +  # <--- Disables color scale legend
+  labs(
+    title = "Motif Percentage Distribution Across Samples",
+    x = "Percentage (%)",
+    y = "Sample",
+    caption = paste("-/+ represent strands")
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Ensures no residual legend elements
+    panel.grid.major.y = element_line(color = "grey90"),
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+
 ```
 
-```{r warning=F, message=F, fig.height=8, fig.width=16}
-combined <- arrangeGrob(
-  grobs = p_cov_dist,
-  nrow = 2,
-  top = textGrob("Coverage Distribution", gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+
+## cutoff: covarage = 10, methelytion level = 20%
+
+```{r warning=F, message=F, fig.height=5, fig.width=5}
+
+counts <- 10
+pct <- 20
+
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
+
+file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
+file_list <- file_list[c(1,2,7,8)]
+combined_data <- map_df(file_list, ~{
+  # Extract sample name from filename
+  sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
+    str_remove(".*241217AVITI-He-lab-24JX-") %>%  # Remove prefix
+    str_remove("^/+") %>%  # Remove leading slashes if present
+    str_remove("/+$")       # Remove trailing slashes if present
+  
+  read_tsv(.x) %>%
+    filter(motif != "motif") %>%  # Remove header remnants
+    mutate(
+      sample = sample_name,
+      percentage = (count / sum(count)) * 100
+    ) %>%
+    select(sample, motif, percentage)
+})
+
+combined_data <- combined_data %>%
+  mutate(motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3"))
+
+combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
+combined_data_gac<-  combined_data_gac %>%
+  group_by(sample) %>%
+  mutate(total_per_sample = sum(percentage)) %>%
+  ungroup()  # Optional: removes grouping
+combined_data_aac <- combined_data[combined_data$motif %in% c("+AAC","-AAC"),]
+combined_data_aac <- combined_data_aac %>%
+  group_by(sample) %>%
+  mutate(total_per_sample = sum(percentage)) %>%
+  ungroup()  # Optional: removes grouping
+
+combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
+combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
+aac_gac <- cbind(combined_data_gac,combined_data_aac)
+
+DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
 
 
-DT::datatable(strand_bias_all,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Checking the strand bias '),options = list(pageLength = 10) )
+# Create visualization
+ggplot(combined_data, aes(x = percentage, y = sample)) +
+  geom_point(
+    aes(color = motif),
+    size = 3,
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    show.legend = FALSE  # <--- This removes the point legend
+  ) +
+  geom_text(
+    aes(label = motif, color = motif),
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    size = 3,
+    vjust = -1.5,
+    show.legend = FALSE  # <--- This removes the text legend
+  ) +
+  scale_color_igv(guide = "none") +  # <--- Disables color scale legend
+  labs(
+    title = "Motif Percentage Distribution Across Samples",
+    x = "Percentage (%)",
+    y = "Sample",
+    caption = paste("-/+ represent strands")
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Ensures no residual legend elements
+    panel.grid.major.y = element_line(color = "grey90"),
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
 
 ```
 
 
+## cutoff: covarage = 10, methelytion level = 30%
 
+
+```{r warning=F, message=F, fig.height=5, fig.width=5}
+
+counts <- 10
+pct <- 30
+
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
+
+file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
+file_list <- file_list[c(1,2,7,8)]
+combined_data <- map_df(file_list, ~{
+  # Extract sample name from filename
+  sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
+    str_remove(".*241217AVITI-He-lab-24JX-") %>%  # Remove prefix
+    str_remove("^/+") %>%  # Remove leading slashes if present
+    str_remove("/+$")       # Remove trailing slashes if present
+  
+  read_tsv(.x) %>%
+    filter(motif != "motif") %>%  # Remove header remnants
+    mutate(
+      sample = sample_name,
+      percentage = (count / sum(count)) * 100
+    ) %>%
+    select(sample, motif, percentage)
+})
+
+combined_data <- combined_data %>%
+  mutate(motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3"))
+
+combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
+combined_data_gac<-  combined_data_gac %>%
+  group_by(sample) %>%
+  mutate(total_per_sample = sum(percentage)) %>%
+  ungroup()  # Optional: removes grouping
+combined_data_aac <- combined_data[combined_data$motif %in% c("+AAC","-AAC"),]
+combined_data_aac <- combined_data_aac %>%
+  group_by(sample) %>%
+  mutate(total_per_sample = sum(percentage)) %>%
+  ungroup()  # Optional: removes grouping
+
+combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
+combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
+aac_gac <- cbind(combined_data_gac,combined_data_aac)
+
+DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
+
+
+# Create visualization
+ggplot(combined_data, aes(x = percentage, y = sample)) +
+  geom_point(
+    aes(color = motif),
+    size = 3,
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    show.legend = FALSE  # <--- This removes the point legend
+  ) +
+  geom_text(
+    aes(label = motif, color = motif),
+    position = position_jitterdodge(
+      jitter.width = 0.2,
+      jitter.height = 0.1,
+      dodge.width = 0.7
+    ),
+    size = 3,
+    vjust = -1.5,
+    show.legend = FALSE  # <--- This removes the text legend
+  ) +
+  scale_color_igv(guide = "none") +  # <--- Disables color scale legend
+  labs(
+    title = "Motif Percentage Distribution Across Samples",
+    x = "Percentage (%)",
+    y = "Sample",
+    caption = paste("-/+ represent strands")
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Ensures no residual legend elements
+    panel.grid.major.y = element_line(color = "grey90"),
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+
+```
