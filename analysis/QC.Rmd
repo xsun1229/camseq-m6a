@@ -19,11 +19,116 @@ library(stringr)
 library(tidyverse)
 library(ggsci)
 
-# Function to extract numeric values using regex
-extract_value <- function(pattern) {
-  line <- str_subset(lines, pattern)
-  as.numeric(str_extract(line, "\\d+"))
+library(tidyverse)
+library(readr)
+library(purrr)
+library(stringr)
+library(ggplot2)
+
+process_motif_data <- function(file_list) {
+  # Process files and calculate totals
+  combined_data <- map_df(file_list, ~{
+    message("\nProcessing: ", normalizePath(.x))
+    
+    # Extract sample name
+    sample_name <- basename(.x) %>%
+      str_remove("_motif_summary_cov\\d+_mepct\\d+\\.tsv$") %>%
+      str_remove("241217AVITI-He-lab-24JX-") %>%
+      str_remove("^_+") %>%
+      str_remove("_+$")
+    
+    # Read and process data
+    sample_data <- read_table(.x, 
+                             col_names = c("motif", "count"), 
+                             col_types = "cn",
+                             skip_empty_rows = TRUE)
+    
+    total_reads <- sum(sample_data$count)
+    
+    processed <- sample_data %>%
+      mutate(
+        sample = sample_name,
+        total_count = total_reads,
+        percentage = (count / total_reads) * 100
+      ) %>%
+      select(sample, motif, percentage, total_count)
+    
+    return(processed)
+  })
+  
+  # Create formatted labels and order data
+  combined_data %>%
+    mutate(
+      sample_label = paste0(sample, " (n=", 
+                           format(total_count, big.mark = ",", scientific = FALSE), ")"),
+      sample_label = fct_reorder(sample_label, total_count)
+    ) %>%
+    arrange(desc(total_count)) %>%
+    mutate(sample_label = factor(sample_label, levels = unique(sample_label)))
 }
+
+create_motif_plot <- function(processed_motif_data, 
+                             title = "Motif Distribution with Total Read coverage",
+                             x_lab = "Percentage (%)",
+                             y_lab = "Sample (Total site coverage passing filter)",
+                             point_size = 3,
+                             text_size = 3) {
+  ggplot(processed_motif_data, aes(x = percentage, y = sample_label)) +
+    geom_point(
+      aes(color = motif),
+      size = point_size,
+      position = position_jitterdodge(
+        jitter.width = 0.2,
+        jitter.height = 0.1,
+        dodge.width = 0.7
+      ),
+      show.legend = FALSE
+    ) +
+    geom_text(
+      aes(label = motif, color = motif),
+      position = position_jitterdodge(
+        jitter.width = 0.2,
+        jitter.height = 0.1,
+        dodge.width = 0.7
+      ),
+      size = text_size,
+      vjust = -1.5,
+      show.legend = FALSE
+    ) +
+    scale_color_igv(guide = "none") +
+    labs(
+      title = title,
+      x = x_lab,
+      y = y_lab
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.major.y = element_line(color = "grey90"),
+      axis.text.y = element_text(size = 9, face = "bold"),
+      axis.text.x = element_text(size = 10),
+      plot.title = element_text(hjust = 0.5, size = 14)
+    )
+}
+
+count_overlap <- function(file_list) {
+  # Initialize an empty list to store the 'name' columns
+  name_list <- list()
+  
+  # Read each file and store the 'name' column
+  for(file in file_list){
+    df_site <- read.table(file, header = T)
+    df_site$name <- paste0(df_site$ref, "_", df_site$pos)
+    name_list <- append(name_list, list(df_site$name))
+  }
+  
+  # Find the overlap among all 'name' columns
+  overlap <- Reduce(intersect, name_list)
+  
+  # Return the overlap count
+  return(length(overlap))
+}
+
+
 ```
 
 # Sample info 
@@ -83,116 +188,33 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-
 ```
 
 
-# Mythelytion level
+# Counting sites
 
 ## cutoff: covarage = 10, methelytion level = 10%
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
 
-counts <- 10
-pct <- 10
+coverage <- 10
+mepct <- 10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/"
 
-file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
-file_list <- file_list[c(1,2,7,8)]
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_cov",coverage,"_mepct",mepct),full.names = T)
 
-# Process files and calculate totals
-combined_data <- map_df(file_list, ~{
-  # Extract sample name
-  sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
-    str_remove(".*241217AVITI-He-lab-24JX-") %>%
-    str_remove("^/+") %>%
-    str_remove("/+$")
-  
-  # Read and process data
-  sample_data <- read_tsv(.x) %>% 
-    filter(motif != "motif") %>%
-    mutate(
-      motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3")
-    )
-  
-  total_reads <- sum(sample_data$count)
-  
-  sample_data %>%
-    mutate(
-      sample = sample_name,
-      total_count = total_reads,
-      percentage = (count / total_reads) * 100
-    ) %>%
-    select(sample, motif, percentage, total_count)
-})
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  point_size = 4,
+                  text_size = 3.5)
 
-# Create formatted labels ordered by total count
-combined_data <- combined_data %>%
-  mutate(
-    sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
-    sample_label = fct_reorder(sample_label, total_count)
-  )
+### site overlap
+file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id_cov",coverage,"_mepct",mepct),full.names = T)
 
-combined_data <- combined_data[nrow(combined_data):1, ]
-combined_data <- combined_data %>%
-  mutate(sample_label = factor(sample_label, 
-                              levels = unique(sample_label)))
+overlap_count <- count_overlap(file_list)
 
-# Create visualization
-ggplot(combined_data, aes(x = percentage, y = sample_label)) +
-  geom_point(
-    aes(color = motif),
-    size = 3,
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    show.legend = FALSE
-  ) +
-  geom_text(
-    aes(label = motif, color = motif),
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    size = 3,
-    vjust = -1.5,
-    show.legend = FALSE
-  ) +
-  scale_color_igv(guide = "none") +
-  labs(
-    title = "Motif Distribution with Total Read Counts",
-    x = "Percentage (%)",
-    y = "Sample (Total site counts passing filter)",
-    caption = "-/+ represent strands"
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_line(color = "grey90"),
-    axis.text.y = element_text(size = 9, face = "bold"),
-    axis.text.x = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  )
-
-
-combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
-combined_data_gac<-  combined_data_gac %>%
-  group_by(sample) %>%
-  mutate(total_per_sample = sum(percentage)) %>%
-  ungroup()  # Optional: removes grouping
-combined_data_aac <- combined_data[combined_data$motif %in% c("+AAC","-AAC"),]
-combined_data_aac <- combined_data_aac %>%
-  group_by(sample) %>%
-  mutate(total_per_sample = sum(percentage)) %>%
-  ungroup()  # Optional: removes grouping
-
-combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
-combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
-aac_gac <- cbind(combined_data_gac,combined_data_aac)
-
-aac_gac <- aac_gac[,-which(colnames(aac_gac) %in% c("total_count","sample_label"))]
-
-DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
+cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
 
 
 ```
@@ -202,112 +224,26 @@ DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
 
-counts <- 10
-pct <- 20
+coverage <- 10
+mepct <-20
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/"
 
-file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
-file_list <- file_list[c(1,2,7,8)]
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_cov",coverage,"_mepct",mepct),full.names = T)
 
-# Process files and calculate totals
-combined_data <- map_df(file_list, ~{
-  # Extract sample name
-  sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
-    str_remove(".*241217AVITI-He-lab-24JX-") %>%
-    str_remove("^/+") %>%
-    str_remove("/+$")
-  
-  # Read and process data
-  sample_data <- read_tsv(.x) %>% 
-    filter(motif != "motif") %>%
-    mutate(
-      motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3")
-    )
-  
-  total_reads <- sum(sample_data$count)
-  
-  sample_data %>%
-    mutate(
-      sample = sample_name,
-      total_count = total_reads,
-      percentage = (count / total_reads) * 100
-    ) %>%
-    select(sample, motif, percentage, total_count)
-})
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  point_size = 4,
+                  text_size = 3.5)
 
-# Create formatted labels ordered by total count
-combined_data <- combined_data %>%
-  mutate(
-    sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
-    sample_label = fct_reorder(sample_label, total_count)
-  )
+### site overlap
+file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id_cov",coverage,"_mepct",mepct),full.names = T)
 
-combined_data <- combined_data[nrow(combined_data):1, ]
-combined_data <- combined_data %>%
-  mutate(sample_label = factor(sample_label, 
-                              levels = unique(sample_label)))
+overlap_count <- count_overlap(file_list)
 
-
-
-
-# Create visualization
-ggplot(combined_data, aes(x = percentage, y = sample_label)) +
-  geom_point(
-    aes(color = motif),
-    size = 3,
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    show.legend = FALSE
-  ) +
-  geom_text(
-    aes(label = motif, color = motif),
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    size = 3,
-    vjust = -1.5,
-    show.legend = FALSE
-  ) +
-  scale_color_igv(guide = "none") +
-  labs(
-    title = "Motif Distribution with Total Read Counts",
-    x = "Percentage (%)",
-    y = "Sample (Total site counts passing filter)",
-    caption = "-/+ represent strands"
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_line(color = "grey90"),
-    axis.text.y = element_text(size = 9, face = "bold"),
-    axis.text.x = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  )
-
-
-combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
-combined_data_gac<-  combined_data_gac %>%
-  group_by(sample) %>%
-  mutate(total_per_sample = sum(percentage)) %>%
-  ungroup()  # Optional: removes grouping
-combined_data_aac <- combined_data[combined_data$motif %in% c("+AAC","-AAC"),]
-combined_data_aac <- combined_data_aac %>%
-  group_by(sample) %>%
-  mutate(total_per_sample = sum(percentage)) %>%
-  ungroup()  # Optional: removes grouping
-
-combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
-combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
-aac_gac <- cbind(combined_data_gac,combined_data_aac)
-
-aac_gac <- aac_gac[,-which(colnames(aac_gac) %in% c("total_count","sample_label"))]
-
-DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
+cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
 
 
 ```
@@ -318,109 +254,111 @@ DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
 
-counts <- 10
-pct <- 30
+coverage <- 10
+mepct <-30
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/"
 
-file_list <- list.files(path = folder_countsites,pattern = paste0("counts_cutoff",counts,"_pct",pct),full.names = T)
-file_list <- file_list[c(1,2,7,8)]
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_cov",coverage,"_mepct",mepct),full.names = T)
 
-# Process files and calculate totals
-combined_data <- map_df(file_list, ~{
-  # Extract sample name
-  sample_name <- str_remove(.x, "_motif_counts_cutoff\\d+_pct\\d+.tsv$") %>%
-    str_remove(".*241217AVITI-He-lab-24JX-") %>%
-    str_remove("^/+") %>%
-    str_remove("/+$")
-  
-  # Read and process data
-  sample_data <- read_tsv(.x) %>% 
-    filter(motif != "motif") %>%
-    mutate(
-      motif = str_replace(motif, "(.)([+-])(.)", "\\2\\1A\\3")
-    )
-  
-  total_reads <- sum(sample_data$count)
-  
-  sample_data %>%
-    mutate(
-      sample = sample_name,
-      total_count = total_reads,
-      percentage = (count / total_reads) * 100
-    ) %>%
-    select(sample, motif, percentage, total_count)
-})
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  point_size = 4,
+                  text_size = 3.5)
 
-# Create formatted labels ordered by total count
-combined_data <- combined_data %>%
-  mutate(
-    sample_label = paste0(sample, " (n=", format(total_count, big.mark = ",", scientific = FALSE), ")"),
-    sample_label = fct_reorder(sample_label, total_count)
-  )
+### site overlap
+file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id_cov",coverage,"_mepct",mepct),full.names = T)
 
-combined_data <- combined_data[nrow(combined_data):1, ]
-combined_data <- combined_data %>%
-  mutate(sample_label = factor(sample_label, 
-                              levels = unique(sample_label)))
+overlap_count <- count_overlap(file_list)
 
-# Create visualization
-ggplot(combined_data, aes(x = percentage, y = sample_label)) +
-  geom_point(
-    aes(color = motif),
-    size = 3,
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    show.legend = FALSE
-  ) +
-  geom_text(
-    aes(label = motif, color = motif),
-    position = position_jitterdodge(
-      jitter.width = 0.2,
-      jitter.height = 0.1,
-      dodge.width = 0.7
-    ),
-    size = 3,
-    vjust = -1.5,
-    show.legend = FALSE
-  ) +
-  scale_color_igv(guide = "none") +
-  labs(
-    title = "Motif Distribution with Total Read Counts",
-    x = "Percentage (%)",
-    y = "Sample (Total site counts passing filter)",
-    caption = "-/+ represent strands"
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_line(color = "grey90"),
-    axis.text.y = element_text(size = 9, face = "bold"),
-    axis.text.x = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  )
+cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+
+```
 
 
-combined_data_gac <- combined_data[combined_data$motif %in% c("+GAC","-GAC"),]
-combined_data_gac<-  combined_data_gac %>%
-  group_by(sample) %>%
-  mutate(total_per_sample = sum(percentage)) %>%
-  ungroup()  # Optional: removes grouping
-combined_data_aac <- combined_data[combined_data$motif %in% c("+AAC","-AAC"),]
-combined_data_aac <- combined_data_aac %>%
-  group_by(sample) %>%
-  mutate(total_per_sample = sum(percentage)) %>%
-  ungroup()  # Optional: removes grouping
+## cutoff: covarage = 20, methelytion level = 10%
 
-combined_data_gac$total_per_sample[seq(2,nrow(combined_data_gac),by=2)] <- "-"
-combined_data_aac$total_per_sample[seq(2,nrow(combined_data_aac),by=2)] <- "-"
-aac_gac <- cbind(combined_data_gac,combined_data_aac)
 
-aac_gac <- aac_gac[,-which(colnames(aac_gac) %in% c("total_count","sample_label"))]
+```{r warning=F, message=F, fig.height=5, fig.width=5}
 
-DT::datatable(aac_gac,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Percentage for AAC,GAC motif'),options = list(pageLength = 10) )
+coverage <- 20
+mepct <-10
 
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/"
+
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_cov",coverage,"_mepct",mepct),full.names = T)
+
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  point_size = 4,
+                  text_size = 3.5)
+
+### site overlap
+file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id_cov",coverage,"_mepct",mepct),full.names = T)
+
+overlap_count <- count_overlap(file_list)
+
+cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+
+```
+
+## cutoff: covarage = 30, methelytion level = 10%
+
+
+```{r warning=F, message=F, fig.height=5, fig.width=5}
+
+coverage <- 30
+mepct <-10
+
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/"
+
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_cov",coverage,"_mepct",mepct),full.names = T)
+
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  point_size = 4,
+                  text_size = 3.5)
+
+### site overlap
+file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id_cov",coverage,"_mepct",mepct),full.names = T)
+
+overlap_count <- count_overlap(file_list)
+
+cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+
+```
+
+
+## cutoff: covarage = 40, methelytion level = 10%
+
+
+```{r warning=F, message=F, fig.height=5, fig.width=5}
+
+coverage <- 40
+mepct <-10
+
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/"
+
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_cov",coverage,"_mepct",mepct),full.names = T)
+
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  point_size = 4,
+                  text_size = 3.5)
+
+### site overlap
+file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id_cov",coverage,"_mepct",mepct),full.names = T)
+
+overlap_count <- count_overlap(file_list)
+
+cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
 
 ```
