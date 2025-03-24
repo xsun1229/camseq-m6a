@@ -190,7 +190,7 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-
 
 # Counting sites
 
-## cutoff: covarage = 10, methelytion level = 10%
+## cutoff: read depth 10, methelytion level = 10%
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
@@ -205,7 +205,7 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summar
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  title = paste0("read depth = ",coverage,", methylation level = ",mepct,"%"),
                   point_size = 4,
                   text_size = 3.5)
 
@@ -214,13 +214,13 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id
 
 overlap_count <- count_overlap(file_list)
 
-cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+cat(sprintf("The number of overlapping site among 4 samples is %s\n",overlap_count))
 
 
 ```
 
 
-## cutoff: covarage = 10, methelytion level = 20%
+## cutoff: read depth 10, methelytion level = 20%
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
 
@@ -234,7 +234,7 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summar
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  title = paste0("read depth = ",coverage,", methylation level = ",mepct,"%"),
                   point_size = 4,
                   text_size = 3.5)
 
@@ -243,13 +243,13 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id
 
 overlap_count <- count_overlap(file_list)
 
-cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+cat(sprintf("The number of overlapping site among 4 samples is %s\n",overlap_count))
 
 
 ```
 
 
-## cutoff: covarage = 10, methelytion level = 30%
+## cutoff: read depth 10, methelytion level = 30%
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
@@ -264,7 +264,7 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summar
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  title = paste0("read depth = ",coverage,", methylation level = ",mepct,"%"),
                   point_size = 4,
                   text_size = 3.5)
 
@@ -273,12 +273,12 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id
 
 overlap_count <- count_overlap(file_list)
 
-cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+cat(sprintf("The number of overlapping site among 4 samples is %s\n",overlap_count))
 
 ```
 
 
-## cutoff: covarage = 20, methelytion level = 10%
+## cutoff: read depth 20, methelytion level = 10%
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
@@ -293,7 +293,7 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summar
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  title = paste0("read depth = ",coverage,", methylation level = ",mepct,"%"),
                   point_size = 4,
                   text_size = 3.5)
 
@@ -302,11 +302,11 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id
 
 overlap_count <- count_overlap(file_list)
 
-cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+cat(sprintf("The number of overlapping site among 4 samples is %s\n",overlap_count))
 
 ```
 
-## cutoff: covarage = 30, methelytion level = 10%
+## cutoff: read depth 30, methelytion level = 10%
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
@@ -321,7 +321,7 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summar
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  title = paste0("read depth = ",coverage,", methylation level = ",mepct,"%"),
                   point_size = 4,
                   text_size = 3.5)
 
@@ -330,12 +330,12 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id
 
 overlap_count <- count_overlap(file_list)
 
-cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+cat(sprintf("The number of overlapping site among 4 samples is %s\n",overlap_count))
 
 ```
 
 
-## cutoff: covarage = 40, methelytion level = 10%
+## cutoff: read depth 40, methelytion level = 10%
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=5}
@@ -350,7 +350,7 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summar
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0("coverage = ",coverage,", methylation level = ",mepct,"%"),
+                  title = paste0("read depth = ",coverage,", methylation level = ",mepct,"%"),
                   point_size = 4,
                   text_size = 3.5)
 
@@ -359,6 +359,6 @@ file_list <- list.files(path =  folder_countsites,pattern = paste0("temp_with_id
 
 overlap_count <- count_overlap(file_list)
 
-cat(sprintf("The number of overlapping site among 4 samples is %s",overlap_count))
+cat(sprintf("The number of overlapping site among 4 samples is %s\n",overlap_count))
 
 ```
