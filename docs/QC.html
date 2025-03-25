@@ -410,7 +410,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-24
+<strong>Last updated:</strong> 2025-03-25
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -544,15 +544,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbftargetblank3e0500ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree0c03f558adecd48d81392440c65ad2da59808753targetblank0c03f55a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf" target="_blank">3e0500c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/0c03f558adecd48d81392440c65ad2da59808753" target="_blank">0c03f55</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbftargetblank3e0500ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree0c03f558adecd48d81392440c65ad2da59808753targetblank0c03f55a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -562,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf" target="_blank">3e0500c</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/0c03f558adecd48d81392440c65ad2da59808753" target="_blank">0c03f55</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/analysis/QC.Rmd" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/0c03f558adecd48d81392440c65ad2da59808753/docs/QC.html" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -842,11 +876,8 @@ library(stringr)
 library(tidyverse)
 library(ggsci)
 
-library(tidyverse)
 library(readr)
 library(purrr)
-library(stringr)
-library(ggplot2)
 
 process_motif_data &lt;- function(file_list) {
   # Process files and calculate totals
@@ -855,7 +886,49 @@ process_motif_data &lt;- function(file_list) {
     
     # Extract sample name
     sample_name &lt;- basename(.x) %&gt;%
-      str_remove(&quot;_motif_summary_cov\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;.genome.tsv_motif_summary_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+    
+    # Read and process data
+    sample_data &lt;- read_table(.x, 
+                             col_names = c(&quot;motif&quot;, &quot;count&quot;), 
+                             col_types = &quot;cn&quot;,
+                             skip_empty_rows = TRUE)
+    
+    total_reads &lt;- sum(sample_data$count)
+    
+    processed &lt;- sample_data %&gt;%
+      mutate(
+        sample = sample_name,
+        total_count = total_reads,
+        percentage = (count / total_reads) * 100
+      ) %&gt;%
+      select(sample, motif, percentage, total_count)
+    
+    return(processed)
+  })
+  
+  # Create formatted labels and order data
+  combined_data %&gt;%
+    mutate(
+      sample_label = paste0(sample, &quot; (n=&quot;, 
+                           format(total_count, big.mark = &quot;,&quot;, scientific = FALSE), &quot;)&quot;),
+      sample_label = fct_reorder(sample_label, total_count)
+    ) %&gt;%
+    arrange(desc(total_count)) %&gt;%
+    mutate(sample_label = factor(sample_label, levels = unique(sample_label)))
+}
+
+process_motif_data_merged &lt;- function(file_list) {
+  # Process files and calculate totals
+  combined_data &lt;- map_df(file_list, ~{
+    message(&quot;\nProcessing: &quot;, normalizePath(.x))
+    
+    # Extract sample name
+    sample_name &lt;- basename(.x) %&gt;%
+      str_remove(&quot;.motif_summary_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
       str_remove(&quot;^_+&quot;) %&gt;%
       str_remove(&quot;_+$&quot;)
@@ -891,9 +964,9 @@ process_motif_data &lt;- function(file_list) {
 }
 
 create_motif_plot &lt;- function(processed_motif_data, 
-                             title = &quot;Motif Distribution with Total Read coverage&quot;,
+                             title = &quot;Motif Distribution with Total Read read_depth&quot;,
                              x_lab = &quot;Percentage (%)&quot;,
-                             y_lab = &quot;Sample (Total site coverage passing filter)&quot;,
+                             y_lab = &quot;Sample (Total site read_depth passing filter)&quot;,
                              point_size = 3,
                              text_size = 3) {
   ggplot(processed_motif_data, aes(x = percentage, y = sample_label)) +
@@ -918,7 +991,7 @@ create_motif_plot &lt;- function(processed_motif_data,
       vjust = -1.5,
       show.legend = FALSE
     ) +
-    scale_color_igv(guide = &quot;none&quot;) +
+   # scale_color_igv(guide = &quot;none&quot;) +
     labs(
       title = title,
       x = x_lab,
@@ -932,6 +1005,8 @@ create_motif_plot &lt;- function(processed_motif_data,
       plot.title = element_text(hjust = 0.5, size = 14)
     )
 }
+
+
 
 count_overlap &lt;- function(file_list) {
   # Initialize an empty list to store the &#39;name&#39; columns
@@ -1106,7 +1181,7 @@ class="uri">https://xsun1229.github.io/camseq-m6a/multiqc_report_aligned_bam.htm
 </div>
 <div id="trimming" class="section level1">
 <h1>Trimming</h1>
-<pre class="r"><code>json_folder &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/report_reads/trimming/&quot;
+<pre class="r"><code>json_folder &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/report_reads/trimming/&quot;
 
 # List all JSON files in the folder
 json_files &lt;- list.files(json_folder, pattern = &quot;*.json&quot;, full.names = TRUE)
@@ -1136,25 +1211,27 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = &#39;capt
 <div id="htmlwidget-72df6e256503a04e505c" style="width:100%;height:auto;" class="datatables html-widget"></div>
 <script type="application/json" data-for="htmlwidget-72df6e256503a04e505c">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Average length after trimming<\/caption>","data":[["1","2","3","4","5","6","7","8"],["12-1-1","12-1-2","12-1-3","12-1-4","12-1-5","12-1-6","12-1-7","12-1-8"],["60.0312","62.0981","67.1198","67.0516","65.0367","64.2955","62.4742","61.8041"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>avg_length/read<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="counting-sites" class="section level1">
-<h1>Counting sites</h1>
+<div id="counting-motif-replicates-merged" class="section level1">
+<h1>Counting motif – replicates merged</h1>
+<div id="nucleoside" class="section level2">
+<h2>+- 1 nucleoside</h2>
 <div id="cutoff-read-depth-10-methelytion-level-10"
-class="section level2">
-<h2>cutoff: read depth 10, methelytion level = 10%</h2>
-<pre class="r"><code>coverage &lt;- 10
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  10
 mepct &lt;- 10
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/&quot;
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_1/&quot;
 
 ### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-processed_motif_data &lt;- process_motif_data(file_list)
+processed_motif_data &lt;- process_motif_data_merged(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,coverage,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
                   point_size = 4,
                   text_size = 3.5)</code></pre>
-<p><img src="figure/QC.Rmd/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC.Rmd/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
 Past versions of unnamed-chunk-3-1.png
@@ -1177,6 +1254,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/docs/figure/QC.Rmd/unnamed-chunk-3-1.png" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-3-1.png" target="_blank">3e0500c</a>
@@ -1237,30 +1325,49 @@ XSun
 </div>
 </div>
 <pre class="r"><code>### site overlap
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;temp_with_id_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
 overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 9439</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-cat(sprintf(&quot;The number of overlapping site among 4 samples is %s\n&quot;,overlap_count))</code></pre>
-<pre><code>The number of overlapping site among 4 samples is 2725</code></pre>
-</div>
-<div id="cutoff-read-depth-10-methelytion-level-20"
-class="section level2">
-<h2>cutoff: read depth 10, methelytion level = 20%</h2>
-<pre class="r"><code>coverage &lt;- 10
-mepct &lt;-20
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/&quot;
 
-### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
 
-processed_motif_data &lt;- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,coverage,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
-                  point_size = 4,
-                  text_size = 3.5)</code></pre>
-<p><img src="figure/QC.Rmd/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
 Past versions of unnamed-chunk-4-1.png
@@ -1283,6 +1390,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/docs/figure/QC.Rmd/unnamed-chunk-4-1.png" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-4-1.png" target="_blank">3e0500c</a>
@@ -1342,31 +1460,24 @@ XSun
 </table>
 </div>
 </div>
-<pre class="r"><code>### site overlap
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;temp_with_id_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
-
-overlap_count &lt;- count_overlap(file_list)
-
-cat(sprintf(&quot;The number of overlapping site among 4 samples is %s\n&quot;,overlap_count))</code></pre>
-<pre><code>The number of overlapping site among 4 samples is 1945</code></pre>
 </div>
-<div id="cutoff-read-depth-10-methelytion-level-30"
-class="section level2">
-<h2>cutoff: read depth 10, methelytion level = 30%</h2>
-<pre class="r"><code>coverage &lt;- 10
-mepct &lt;-30
+<div id="cutoff-read-depth-10-methelytion-level-20"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 20%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-20
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/&quot;
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_1/&quot;
 
 ### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-processed_motif_data &lt;- process_motif_data(file_list)
+processed_motif_data &lt;- process_motif_data_merged(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,coverage,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
                   point_size = 4,
                   text_size = 3.5)</code></pre>
-<p><img src="figure/QC.Rmd/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC.Rmd/unnamed-chunk-5-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
 Past versions of unnamed-chunk-5-1.png
@@ -1389,6 +1500,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/docs/figure/QC.Rmd/unnamed-chunk-5-1.png" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-5-1.png" target="_blank">3e0500c</a>
@@ -1438,30 +1560,49 @@ XSun
 </div>
 </div>
 <pre class="r"><code>### site overlap
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;temp_with_id_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
 overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 6223</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-cat(sprintf(&quot;The number of overlapping site among 4 samples is %s\n&quot;,overlap_count))</code></pre>
-<pre><code>The number of overlapping site among 4 samples is 1494</code></pre>
-</div>
-<div id="cutoff-read-depth-20-methelytion-level-10"
-class="section level2">
-<h2>cutoff: read depth 20, methelytion level = 10%</h2>
-<pre class="r"><code>coverage &lt;- 20
-mepct &lt;-10
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/&quot;
 
-### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
 
-processed_motif_data &lt;- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,coverage,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
-                  point_size = 4,
-                  text_size = 3.5)</code></pre>
-<p><img src="figure/QC.Rmd/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" /></p>
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
 Past versions of unnamed-chunk-6-1.png
@@ -1486,6 +1627,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/docs/figure/QC.Rmd/unnamed-chunk-6-1.png" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-6-1.png" target="_blank">3e0500c</a>
 </td>
 <td>
@@ -1499,31 +1651,24 @@ XSun
 </table>
 </div>
 </div>
-<pre class="r"><code>### site overlap
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;temp_with_id_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
-
-overlap_count &lt;- count_overlap(file_list)
-
-cat(sprintf(&quot;The number of overlapping site among 4 samples is %s\n&quot;,overlap_count))</code></pre>
-<pre><code>The number of overlapping site among 4 samples is 1217</code></pre>
 </div>
-<div id="cutoff-read-depth-30-methelytion-level-10"
-class="section level2">
-<h2>cutoff: read depth 30, methelytion level = 10%</h2>
-<pre class="r"><code>coverage &lt;- 30
-mepct &lt;-10
+<div id="cutoff-read-depth-10-methelytion-level-30"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 30%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-30
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/&quot;
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_1/&quot;
 
 ### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-processed_motif_data &lt;- process_motif_data(file_list)
+processed_motif_data &lt;- process_motif_data_merged(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,coverage,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
                   point_size = 4,
                   text_size = 3.5)</code></pre>
-<p><img src="figure/QC.Rmd/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC.Rmd/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
 Past versions of unnamed-chunk-7-1.png
@@ -1548,6 +1693,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/docs/figure/QC.Rmd/unnamed-chunk-7-1.png" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-7-1.png" target="_blank">3e0500c</a>
 </td>
 <td>
@@ -1562,30 +1718,49 @@ XSun
 </div>
 </div>
 <pre class="r"><code>### site overlap
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;temp_with_id_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
 overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 4737</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-cat(sprintf(&quot;The number of overlapping site among 4 samples is %s\n&quot;,overlap_count))</code></pre>
-<pre><code>The number of overlapping site among 4 samples is 743</code></pre>
-</div>
-<div id="cutoff-read-depth-40-methelytion-level-10"
-class="section level2">
-<h2>cutoff: read depth 40, methelytion level = 10%</h2>
-<pre class="r"><code>coverage &lt;- 40
-mepct &lt;-10
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace/count_sites/pileup/processed/&quot;
 
-### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
 
-processed_motif_data &lt;- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,coverage,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
-                  point_size = 4,
-                  text_size = 3.5)</code></pre>
-<p><img src="figure/QC.Rmd/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /></p>
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
 Past versions of unnamed-chunk-8-1.png
@@ -1610,6 +1785,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/0c03f558adecd48d81392440c65ad2da59808753/docs/figure/QC.Rmd/unnamed-chunk-8-1.png" target="_blank">0c03f55</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-8-1.png" target="_blank">3e0500c</a>
 </td>
 <td>
@@ -1623,13 +1809,1417 @@ XSun
 </table>
 </div>
 </div>
+</div>
+<div id="cutoff-read-depth-20-methelytion-level-10"
+class="section level3">
+<h3>cutoff: read depth 20, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  20
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-9-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/3e0500c4dab50aa6db58ad9a4a9f1ddb2da08cbf/docs/figure/QC.Rmd/unnamed-chunk-9-1.png" target="_blank">3e0500c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>### site overlap
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;temp_with_id_cov&quot;,coverage,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
 overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 4156</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 
-cat(sprintf(&quot;The number of overlapping site among 4 samples is %s\n&quot;,overlap_count))</code></pre>
-<pre><code>The number of overlapping site among 4 samples is 522</code></pre>
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-30-methelytion-level-10"
+class="section level3">
+<h3>cutoff: read depth 30, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  30
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 2452</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-40-methelytion-level-10"
+class="section level3">
+<h3>cutoff: read depth 40, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  40
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-13-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 1671</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="nucleosides" class="section level2">
+<h2>+- 2 nucleosides</h2>
+<div id="cutoff-read-depth-10-methelytion-level-10-1"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;- 10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 9439</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-10-methelytion-level-20-1"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 20%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-20
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 6223</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-10-methelytion-level-30-1"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 30%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-30
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-19-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 4737</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-20-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-20-methelytion-level-10-1"
+class="section level3">
+<h3>cutoff: read depth 20, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  20
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 4156</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-22-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-30-methelytion-level-10-1"
+class="section level3">
+<h3>cutoff: read depth 30, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  30
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 2452</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-24-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-40-methelytion-level-10-1"
+class="section level3">
+<h3>cutoff: read depth 40, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  40
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/merged/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+overlap_count &lt;- count_overlap(file_list)
+cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for the two sample is 1671</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-26-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="counting-motif-replicates-not-merged" class="section level1">
+<h1>Counting motif – replicates not merged</h1>
+<div id="nucleoside-1" class="section level2">
+<h2>+- 1 nucleoside</h2>
+<div id="cutoff-read-depth-10-methelytion-level-10-2"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;- 10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 3834</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 6157</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-28-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-10-methelytion-level-20-2"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 20%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-20
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 2523</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 4046</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-30-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-10-methelytion-level-30-2"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 30%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-30
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 1931</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 3076</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-32-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-20-methelytion-level-10-2"
+class="section level3">
+<h3>cutoff: read depth 20, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  20
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 1543</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 2703</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-34-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-30-methelytion-level-10-2"
+class="section level3">
+<h3>cutoff: read depth 30, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  30
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 902</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 1607</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-36-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-40-methelytion-level-10-2"
+class="section level3">
+<h3>cutoff: read depth 40, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  40
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 622</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 1093</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-38-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="nucleosides-1" class="section level2">
+<h2>+- 2 nucleosides</h2>
+<div id="cutoff-read-depth-10-methelytion-level-10-3"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;- 10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 3834</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 6157</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-40-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-10-methelytion-level-20-3"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 20%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-20
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 2523</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 4046</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-42-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-10-methelytion-level-30-3"
+class="section level3">
+<h3>cutoff: read depth 10, methelytion level = 30%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-30
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 1931</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 3076</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-44-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-20-methelytion-level-10-3"
+class="section level3">
+<h3>cutoff: read depth 20, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  20
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 1543</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 2703</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-46-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-30-methelytion-level-10-3"
+class="section level3">
+<h3>cutoff: read depth 30, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  30
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-47-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 902</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 1607</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-48-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cutoff-read-depth-40-methelytion-level-10-3"
+class="section level3">
+<h3>cutoff: read depth 40, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  40
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_sep/count_sites/pileup/processed_2/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-49-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>### site overlap
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+file_1_7 &lt;- file_list[c(1,3)]
+overlap_count &lt;- count_overlap(file_1_7)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-1 and 12-1-7 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-1 and 12-1-7 is 622</code></pre>
+<pre class="r"><code>file_2_8 &lt;- file_list[c(2,4)]
+overlap_count &lt;- count_overlap(file_2_8)
+cat(sprintf(&quot;The number of overlapping site for replicates 12-1-2 and 12-1-8 is %s\n&quot;,overlap_count))</code></pre>
+<pre><code>The number of overlapping site for replicates 12-1-2 and 12-1-8 is 1093</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+  
+  # Read the data
+  data &lt;- read.table(file_list[i], 
+                   header = TRUE, sep = &quot;\t&quot;)
+  
+    # Calculate methylation percentage (converted/(converted+unconverted))
+  data$methylation &lt;- data$convertedBaseCount / 
+                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
+  
+  data &lt;- data[!data$methylation &lt; mepct,]
+  
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+  
+  
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 2,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC.Rmd/unnamed-chunk-50-1.png" width="768" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1676,6 +3266,7 @@ loaded via a namespace (and not attached):
 [57] glue_1.6.2        crosstalk_1.2.0   hms_1.1.1         fastmap_1.1.0    
 [61] yaml_2.3.5        colorspace_2.0-3  rvest_1.0.2       knitr_1.39       
 [65] haven_2.5.0       sass_0.4.1       </code></pre>
+</div>
 </div>
 </div>
 </div>
