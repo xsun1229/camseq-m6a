@@ -232,6 +232,8 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-
 
 # Counting motif -- replicates merged
 
+The replicates are merged using only the final m6A site file, summing up the sites.
+
 ## +- 1 nucleoside 
 
 ### cutoff: read depth 10, methelytion level = 10%
