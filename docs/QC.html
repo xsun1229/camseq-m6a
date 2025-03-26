@@ -410,7 +410,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-25
+<strong>Last updated:</strong> 2025-03-26
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -544,15 +544,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreeadfc5a23404fd5822fe12be32be7f5e9c3a8d379targetblankadfc5a2a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree69da8f0fe8091360245c3bdab2357ea29bf0975atargetblank69da8f0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/adfc5a23404fd5822fe12be32be7f5e9c3a8d379" target="_blank">adfc5a2</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/69da8f0fe8091360245c3bdab2357ea29bf0975a" target="_blank">69da8f0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreeadfc5a23404fd5822fe12be32be7f5e9c3a8d379targetblankadfc5a2a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree69da8f0fe8091360245c3bdab2357ea29bf0975atargetblank69da8f0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -562,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/adfc5a23404fd5822fe12be32be7f5e9c3a8d379" target="_blank">adfc5a2</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/69da8f0fe8091360245c3bdab2357ea29bf0975a" target="_blank">69da8f0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -622,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/69da8f0fe8091360245c3bdab2357ea29bf0975a/analysis/QC.Rmd" target="_blank">69da8f0</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-25
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/69da8f0fe8091360245c3bdab2357ea29bf0975a/docs/QC.html" target="_blank">69da8f0</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2025-03-25
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1385,12 +1419,7 @@ for (i in 1:length(file_list)){
   # Read the data
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
-  
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
+
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -1398,7 +1427,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -1643,11 +1672,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -1655,7 +1679,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -1823,9 +1847,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
   
   data &lt;- data[!data$methylation &lt; mepct,]
   
@@ -1835,7 +1856,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -1992,9 +2013,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
   
   data &lt;- data[!data$methylation &lt; mepct,]
   
@@ -2004,7 +2022,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2128,10 +2146,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
   data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
@@ -2140,7 +2154,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2264,19 +2278,13 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
-  
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
       str_remove(&quot;^_+&quot;) %&gt;%
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2403,11 +2411,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -2415,7 +2418,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2539,19 +2542,14 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
-  
+
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
       str_remove(&quot;^_+&quot;) %&gt;%
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2675,11 +2673,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -2687,7 +2680,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2811,11 +2804,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -2823,7 +2811,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -2947,11 +2935,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -2959,7 +2942,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3083,11 +3066,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3095,7 +3073,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3230,11 +3208,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3242,7 +3215,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3371,11 +3344,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3383,7 +3351,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3512,11 +3480,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3524,7 +3487,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3653,11 +3616,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3665,7 +3623,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3794,11 +3752,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3806,7 +3759,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -3935,11 +3888,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -3947,7 +3895,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -4079,11 +4027,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -4091,7 +4034,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -4220,11 +4163,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -4232,7 +4170,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -4361,11 +4299,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -4373,7 +4306,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -4501,12 +4434,7 @@ for (i in 1:length(file_list)){
   # Read the data
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
-  
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
+
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -4514,7 +4442,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -4643,11 +4571,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -4655,7 +4578,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
@@ -4784,11 +4707,6 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i], 
                    header = TRUE, sep = &quot;\t&quot;)
   
-    # Calculate methylation percentage (converted/(converted+unconverted))
-  data$methylation &lt;- data$convertedBaseCount / 
-                   (data$convertedBaseCount + data$unconvertedBaseCount) * 100
-  
-  data &lt;- data[!data$methylation &lt; mepct,]
   
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;241217AVITI-He-lab-24JX-&quot;) %&gt;%
@@ -4796,7 +4714,7 @@ for (i in 1:length(file_list)){
       str_remove(&quot;_+$&quot;)
 
 
-  p[[i]] &lt;- ggplot(data, aes(x = methylation)) +
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
     labs(title = sample,
          x = &quot;Methylation Percentage (%)&quot;,
