@@ -10,4 +10,6 @@ editor_options:
 
 # Processing raw data
 
-[QC](https://xsun1229.github.io/camseq-m6a/QC.html)
+[QC -- data round 1](https://xsun1229.github.io/camseq-m6a/QC.html)
+
+[QC -- deeper sequencing](https://xsun1229.github.io/camseq-m6a/QC.html)
