@@ -183,6 +183,38 @@ https://xsun1229.github.io/camseq-m6a/multiqc_report_genome_all_deeper.html
 https://xsun1229.github.io/camseq-m6a/multiqc_report_aligned_bam_deeper.html
 
 
+# Trimming
+
+```{r}
+json_folder <- "/project/xinhe/xsun/camseq/data/workspace_deeper/report_reads/trimming/"
+
+# List all JSON files in the folder
+json_files <- list.files(json_folder, pattern = "*.json", full.names = TRUE)
+
+avg_length_all <- c()
+for (file in json_files) {
+  # Read the JSON file
+  
+  json_data <- fromJSON(file)
+  
+  total_bases <- json_data$basepair_counts$output
+  output_reads <- json_data$read_counts$output
+  
+  avg_length <- round(total_bases / (output_reads * 2),digits = 4)  # Paired-end
+  sample <- sub(".*/([0-9]+-[0-9]+-[0-9]+[a-z]?)_run1.*", "\\1", file)
+
+  
+  tmp <- c(sample, avg_length)
+  avg_length_all <- rbind(avg_length_all,tmp)
+  
+}
+
+rownames(avg_length_all) <- NULL
+colnames(avg_length_all) <- c("sample","avg_length/read")
+avg_length_all <- as.data.frame(avg_length_all )
+
+DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Average length after trimming'),options = list(pageLength = 10) )
+```
 
 # Counting motif -- replicates merged
 
@@ -198,7 +230,7 @@ The replicates are merged using only the final m6A site file, summing up the sit
 read_depth <-  10
 mepct <- 10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_1/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_1/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -263,7 +295,7 @@ grid.draw(combined)
 read_depth <-  10
 mepct <-20
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_1/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_1/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -329,7 +361,7 @@ grid.draw(combined)
 read_depth <-  10
 mepct <-30
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_1/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_1/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -396,7 +428,7 @@ grid.draw(combined)
 read_depth <-  20
 mepct <-10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_1/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_1/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -463,7 +495,7 @@ grid.draw(combined)
 read_depth <-  30
 mepct <-10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_1/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_1/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -529,7 +561,7 @@ grid.draw(combined)
 read_depth <-  40
 mepct <-10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_1/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_1/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -595,7 +627,7 @@ grid.draw(combined)
 read_depth <-  10
 mepct <- 10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_2/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_2/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -661,7 +693,7 @@ grid.draw(combined)
 read_depth <-  10
 mepct <-20
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_2/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_2/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -727,7 +759,7 @@ grid.draw(combined)
 read_depth <-  10
 mepct <-30
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_2/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_2/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -792,7 +824,7 @@ grid.draw(combined)
 read_depth <-  20
 mepct <-10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_2/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_2/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -857,7 +889,7 @@ grid.draw(combined)
 read_depth <-  30
 mepct <-10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_2/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_2/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
@@ -922,7 +954,7 @@ grid.draw(combined)
 read_depth <-  40
 mepct <-10
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data_deeper/workspace/count_sites/pileup/merged/processed_2/"
+folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_deeper/count_sites/pileup/merged/processed_2/"
 
 ### motif percentage
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
