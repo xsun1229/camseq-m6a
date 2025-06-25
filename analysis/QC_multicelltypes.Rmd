@@ -2,10 +2,11 @@
 title: "Quality Control -- multi cell types"
 author: "XSun"
 date: "2025-06-25"
-output: 
+output:
   workflowr::wflow_html:
-    code_folder: hide
+    code_folding: hide
     toc: true
+    
 ---
 
 ```{r message=F, warning=F}
