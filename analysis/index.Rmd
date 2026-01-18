@@ -10,10 +10,12 @@ editor_options:
 
 # Processing raw data
 
-[QC -- data round 1](https://xsun1229.github.io/camseq-m6a/QC.html)
+[QC -- data round 1, from Pingluan](https://xsun1229.github.io/camseq-m6a/QC.html)
 
-[QC -- deeper sequencing](https://xsun1229.github.io/camseq-m6a/QC_deeper.html)
+[QC -- deeper sequencing, from Pingluan](https://xsun1229.github.io/camseq-m6a/QC_deeper.html)
 
-[QC -- combining 2 rounds](https://xsun1229.github.io/camseq-m6a/QC_2rounds.html)
+[QC -- combining 2 rounds above](https://xsun1229.github.io/camseq-m6a/QC_2rounds.html)
 
-[QC -- multi cell types](https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html)
+[QC -- data round 3, from Jiahao](https://xsun1229.github.io/camseq-m6a/QC_round3.html)
+
+[QC -- multi cell types, from Kinga](https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html)
