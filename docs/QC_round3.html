@@ -544,15 +544,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree6de715b65eca2aa101922c198b0b3abd958dc8e4targetblank6de715ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreef26d88249e7d44607f5b3e9da84ddc2eb6883720targetblankf26d882a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/6de715b65eca2aa101922c198b0b3abd958dc8e4" target="_blank">6de715b</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/f26d88249e7d44607f5b3e9da84ddc2eb6883720" target="_blank">f26d882</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree6de715b65eca2aa101922c198b0b3abd958dc8e4targetblank6de715ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreef26d88249e7d44607f5b3e9da84ddc2eb6883720targetblankf26d882a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -562,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/6de715b65eca2aa101922c198b0b3abd958dc8e4" target="_blank">6de715b</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/f26d88249e7d44607f5b3e9da84ddc2eb6883720" target="_blank">f26d882</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/analysis/QC_round3.Rmd" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/QC_round3.html" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -861,6 +895,10 @@ avg_length_all &lt;- as.data.frame(avg_length_all )
 DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Average length after trimming&#39;),options = list(pageLength = 10) )</code></pre>
 <div id="htmlwidget-72df6e256503a04e505c" style="width:100%;height:auto;" class="datatables html-widget"></div>
 <script type="application/json" data-for="htmlwidget-72df6e256503a04e505c">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Average length after trimming<\/caption>","data":[["1","2","3","4","5"],["sample01","sample02","sample03","sample04","sample05"],["109.3582","73.2535","70.0873","61.9953","71.1141"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>sample<\/th>\n      <th>avg_length/read<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p>The input sample (sample01) retains substantially longer reads after
+trimming, indicating minimal chemical damage.</p>
+<p>Treated samples show shorter average read lengths, consistent with
+chemical treatment effects.</p>
 <!-- # Checking the read depth and methylation level for each sample -->
 <!-- ```{r fig.height=9, fig.width=8} -->
 <!-- dir_workspace <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/" -->
@@ -887,10 +925,37 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = &#39;capt
 <!-- all <- grid.arrange(p[[1]],p[[2]],p[[3]],p[[4]],p[[5]], nrow = 3) -->
 <!-- ``` -->
 </div>
-<div id="counting-motif" class="section level1">
-<h1>Counting motif</h1>
-<div id="nucleoside" class="section level2">
-<h2>+- 1 nucleoside</h2>
+<div id="motif-counting" class="section level1">
+<h1>Motif counting</h1>
+<p>Motifs are counted within ±1 nucleotide of the candidate modified
+base. This corresponds to a 3-nt window centered on the site of
+interest</p>
+<p>To reduce false positives and low-confidence sites, the following
+thresholds are applied before motif analysis:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Filter</th>
+<th>Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Minimum read depth</td>
+<td>≥ 10/20/30/40 reads</td>
+</tr>
+<tr class="even">
+<td>Minimum methylation level</td>
+<td>≥ 10/20/30%</td>
+</tr>
+</tbody>
+</table>
+<p>Definitions:</p>
+<ul>
+<li>Read depth: total number of reads covering a genomic position</li>
+<li>Methylation level:converted reads / total reads * 100%</li>
+</ul>
+<p>Only sites passing both criteria are retained</p>
 <div id="cutoff-read-depth-10-methelytion-level-10"
 class="section level3">
 <h3>cutoff: read depth 10, methelytion level = 10%</h3>
@@ -931,6 +996,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-3-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/6de715b65eca2aa101922c198b0b3abd958dc8e4/docs/figure/QC_round3.Rmd/unnamed-chunk-3-1.png" target="_blank">6de715b</a>
@@ -985,6 +1061,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-4-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-4-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="cutoff-read-depth-10-methelytion-level-20"
 class="section level3">
@@ -1004,6 +1117,43 @@ create_motif_plot(processed_motif_data,
                   point_size = 4,
                   text_size = 3.5)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-5-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-5-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># ### site overlap
 # file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 # 
@@ -1043,6 +1193,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-6-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-6-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="cutoff-read-depth-10-methelytion-level-30"
 class="section level3">
@@ -1062,6 +1249,43 @@ create_motif_plot(processed_motif_data,
                   point_size = 4,
                   text_size = 3.5)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-7-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># ### site overlap
 # file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 # 
@@ -1103,6 +1327,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-8-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-8-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="cutoff-read-depth-20-methelytion-level-10"
 class="section level3">
@@ -1122,6 +1383,43 @@ create_motif_plot(processed_motif_data,
                   point_size = 4,
                   text_size = 3.5)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-9-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-9-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># ### site overlap
 # file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 # 
@@ -1163,6 +1461,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-10-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-10-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="cutoff-read-depth-30-methelytion-level-10"
 class="section level3">
@@ -1182,6 +1517,43 @@ create_motif_plot(processed_motif_data,
                   point_size = 4,
                   text_size = 3.5)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-11-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># ### site overlap
 # file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 # 
@@ -1222,6 +1594,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-12-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-12-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="cutoff-read-depth-40-methelytion-level-10"
 class="section level3">
@@ -1241,6 +1650,43 @@ create_motif_plot(processed_motif_data,
                   point_size = 4,
                   text_size = 3.5)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-13-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
+Past versions of unnamed-chunk-13-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-13-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># ### site overlap
 # file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
 # 
@@ -1279,6 +1725,43 @@ combined &lt;- arrangeGrob(
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-14-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/f26d88249e7d44607f5b3e9da84ddc2eb6883720/docs/figure/QC_round3.Rmd/unnamed-chunk-14-1.png" target="_blank">f26d882</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <!-- ## +- 2 nucleosides -->
 <!-- ### cutoff: read depth 10, methelytion level = 10% -->
 <!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
@@ -1590,7 +2073,6 @@ loaded via a namespace (and not attached):
 [57] tools_4.2.0        dichromat_2.0-0.1  glue_1.6.2         crosstalk_1.2.0   
 [61] hms_1.1.1          fastmap_1.1.0      yaml_2.3.5         rvest_1.0.2       
 [65] knitr_1.39         haven_2.5.0        sass_0.4.1        </code></pre>
-</div>
 </div>
 </div>
 </div>

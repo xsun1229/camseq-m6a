@@ -211,6 +211,10 @@ avg_length_all <- as.data.frame(avg_length_all )
 DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Average length after trimming'),options = list(pageLength = 10) )
 ```
 
+The input sample (sample01) retains substantially longer reads after trimming, indicating minimal chemical damage.
+
+Treated samples show shorter average read lengths, consistent with chemical treatment effects.
+
 
 <!-- # Checking the read depth and methylation level for each sample -->
 
@@ -251,9 +255,25 @@ DT::datatable(avg_length_all,caption = htmltools::tags$caption(style = 'caption-
 <!-- ``` -->
 
 
-# Counting motif
+# Motif counting
 
-## +- 1 nucleoside
+Motifs are counted within ±1 nucleotide of the candidate modified base. This corresponds to a 3-nt window centered on the site of interest
+
+To reduce false positives and low-confidence sites, the following thresholds are applied before motif analysis:
+
+| Filter                    | Threshold  |
+| ------------------------- | ---------- |
+| Minimum read depth        | ≥ 10/20/30/40 reads |
+| Minimum methylation level | ≥ 10/20/30%      |
+
+
+Definitions:
+
+- Read depth: total number of reads covering a genomic position
+- Methylation level:converted reads / total reads * 100%
+
+Only sites passing both criteria are retained 
+
 
 ### cutoff: read depth 10, methelytion level = 10%
 
