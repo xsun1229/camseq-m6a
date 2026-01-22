@@ -29,10 +29,7 @@ process_motif_data <- function(file_list) {
     
     # Extract sample name
     sample_name <- basename(.x) %>%
-      str_remove(".genome.tsv_motif_summary_read\\d+_mepct\\d+\\.tsv$") %>%
-      #str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+      str_extract("^sample\\d+")
     
     # Read and process data
     sample_data <- read_table(.x, 
@@ -71,7 +68,7 @@ process_motif_data_merged <- function(file_list) {
     
     # Extract sample name
     sample_name <- basename(.x) %>%
-      str_extract("^sample\\d+")
+      stringr::str_extract("(?<=merged_)[^.]+")
     
     # Read and process data
     sample_data <- read_table(.x, 
@@ -169,6 +166,21 @@ count_overlap <- function(file_list) {
 
 ```
 
+
+# Sample information 
+
+| Condition / Description | Sample ID            | i7 Index Name | i7 Index Seq | i5 Index Name | i5 Index Seq | i5 Rev Comp | Index Kit | Input |
+|------------------------|-----------------------|---------------|--------------|---------------|--------------|-------------|-----------|-------|
+| HEK293T input          | JL-CAM-1(sample01)    | NEB S773      | ATCTGACC     | NEB S593      | CTCGACTT     | AAGTCGAG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| Mfs_NI_RIH014 treat    | JL-CAM-2(sample02)    | NEB S714      | AACCAGAG     | NEB S520      | CTTCGGTT     | AACCGAAG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| Mfs_LPS_RIH004 treat   | JL-CAM-3(sample03)    | NEB S761      | GTACCACA     | NEB S533      | CCACAACA     | TGTTGTGG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| Mfs_LPS_RIH007 treat   | JL-CAM-4(sample04)    | NEB S721      | CGAGAGAA     | NEB S508      | GGAAGAGA     | TCTCTTCC    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| HEK293T treat          | JL-CAM-5(sample05)    | NEB S792      | CAGCATAC     | NEB S534      | GCGTTAGA     | TCTAACGC    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+
+
+Sample 2-4 are from the same cell type, so they should be similar. So we merged the M6A sites of these 3 samples later.
+
+
 # Output from multiqc 
 
 ## Pipeline output 
@@ -259,6 +271,83 @@ Treated samples show shorter average read lengths, consistent with chemical trea
 
 Motifs are counted within ±1 nucleotide of the candidate modified base. This corresponds to a 3-nt window centered on the site of interest
 
+## Filter the M6A sites by site-level p-value
+
+**Site-level p-value calculation**
+
+For each site, the number of unconverted reads is modeled as a binomial random variable,
+\( X \sim \mathrm{Binomial}(n, p_{\mathrm{bg}}) \),
+where \( n \) is the total read depth at the site and \( p_{\mathrm{bg}} \) represents the background probability of observing an unconverted A due to random sequencing or reverse-transcription errors and incomplete chemical conversion. Sites are first filtered by a minimum read depth to ensure stable statistical estimation. 
+
+The background probability is set to 0.05
+
+<!-- Because the input/control sample contains too few high-coverage sites to reliably estimate background, \( p_{\mathrm{bg}} \) is estimated empirically from a large set of background sites in the treated sample that are unlikely to be modified (e.g., m⁶A-rare motifs or sites with low unconverted fractions). Specifically, \( p_{\mathrm{bg}} \) is calculated as \( \sum k / \sum n \), where \( k \) and \( n \) denote the unconverted read counts and total depth aggregated across background sites. For each tested site, a one-sided binomial p-value is computed as \( P(X \ge k) \), and sites passing both the depth filter and a stringent p-value cutoff are classified as significantly modified. -->
+
+
+ref: PMID: 40247118 SI page3
+
+
+### read depth 20, p-value < 0.0001 (The background probability is set to 0.05)
+
+
+```{r warning=F, message=F, fig.height=5, fig.width=6}
+
+read_depth <-  20
+binomp <- "0.0001"
+
+folder_countsites <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites_merged/processed_binomp_",binomp,"_1n/")
+
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_binomp",binomp),full.names = T)
+
+processed_motif_data <- process_motif_data_merged(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("read depth = ",read_depth,", binomial p-value < ",binomp),
+                  point_size = 4,
+                  text_size = 3.5)
+
+```
+
+
+```{r warning=F, message=F, fig.height=4, fig.width=5}
+
+file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_binomp",binomp),full.names = T)
+
+p <- list()
+for (i in 1:length(file_list)){
+
+  # Read the data
+  data <- read.table(file_list[i],
+                   header = TRUE, sep = "\t")
+
+
+  sample <- basename(file_list[i]) %>%
+    stringr::str_extract("(?<=merged_)[^.]+")
+  
+
+  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
+    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+    labs(title = sample,
+         x = "Methylation Percentage (%)",
+         y = "Frequency") +
+    theme_minimal()
+
+
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0("Cutoff: read depth =",read_depth,", binomial p-value < ",binomp), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+
+## Filter the M6A sites by read depth and methylation level
+
+
 To reduce false positives and low-confidence sites, the following thresholds are applied before motif analysis:
 
 | Filter                    | Threshold  |
@@ -289,7 +378,7 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sit
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
 file_list <- file_list[2:5]
 
-processed_motif_data <- process_motif_data_merged(file_list)
+processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
                   point_size = 4,
@@ -356,7 +445,7 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sit
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
 file_list <- file_list[2:5]
 
-processed_motif_data <- process_motif_data_merged(file_list)
+processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
                   point_size = 4,
@@ -424,7 +513,7 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sit
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
 file_list <- file_list[2:5]
 
-processed_motif_data <- process_motif_data_merged(file_list)
+processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
                   point_size = 4,
@@ -493,7 +582,7 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sit
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
 file_list <- file_list[2:5]
 
-processed_motif_data <- process_motif_data_merged(file_list)
+processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
                   point_size = 4,
@@ -562,7 +651,7 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sit
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
 file_list <- file_list[2:5]
 
-processed_motif_data <- process_motif_data_merged(file_list)
+processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
                   point_size = 4,
@@ -630,7 +719,7 @@ folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sit
 file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
 file_list <- file_list[2:5]
 
-processed_motif_data <- process_motif_data_merged(file_list)
+processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
                   point_size = 4,
@@ -698,7 +787,7 @@ grid.draw(combined)
 <!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
 <!-- file_list <- file_list[2:5] -->
 
-<!-- processed_motif_data <- process_motif_data_merged(file_list) -->
+<!-- processed_motif_data <- process_motif_data(file_list) -->
 <!-- create_motif_plot(processed_motif_data, -->
 <!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
 <!--                   point_size = 4, -->
@@ -765,7 +854,7 @@ grid.draw(combined)
 <!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
 <!-- file_list <- file_list[2:5] -->
 
-<!-- processed_motif_data <- process_motif_data_merged(file_list) -->
+<!-- processed_motif_data <- process_motif_data(file_list) -->
 <!-- create_motif_plot(processed_motif_data, -->
 <!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
 <!--                   point_size = 4, -->
@@ -832,7 +921,7 @@ grid.draw(combined)
 <!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
 <!-- file_list <- file_list[2:5] -->
 
-<!-- processed_motif_data <- process_motif_data_merged(file_list) -->
+<!-- processed_motif_data <- process_motif_data(file_list) -->
 <!-- create_motif_plot(processed_motif_data, -->
 <!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
 <!--                   point_size = 4, -->
@@ -898,7 +987,7 @@ grid.draw(combined)
 <!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
 <!-- file_list <- file_list[2:5] -->
 
-<!-- processed_motif_data <- process_motif_data_merged(file_list) -->
+<!-- processed_motif_data <- process_motif_data(file_list) -->
 <!-- create_motif_plot(processed_motif_data, -->
 <!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
 <!--                   point_size = 4, -->
@@ -964,7 +1053,7 @@ grid.draw(combined)
 <!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
 <!-- file_list <- file_list[2:5] -->
 
-<!-- processed_motif_data <- process_motif_data_merged(file_list) -->
+<!-- processed_motif_data <- process_motif_data(file_list) -->
 <!-- create_motif_plot(processed_motif_data, -->
 <!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
 <!--                   point_size = 4, -->
@@ -1030,7 +1119,7 @@ grid.draw(combined)
 <!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
 <!-- file_list <- file_list[2:5] -->
 
-<!-- processed_motif_data <- process_motif_data_merged(file_list) -->
+<!-- processed_motif_data <- process_motif_data(file_list) -->
 <!-- create_motif_plot(processed_motif_data, -->
 <!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
 <!--                   point_size = 4, -->
