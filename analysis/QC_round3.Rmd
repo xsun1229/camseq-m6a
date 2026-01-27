@@ -345,6 +345,62 @@ grid.draw(combined)
 ```
 
 
+```{r warning=F, message=F, fig.height=5, fig.width=6}
+
+read_depth <-  20
+binomp <- "0.0001"
+
+folder_countsites <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_",binomp,"_1n/")
+
+### motif percentage
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_binomp",binomp),full.names = T)
+
+processed_motif_data <- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0("read depth = ",read_depth,", binomial p-value < ",binomp),
+                  point_size = 4,
+                  text_size = 3.5)
+
+```
+
+
+```{r warning=F, message=F, fig.height=4, fig.width=16}
+
+file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_binomp",binomp),full.names = T)
+
+p <- list()
+for (i in 1:length(file_list)){
+
+  # Read the data
+  data <- read.table(file_list[i],
+                   header = TRUE, sep = "\t")
+
+  
+  sample <- basename(file_list[i]) %>%
+    str_extract("^sample\\d+")
+  
+
+  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
+    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+    labs(title = sample,
+         x = "Methylation Percentage (%)",
+         y = "Frequency") +
+    theme_minimal()
+
+
+}
+
+combined <- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0("Cutoff: read depth =",read_depth,", binomial p-value < ",binomp), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)
+
+```
+
+
+
 ## Filter the M6A sites by read depth and methylation level
 
 

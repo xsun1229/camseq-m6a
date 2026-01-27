@@ -544,15 +544,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree9246411501dacb42e4d4ca9a5cc70cb0e84d3bd0targetblank9246411a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreee95a2a24418bc40f223379f21910b6fdc61487catargetblanke95a2a2a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/9246411501dacb42e4d4ca9a5cc70cb0e84d3bd0" target="_blank">9246411</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/e95a2a24418bc40f223379f21910b6fdc61487ca" target="_blank">e95a2a2</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree9246411501dacb42e4d4ca9a5cc70cb0e84d3bd0targetblank9246411a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreee95a2a24418bc40f223379f21910b6fdc61487catargetblanke95a2a2a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -562,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/9246411501dacb42e4d4ca9a5cc70cb0e84d3bd0" target="_blank">9246411</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/e95a2a24418bc40f223379f21910b6fdc61487ca" target="_blank">e95a2a2</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -623,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e95a2a24418bc40f223379f21910b6fdc61487ca/analysis/QC_round3.Rmd" target="_blank">e95a2a2</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-27
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/e95a2a24418bc40f223379f21910b6fdc61487ca/docs/QC_round3.html" target="_blank">e95a2a2</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-01-27
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1312,52 +1346,17 @@ XSun
 </table>
 </div>
 </div>
-</div>
-</div>
-<div id="filter-the-m6a-sites-by-read-depth-and-methylation-level"
-class="section level2">
-<h2>Filter the M6A sites by read depth and methylation level</h2>
-<p>To reduce false positives and low-confidence sites, the following
-thresholds are applied before motif analysis:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Filter</th>
-<th>Threshold</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Minimum read depth</td>
-<td>≥ 10/20/30/40 reads</td>
-</tr>
-<tr class="even">
-<td>Minimum methylation level</td>
-<td>≥ 10/20/30%</td>
-</tr>
-</tbody>
-</table>
-<p>Definitions:</p>
-<ul>
-<li>Read depth: total number of reads covering a genomic position</li>
-<li>Methylation level:converted reads / total reads * 100%</li>
-</ul>
-<p>Only sites passing both criteria are retained</p>
-<div id="cutoff-read-depth-10-methelytion-level-10"
-class="section level3">
-<h3>cutoff: read depth 10, methelytion level = 10%</h3>
-<pre class="r"><code>read_depth &lt;-  10
-mepct &lt;- 10
+<pre class="r"><code>read_depth &lt;-  20
+binomp &lt;- &quot;0.0001&quot;
 
-folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
+folder_countsites &lt;- paste0(&quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_&quot;,binomp,&quot;_1n/&quot;)
 
 ### motif percentage
-file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
-file_list &lt;- file_list[2:5]
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_binomp&quot;,binomp),full.names = T)
 
 processed_motif_data &lt;- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
-                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, binomial p-value &lt; &quot;,binomp),
                   point_size = 4,
                   text_size = 3.5)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-5-1.png" width="576" style="display: block; margin: auto;" /></p>
@@ -1409,13 +1408,7 @@ XSun
 </table>
 </div>
 </div>
-<pre class="r"><code># ### site overlap
-# file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
-# 
-# overlap_count &lt;- count_overlap(file_list)
-# cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
-<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
-file_list &lt;- file_list[2:5]
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_binomp&quot;,binomp),full.names = T)
 
 p &lt;- list()
 for (i in 1:length(file_list)){
@@ -1424,12 +1417,10 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i],
                    header = TRUE, sep = &quot;\t&quot;)
 
-
-  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
-      str_remove(&quot;.genome.tsv&quot;) %&gt;%
-      str_remove(&quot;^_+&quot;) %&gt;%
-      str_remove(&quot;_+$&quot;)
-
+  
+  sample &lt;- basename(file_list[i]) %&gt;%
+    str_extract(&quot;^sample\\d+&quot;)
+  
 
   p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
@@ -1444,7 +1435,7 @@ for (i in 1:length(file_list)){
 combined &lt;- arrangeGrob(
   grobs = p,
   nrow = 1,
-  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, binomial p-value &lt; &quot;,binomp), gp = gpar(fontsize = 14))
 )
 grid.draw(combined)</code></pre>
 <p><img src="figure/QC_round3.Rmd/unnamed-chunk-6-1.png" width="1536" style="display: block; margin: auto;" /></p>
@@ -1497,11 +1488,41 @@ XSun
 </div>
 </div>
 </div>
-<div id="cutoff-read-depth-10-methelytion-level-20"
+</div>
+<div id="filter-the-m6a-sites-by-read-depth-and-methylation-level"
+class="section level2">
+<h2>Filter the M6A sites by read depth and methylation level</h2>
+<p>To reduce false positives and low-confidence sites, the following
+thresholds are applied before motif analysis:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Filter</th>
+<th>Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Minimum read depth</td>
+<td>≥ 10/20/30/40 reads</td>
+</tr>
+<tr class="even">
+<td>Minimum methylation level</td>
+<td>≥ 10/20/30%</td>
+</tr>
+</tbody>
+</table>
+<p>Definitions:</p>
+<ul>
+<li>Read depth: total number of reads covering a genomic position</li>
+<li>Methylation level:converted reads / total reads * 100%</li>
+</ul>
+<p>Only sites passing both criteria are retained</p>
+<div id="cutoff-read-depth-10-methelytion-level-10"
 class="section level3">
-<h3>cutoff: read depth 10, methelytion level = 20%</h3>
+<h3>cutoff: read depth 10, methelytion level = 10%</h3>
 <pre class="r"><code>read_depth &lt;-  10
-mepct &lt;-20
+mepct &lt;- 10
 
 folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
 
@@ -1651,11 +1672,11 @@ XSun
 </div>
 </div>
 </div>
-<div id="cutoff-read-depth-10-methelytion-level-30"
+<div id="cutoff-read-depth-10-methelytion-level-20"
 class="section level3">
-<h3>cutoff: read depth 10, methelytion level = 30%</h3>
+<h3>cutoff: read depth 10, methelytion level = 20%</h3>
 <pre class="r"><code>read_depth &lt;-  10
-mepct &lt;-30
+mepct &lt;-20
 
 folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
 
@@ -1733,8 +1754,6 @@ for (i in 1:length(file_list)){
                    header = TRUE, sep = &quot;\t&quot;)
 
 
-  data &lt;- data[!data$methylation &lt; mepct,]
-
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;.genome.tsv&quot;) %&gt;%
       str_remove(&quot;^_+&quot;) %&gt;%
@@ -1807,11 +1826,11 @@ XSun
 </div>
 </div>
 </div>
-<div id="cutoff-read-depth-20-methelytion-level-10"
+<div id="cutoff-read-depth-10-methelytion-level-30"
 class="section level3">
-<h3>cutoff: read depth 20, methelytion level = 10%</h3>
-<pre class="r"><code>read_depth &lt;-  20
-mepct &lt;-10
+<h3>cutoff: read depth 10, methelytion level = 30%</h3>
+<pre class="r"><code>read_depth &lt;-  10
+mepct &lt;-30
 
 folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
 
@@ -1963,10 +1982,10 @@ XSun
 </div>
 </div>
 </div>
-<div id="cutoff-read-depth-30-methelytion-level-10"
+<div id="cutoff-read-depth-20-methelytion-level-10"
 class="section level3">
-<h3>cutoff: read depth 30, methelytion level = 10%</h3>
-<pre class="r"><code>read_depth &lt;-  30
+<h3>cutoff: read depth 20, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  20
 mepct &lt;-10
 
 folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
@@ -2044,6 +2063,7 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i],
                    header = TRUE, sep = &quot;\t&quot;)
 
+
   data &lt;- data[!data$methylation &lt; mepct,]
 
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
@@ -2118,10 +2138,10 @@ XSun
 </div>
 </div>
 </div>
-<div id="cutoff-read-depth-40-methelytion-level-10"
+<div id="cutoff-read-depth-30-methelytion-level-10"
 class="section level3">
-<h3>cutoff: read depth 40, methelytion level = 10%</h3>
-<pre class="r"><code>read_depth &lt;-  40
+<h3>cutoff: read depth 30, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  30
 mepct &lt;-10
 
 folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
@@ -2188,6 +2208,8 @@ for (i in 1:length(file_list)){
   data &lt;- read.table(file_list[i],
                    header = TRUE, sep = &quot;\t&quot;)
 
+  data &lt;- data[!data$methylation &lt; mepct,]
+
   sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
       str_remove(&quot;.genome.tsv&quot;) %&gt;%
       str_remove(&quot;^_+&quot;) %&gt;%
@@ -2248,6 +2270,63 @@ XSun
 </table>
 </div>
 </div>
+</div>
+<div id="cutoff-read-depth-40-methelytion-level-10"
+class="section level3">
+<h3>cutoff: read depth 40, methelytion level = 10%</h3>
+<pre class="r"><code>read_depth &lt;-  40
+mepct &lt;-10
+
+folder_countsites &lt;- &quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/&quot;
+
+### motif percentage
+file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;motif_summary_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- file_list[2:5]
+
+processed_motif_data &lt;- process_motif_data(file_list)
+create_motif_plot(processed_motif_data,
+                  title = paste0(&quot;read depth = &quot;,read_depth,&quot;, methylation level = &quot;,mepct,&quot;%&quot;),
+                  point_size = 4,
+                  text_size = 3.5)</code></pre>
+<p><img src="figure/QC_round3.Rmd/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># ### site overlap
+# file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+# 
+# overlap_count &lt;- count_overlap(file_list)
+# cat(sprintf(&quot;The number of overlapping site for the two sample is %s\n&quot;,overlap_count))</code></pre>
+<pre class="r"><code>file_list &lt;- list.files(path =  folder_countsites,pattern = paste0(&quot;with_id_read&quot;,read_depth,&quot;_mepct&quot;,mepct),full.names = T)
+file_list &lt;- file_list[2:5]
+
+p &lt;- list()
+for (i in 1:length(file_list)){
+
+  # Read the data
+  data &lt;- read.table(file_list[i],
+                   header = TRUE, sep = &quot;\t&quot;)
+
+  sample &lt;- basename(file_list[i]) %&gt;% str_remove(&quot;_with_id_read\\d+_mepct\\d+\\.tsv$&quot;) %&gt;%
+      str_remove(&quot;.genome.tsv&quot;) %&gt;%
+      str_remove(&quot;^_+&quot;) %&gt;%
+      str_remove(&quot;_+$&quot;)
+
+
+  p[[i]] &lt;- ggplot(data, aes(x = methylation_mepct)) +
+    geom_histogram(binwidth = 5, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+    labs(title = sample,
+         x = &quot;Methylation Percentage (%)&quot;,
+         y = &quot;Frequency&quot;) +
+    theme_minimal()
+
+
+}
+
+combined &lt;- arrangeGrob(
+  grobs = p,
+  nrow = 1,
+  top = textGrob(paste0(&quot;Cutoff: read depth =&quot;,read_depth,&quot;, methlation level = &quot;,mepct), gp = gpar(fontsize = 14))
+)
+grid.draw(combined)</code></pre>
+<p><img src="figure/QC_round3.Rmd/unnamed-chunk-18-1.png" width="1536" style="display: block; margin: auto;" /></p>
 <!-- ## +- 2 nucleosides -->
 <!-- ### cutoff: read depth 10, methelytion level = 10% -->
 <!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
