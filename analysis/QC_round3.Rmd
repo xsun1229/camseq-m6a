@@ -169,7 +169,7 @@ count_overlap <- function(file_list) {
 
 # Sample information 
 
-| Condition / Description | Sample ID            | i7 Index Name | i7 Index Seq | i5 Index Name | i5 Index Seq | i5 Rev Comp | Index Kit | Input |
+| Condition / Description | Sample ID            | i7 Index Name | i7 Index Seq | i5 Index Name | i5 Index Seq | i5 Rev Comp | Manufacturer | Input |
 |------------------------|-----------------------|---------------|--------------|---------------|--------------|-------------|-----------|-------|
 | HEK293T input          | JL-CAM-1(sample01)    | NEB S773      | ATCTGACC     | NEB S593      | CTCGACTT     | AAGTCGAG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
 | Mfs_NI_RIH014 treat    | JL-CAM-2(sample02)    | NEB S714      | AACCAGAG     | NEB S520      | CTTCGGTT     | AACCGAAG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
@@ -279,7 +279,7 @@ For each site, the number of unconverted reads is modeled as a binomial random v
 \( X \sim \mathrm{Binomial}(n, p_{\mathrm{bg}}) \),
 where \( n \) is the total read depth at the site and \( p_{\mathrm{bg}} \) represents the background probability of observing an unconverted A due to random sequencing or reverse-transcription errors and incomplete chemical conversion. Sites are first filtered by a minimum read depth to ensure stable statistical estimation. 
 
-The background probability is set to 0.05
+The background probability is set to 0.005
 
 <!-- Because the input/control sample contains too few high-coverage sites to reliably estimate background, \( p_{\mathrm{bg}} \) is estimated empirically from a large set of background sites in the treated sample that are unlikely to be modified (e.g., m⁶A-rare motifs or sites with low unconverted fractions). Specifically, \( p_{\mathrm{bg}} \) is calculated as \( \sum k / \sum n \), where \( k \) and \( n \) denote the unconverted read counts and total depth aggregated across background sites. For each tested site, a one-sided binomial p-value is computed as \( P(X \ge k) \), and sites passing both the depth filter and a stringent p-value cutoff are classified as significantly modified. -->
 
