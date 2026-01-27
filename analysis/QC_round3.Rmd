@@ -287,7 +287,7 @@ The background probability is set to 0.005
 ref: PMID: 40247118 SI page3
 
 
-### read depth 20, p-value < 0.0001 (The background probability is set to 0.05)
+### read depth 20, p-value < 0.0001 (The background probability is set to 0.005)
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=6}
