@@ -18,4 +18,6 @@ editor_options:
 
 [QC -- data round 3, from Jiahao](https://xsun1229.github.io/camseq-m6a/QC_round3.html)
 
-[QC -- multi cell types, from Kinga](https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html)
+[Comparing m6a sites from sample5 with camseq paper](https://xsun1229.github.io/camseq-m6a/compare_round3_sample5_camseqpaper.html)
+
+[QC -- multi cell types, from Kinga, has some quality issues](https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html)

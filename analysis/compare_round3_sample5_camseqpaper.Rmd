@@ -1,0 +1,28 @@
+---
+title: "Comparing m6a sites from sample5 with camseq paper"
+author: "XSun"
+date: "2026-02-01"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+We compare the m6a sites called from sample 5 (https://xsun1229.github.io/camseq-m6a/QC_round3.html) with the camseq paper.
+
+camseq paper: 
+
+[Small-molecule-catalysed deamination enables transcriptome-wide profiling of N6-methyladenosine in RNA](https://pubmed.ncbi.nlm.nih.gov/40247118/)
+
+Data: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE268871
+
+
+## 
+
+
+
+```{r}
+
+```
+

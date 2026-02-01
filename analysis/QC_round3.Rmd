@@ -287,13 +287,13 @@ The background probability is set to 0.005
 ref: PMID: 40247118 SI page3
 
 
-### read depth 20, p-value < 0.0001 (The background probability is set to 0.005)
+### read depth 20, p-value < 0.001 (The background probability is set to 0.005)
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=6}
 
 read_depth <-  20
-binomp <- "0.0001"
+binomp <- "0.001"
 
 folder_countsites <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites_merged/processed_binomp_",binomp,"_1n/")
 
@@ -348,7 +348,7 @@ grid.draw(combined)
 ```{r warning=F, message=F, fig.height=5, fig.width=6}
 
 read_depth <-  20
-binomp <- "0.0001"
+binomp <- "0.001"
 
 folder_countsites <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_",binomp,"_1n/")
 
