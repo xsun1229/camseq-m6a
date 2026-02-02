@@ -2,14 +2,15 @@
 title: "Comparing m6a sites from sample5 with camseq paper"
 author: "XSun"
 date: "2026-02-01"
-output: workflowr::wflow_html
-editor_options:
-  chunk_output_type: console
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
 ---
 
 # Introduction
 
-We compare the m6a sites called from sample 5 (https://xsun1229.github.io/camseq-m6a/QC_round3.html) with the camseq paper.
+We compare the m6a sites called from sample 5 (HEK293T cell, https://xsun1229.github.io/camseq-m6a/QC_round3.html) with the camseq paper.
 
 camseq paper: 
 
@@ -17,12 +18,68 @@ camseq paper:
 
 Data: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE268871
 
+```{r message=F, warning=F}
 
-## 
+library(data.table)
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/data/data_campaper/sum_d20_p30.tsv")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
 
 
-
-```{r}
+print(paste0("Total number of m6a sites reported by the camseq paper (p<0.001, depth >=20): ", nrow(df_paper_raw)))
 
 ```
+
+
+# Comparison 
+
+We vary the read depth (10, 15, 20)/ methylation level (0, 0.05,0.1) / p-value (0.01, 0.001, 0.0001) for our data, then compare the m6a sites with the paper.
+
+
+```{r message=F, warning=F}
+
+READDEPTH_vec <- c(10, 15, 20)
+p_cutoff_str_vec <- c("0.01", "0.001", "0.0001")
+methylation_vec <- c(0, 0.05, 0.1)
+
+df_summary <- c()
+for (rd in READDEPTH_vec) {
+  
+  for (p_cutoff_str in p_cutoff_str_vec){
+    
+    for (methylation_level in methylation_vec){
+      
+      file_ours <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_", p_cutoff_str,"_1n/sample05_with_id_read", rd,"_binomp", p_cutoff_str,".tsv")
+      df_ours_raw <- fread(file_ours)
+      df_ours_raw$methylation_mepct <- df_ours_raw$methylation_mepct/100
+      df_ours_mefiltered <- df_ours_raw[df_ours_raw$methylation_mepct >= methylation_level,]
+      
+      df_ours_mefiltered$site <- paste0(df_ours_mefiltered$ref,"-",df_ours_mefiltered$pos)
+      df_paper_raw$site <- paste0(df_paper_raw$Chrom,"-",df_paper_raw$Pos)
+      
+      num_overlap <- sum(df_ours_mefiltered$site %in% df_paper_raw$site)
+      
+      tmp <- c(rd, p_cutoff_str, methylation_level, nrow(df_ours_mefiltered), num_overlap, num_overlap/nrow(df_ours_mefiltered)*100)
+      df_summary <- rbind(df_summary, tmp)
+      
+    }
+    
+    
+    
+  }
+  
+  
+}
+
+df_summary <- as.data.frame(df_summary)
+colnames(df_summary) <- c("Read_depth", "binomial_p","methylation_level_fileter","#sites_filtered","#sites_overlap_with_paper","%sites_overlap_with_paper")
+
+
+DT::datatable(df_summary,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Overlap with the cam-seq paper'),options = list(pageLength = 10) )
+
+```
+
+
+
 
