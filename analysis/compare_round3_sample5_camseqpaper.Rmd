@@ -21,6 +21,8 @@ Data: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE268871
 ```{r message=F, warning=F}
 
 library(data.table)
+library(gridExtra)
+library(ggplot2)
 
 df_paper_raw <- fread("/project/xinhe/xsun/camseq/data/data_campaper/sum_d20_p30.tsv")
 
@@ -37,47 +39,151 @@ print(paste0("Total number of m6a sites reported by the camseq paper (p<0.001, d
 We vary the read depth (10, 15, 20)/ methylation level (0, 0.05,0.1) / p-value (0.01, 0.001, 0.0001) for our data, then compare the m6a sites with the paper.
 
 
-```{r message=F, warning=F}
+```{r message=F, warning=F, fig.height=27, fig.width=12}
 
-READDEPTH_vec <- c(10, 15, 20)
-p_cutoff_str_vec <- c("0.01", "0.001", "0.0001")
-methylation_vec <- c(0, 0.05, 0.1)
+# READDEPTH_vec <- c(10, 15, 20)
+# p_cutoff_str_vec <- c("0.01", "0.001", "0.0001")
+# methylation_vec <- c(0, 0.05, 0.1)
+# 
+# df_summary <- c()
+# p <- list()
+# for (rd in READDEPTH_vec) {
+#   
+#   for (p_cutoff_str in p_cutoff_str_vec){
+#     
+#     for (methylation_level in methylation_vec){
+#       
+#       file_ours <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_", p_cutoff_str,"_1n/sample05_with_id_read", rd,"_binomp", p_cutoff_str,".tsv")
+#       df_ours_raw <- fread(file_ours)
+#       df_ours_raw$methylation_mepct <- df_ours_raw$methylation_mepct/100
+#       df_ours_mefiltered <- df_ours_raw[df_ours_raw$methylation_mepct >= methylation_level,]
+#       
+#       df_ours_mefiltered$site <- paste0(df_ours_mefiltered$ref,"-",df_ours_mefiltered$pos)
+#       df_paper_raw$site <- paste0(df_paper_raw$Chrom,"-",df_paper_raw$Pos)
+#       df_paper_raw$methylation_level <- df_paper_raw$Uncon / df_paper_raw$Depth
+#       
+#       df_merge <- merge(df_ours_mefiltered, df_paper_raw, by="site")
+#       
+#       p[[length(p) + 1]] <- ggplot(df_merge, aes(x = methylation_level, y = methylation_mepct)) +
+#         geom_point(alpha = 0.6, size = 2) +
+#         geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+#         labs(
+#           x = "Paper methylation level",
+#           y = "Our methylation level",
+#           title = sprintf("read depth %s, p-val %s, methylation level %s",rd,p_cutoff_str, methylation_level)
+#         ) +
+#         coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+#         theme_classic(base_size = 14)
+#       
+#       
+#       num_overlap <- sum(df_ours_mefiltered$site %in% df_paper_raw$site)
+#       
+#       tmp <- c(rd, p_cutoff_str, methylation_level, nrow(df_ours_mefiltered), num_overlap, num_overlap/nrow(df_ours_mefiltered)*100)
+#       df_summary <- rbind(df_summary, tmp)
+#       
+#     }
+#     
+#     
+#     
+#   }
+#   
+#   
+# }
+# 
+# df_summary <- as.data.frame(df_summary)
+# colnames(df_summary) <- c("Read_depth", "binomial_p","methylation_level_fileter","#sites_filtered","#sites_overlap_with_paper","%sites_overlap_with_paper")
+# rownames(df_summary) <- NULL
 
-df_summary <- c()
-for (rd in READDEPTH_vec) {
-  
-  for (p_cutoff_str in p_cutoff_str_vec){
-    
-    for (methylation_level in methylation_vec){
-      
-      file_ours <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_", p_cutoff_str,"_1n/sample05_with_id_read", rd,"_binomp", p_cutoff_str,".tsv")
-      df_ours_raw <- fread(file_ours)
-      df_ours_raw$methylation_mepct <- df_ours_raw$methylation_mepct/100
-      df_ours_mefiltered <- df_ours_raw[df_ours_raw$methylation_mepct >= methylation_level,]
-      
-      df_ours_mefiltered$site <- paste0(df_ours_mefiltered$ref,"-",df_ours_mefiltered$pos)
-      df_paper_raw$site <- paste0(df_paper_raw$Chrom,"-",df_paper_raw$Pos)
-      
-      num_overlap <- sum(df_ours_mefiltered$site %in% df_paper_raw$site)
-      
-      tmp <- c(rd, p_cutoff_str, methylation_level, nrow(df_ours_mefiltered), num_overlap, num_overlap/nrow(df_ours_mefiltered)*100)
-      df_summary <- rbind(df_summary, tmp)
-      
-    }
-    
-    
-    
-  }
-  
-  
+
+READDEPTH_vec      <- c(10, 15, 20)
+p_cutoff_str_vec   <- c("0.01", "0.001", "0.0001")
+methylation_vec    <- c(0, 0.05, 0.1)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw[, site := paste0(Chrom, "-", Pos)]
+df_paper_raw[, methylation_level := Uncon / Depth]
+
+paper_sites <- df_paper_raw$site
+
+# ---- All combinations (fast + tidy) ----
+param_dt <- CJ(
+  Read_depth = READDEPTH_vec,
+  binomial_p = p_cutoff_str_vec,
+  methylation_level_filter = methylation_vec,
+  sorted = TRUE
+)
+
+# Helper to build file paths
+make_file <- function(rd, p_cutoff_str) {
+  sprintf(
+    "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv",
+    p_cutoff_str, rd, p_cutoff_str
+  )
 }
 
-df_summary <- as.data.frame(df_summary)
-colnames(df_summary) <- c("Read_depth", "binomial_p","methylation_level_fileter","#sites_filtered","#sites_overlap_with_paper","%sites_overlap_with_paper")
+# ---- Compute per combo ----
+res_list <- lapply(seq_len(nrow(param_dt)), function(i) {
+  rd  <- param_dt$Read_depth[i]
+  pc  <- param_dt$binomial_p[i]
+  me0 <- param_dt$methylation_level_filter[i]
 
+  file_ours <- make_file(rd, pc)
+  df_ours_raw <- fread(file_ours)
+
+  # normalize methylation once; build site once
+  df_ours_raw[, methylation_mepct := methylation_mepct / 100]
+  df_ours_raw[, site := paste0(ref, "-", pos)]
+
+  df_ours_f <- df_ours_raw[methylation_mepct >= me0]
+
+  # merge only the needed columns from paper (smaller/faster)
+  df_merge <- merge(
+    df_ours_f,
+    df_paper_raw[, .(site, methylation_level)],
+    by = "site",
+    all = FALSE
+  )
+
+  # plot
+  plot_i <- ggplot(df_merge, aes(x = methylation_level, y = methylation_mepct)) +
+    geom_point(alpha = 0.6, size = 2) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+    coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+    labs(
+      x = "Paper methylation level",
+      y = "Our methylation level",
+      title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+    ) +
+    theme_classic(base_size = 14)
+
+  # summary (avoid divide-by-zero)
+  n_filtered <- nrow(df_ours_f)
+  n_overlap  <- sum(df_ours_f$site %in% paper_sites)
+  pct_overlap <- if (n_filtered == 0) NA_real_ else (n_overlap / n_filtered * 100)
+
+  summary_row <- data.table(
+    Read_depth = rd,
+    binomial_p = pc,
+    methylation_level_filter = me0,
+    sites_filtered = n_filtered,
+    sites_overlap_with_paper = n_overlap,
+    pct_overlap_with_paper = pct_overlap
+  )
+
+  list(plot = plot_i, summary = summary_row)
+})
+
+# ---- Collect outputs ----
+p <- lapply(res_list, `[[`, "plot")
+df_summary <- rbindlist(lapply(res_list, `[[`, "summary"))
 
 DT::datatable(df_summary,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Overlap with the cam-seq paper'),options = list(pageLength = 10) )
 
+
+grid.arrange(
+     grobs = p,
+     ncol = 3
+)
 ```
 
 
