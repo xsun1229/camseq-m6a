@@ -1,0 +1,47 @@
+---
+title: "Comparing m6a sites from sample5 with camseq paper"
+author: "XSun"
+date: "2026-02-03"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+We compare the m6a sites called from sample 2-4 (https://xsun1229.github.io/camseq-m6a/QC_round3.html) with some other databases.
+
+Paper1: [m6A RNA modifications are measured at single-base resolution across the mammalian transcriptome, PMID: 35288668](https://pubmed.ncbi.nlm.nih.gov/35288668/)
+
+The sites are included in Supplementary Data 1, containing the cell types below
+
+| Category | Cell type / Sample | Differentiation stage | RNA preparation | Notes |
+|--------|-------------------|----------------------|-----------------|-------|
+| Cell line | HeLa | – | poly(A)-selected | Non-immune epithelial cancer cell line |
+| Cell line | HEK293 | – | poly(A)-selected | Human embryonic kidney cells |
+| Cell line | HEK293 | – | rRNA-depleted (ribo) | Includes pre-mRNA and intronic RNA |
+| Cell line | HepG2 | – | poly(A)-selected | Human liver cancer cell line |
+| Primary immune | HSPC ribo – d0 | CD34⁺ HSPCs | rRNA-depleted (ribo) | Stem/progenitor stage |
+| Primary immune | HSPC ribo – d3 | Early myeloid commitment | rRNA-depleted (ribo) | Early monocytopoiesis |
+| Primary immune | HSPC ribo – d6 | Late monocyte progenitors | rRNA-depleted (ribo) | Pre-monocyte stage |
+| Primary immune | HSPC ribo – d9 | Monocytes | rRNA-depleted (ribo) | Closest proxy to macrophages |
+
+
+Paper 2: [REPIC: a database for exploring the N6-methyladenosine methylome, PMID: 32345346](https://pubmed.ncbi.nlm.nih.gov/32345346/)
+
+This paper provides peak-level calls, not single-nucleotide–resolution sites.
+
+data download: https://repicmod.uchicago.edu/repic/download.php
+
+MONO-MAC-6
+
+
+Paper 3: [m6a-atlas](https://rnamd.org/m6a/merip.php)
+
+peak-level calls, not single-nucleotide–resolution sites.
+
+MONO-MAC-6. 
+
+
+
+

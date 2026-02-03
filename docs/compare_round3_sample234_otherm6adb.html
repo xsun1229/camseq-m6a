@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="XSun" />
 
+<meta name="date" content="2026-02-03" />
 
-<title>Home</title>
+<title>Comparing m6a sites from sample5 with camseq paper</title>
 
 <script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -29,6 +31,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -231,6 +236,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -238,6 +306,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -281,7 +359,10 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">Comparing m6a sites from sample5 with
+camseq paper</h1>
+<h4 class="author">XSun</h4>
+<h4 class="date">2026-02-03</h4>
 
 </div>
 
@@ -348,10 +429,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -395,9 +476,6 @@ were generated:
 Untracked files:
     Untracked:  analysis/compare_round3_sample234_otherm6adb.Rmd
 
-Unstaged changes:
-    Modified:   analysis/index.Rmd
-
 </code></pre>
 <p>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not
@@ -411,317 +489,113 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
-(<code>docs/index.html</code>) files. If you’ve configured a remote Git
-repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
-in the table below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/47d3d299dce9deb9896d823c9a345d9fa2a8912e/docs/index.html" target="_blank">47d3d29</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-02-02
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/c6394aeec47e7c94e77bfb35799647ff8df17c97/analysis/index.Rmd" target="_blank">c6394ae</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-02-01
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6de715b65eca2aa101922c198b0b3abd958dc8e4/analysis/index.Rmd" target="_blank">6de715b</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-01-18
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/6de715b65eca2aa101922c198b0b3abd958dc8e4/docs/index.html" target="_blank">6de715b</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-01-18
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/0f861bd7b8749a48adff0264409c2c249f5c14ec/docs/index.html" target="_blank">0f861bd</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-06-25
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/da70f31ee3cab13d519350acdfbdc3bffaeaf156/analysis/index.Rmd" target="_blank">da70f31</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-06-25
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/da70f31ee3cab13d519350acdfbdc3bffaeaf156/docs/index.html" target="_blank">da70f31</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-06-25
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/93c4576b36e7f8d43ee43229653e78daa5e7778f/analysis/index.Rmd" target="_blank">93c4576</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-06-20
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/93c4576b36e7f8d43ee43229653e78daa5e7778f/docs/index.html" target="_blank">93c4576</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-06-20
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7a703e21b08096c8d34a07a9a47a99b757a52d41/analysis/index.Rmd" target="_blank">7a703e2</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-03-18
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/7a703e21b08096c8d34a07a9a47a99b757a52d41/docs/index.html" target="_blank">7a703e2</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-03-18
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/8c2aff5cdd256595892f36032d9929c759867aed/analysis/index.Rmd" target="_blank">8c2aff5</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/8c2aff5cdd256595892f36032d9929c759867aed/docs/index.html" target="_blank">8c2aff5</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-28
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/6d825d0eef385997150fb0999aeb2b3b0005923f/docs/index.html" target="_blank">6d825d0</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-26
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/b32e336f3d48e3134f7cfd4f3dd14d3684e874c4/analysis/index.Rmd" target="_blank">b32e336</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2025-02-26
-</td>
-<td>
-Start workflowr project.
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<div id="processing-raw-data" class="section level1">
-<h1>Processing raw data</h1>
-<p><a href="https://xsun1229.github.io/camseq-m6a/QC.html">QC – data
-round 1, from Pingluan</a></p>
-<p><a href="https://xsun1229.github.io/camseq-m6a/QC_deeper.html">QC –
-deeper sequencing, from Pingluan</a></p>
-<p><a href="https://xsun1229.github.io/camseq-m6a/QC_2rounds.html">QC –
-combining 2 rounds above</a></p>
-<p><a href="https://xsun1229.github.io/camseq-m6a/QC_round3.html">QC –
-data round 3, from Jiahao</a></p>
-<p><a
-href="https://xsun1229.github.io/camseq-m6a/compare_round3_sample5_camseqpaper.html">Comparing
-m6a sites from sample5 with camseq paper</a></p>
-<p><a
-href="https://xsun1229.github.io/camseq-m6a/compare_round3_sample234_otherm6adb.html">Comparing
-m6a sites from sample2-4 with other data bases</a></p>
-<p><a
-href="https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html">QC –
-multi cell types, from Kinga, has some quality issues</a></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>We compare the m6a sites called from sample 2-4 (<a
+href="https://xsun1229.github.io/camseq-m6a/QC_round3.html"
+class="uri">https://xsun1229.github.io/camseq-m6a/QC_round3.html</a>)
+with some other databases.</p>
+<p>Paper1: <a href="https://pubmed.ncbi.nlm.nih.gov/35288668/">m6A RNA
+modifications are measured at single-base resolution across the
+mammalian transcriptome, PMID: 35288668</a></p>
+<p>The sites are included in Supplementary Data 1, containing the cell
+types below</p>
+<table>
+<colgroup>
+<col width="10%" />
+<col width="26%" />
+<col width="30%" />
+<col width="23%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Cell type / Sample</th>
+<th>Differentiation stage</th>
+<th>RNA preparation</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cell line</td>
+<td>HeLa</td>
+<td>–</td>
+<td>poly(A)-selected</td>
+<td>Non-immune epithelial cancer cell line</td>
+</tr>
+<tr class="even">
+<td>Cell line</td>
+<td>HEK293</td>
+<td>–</td>
+<td>poly(A)-selected</td>
+<td>Human embryonic kidney cells</td>
+</tr>
+<tr class="odd">
+<td>Cell line</td>
+<td>HEK293</td>
+<td>–</td>
+<td>rRNA-depleted (ribo)</td>
+<td>Includes pre-mRNA and intronic RNA</td>
+</tr>
+<tr class="even">
+<td>Cell line</td>
+<td>HepG2</td>
+<td>–</td>
+<td>poly(A)-selected</td>
+<td>Human liver cancer cell line</td>
+</tr>
+<tr class="odd">
+<td>Primary immune</td>
+<td>HSPC ribo – d0</td>
+<td>CD34⁺ HSPCs</td>
+<td>rRNA-depleted (ribo)</td>
+<td>Stem/progenitor stage</td>
+</tr>
+<tr class="even">
+<td>Primary immune</td>
+<td>HSPC ribo – d3</td>
+<td>Early myeloid commitment</td>
+<td>rRNA-depleted (ribo)</td>
+<td>Early monocytopoiesis</td>
+</tr>
+<tr class="odd">
+<td>Primary immune</td>
+<td>HSPC ribo – d6</td>
+<td>Late monocyte progenitors</td>
+<td>rRNA-depleted (ribo)</td>
+<td>Pre-monocyte stage</td>
+</tr>
+<tr class="even">
+<td>Primary immune</td>
+<td>HSPC ribo – d9</td>
+<td>Monocytes</td>
+<td>rRNA-depleted (ribo)</td>
+<td>Closest proxy to macrophages</td>
+</tr>
+</tbody>
+</table>
+<p>Paper 2: <a href="https://pubmed.ncbi.nlm.nih.gov/32345346/">REPIC: a
+database for exploring the N6-methyladenosine methylome, PMID:
+32345346</a></p>
+<p>This paper provides peak-level calls, not
+single-nucleotide–resolution sites.</p>
+<p>data download: <a
+href="https://repicmod.uchicago.edu/repic/download.php"
+class="uri">https://repicmod.uchicago.edu/repic/download.php</a></p>
+<p>MONO-MAC-6</p>
+<p>Paper 3: <a href="https://rnamd.org/m6a/merip.php">m6a-atlas</a></p>
+<p>peak-level calls, not single-nucleotide–resolution sites.</p>
+<p>MONO-MAC-6.</p>
 </div>
 
 
@@ -740,6 +614,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -772,6 +648,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
