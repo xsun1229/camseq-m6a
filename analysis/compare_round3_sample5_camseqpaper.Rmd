@@ -41,60 +41,6 @@ We vary the read depth (10, 15, 20)/ methylation level (0, 0.05,0.1) / p-value (
 
 ```{r message=F, warning=F, fig.height=27, fig.width=12}
 
-# READDEPTH_vec <- c(10, 15, 20)
-# p_cutoff_str_vec <- c("0.01", "0.001", "0.0001")
-# methylation_vec <- c(0, 0.05, 0.1)
-# 
-# df_summary <- c()
-# p <- list()
-# for (rd in READDEPTH_vec) {
-#   
-#   for (p_cutoff_str in p_cutoff_str_vec){
-#     
-#     for (methylation_level in methylation_vec){
-#       
-#       file_ours <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_", p_cutoff_str,"_1n/sample05_with_id_read", rd,"_binomp", p_cutoff_str,".tsv")
-#       df_ours_raw <- fread(file_ours)
-#       df_ours_raw$methylation_mepct <- df_ours_raw$methylation_mepct/100
-#       df_ours_mefiltered <- df_ours_raw[df_ours_raw$methylation_mepct >= methylation_level,]
-#       
-#       df_ours_mefiltered$site <- paste0(df_ours_mefiltered$ref,"-",df_ours_mefiltered$pos)
-#       df_paper_raw$site <- paste0(df_paper_raw$Chrom,"-",df_paper_raw$Pos)
-#       df_paper_raw$methylation_level <- df_paper_raw$Uncon / df_paper_raw$Depth
-#       
-#       df_merge <- merge(df_ours_mefiltered, df_paper_raw, by="site")
-#       
-#       p[[length(p) + 1]] <- ggplot(df_merge, aes(x = methylation_level, y = methylation_mepct)) +
-#         geom_point(alpha = 0.6, size = 2) +
-#         geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
-#         labs(
-#           x = "Paper methylation level",
-#           y = "Our methylation level",
-#           title = sprintf("read depth %s, p-val %s, methylation level %s",rd,p_cutoff_str, methylation_level)
-#         ) +
-#         coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-#         theme_classic(base_size = 14)
-#       
-#       
-#       num_overlap <- sum(df_ours_mefiltered$site %in% df_paper_raw$site)
-#       
-#       tmp <- c(rd, p_cutoff_str, methylation_level, nrow(df_ours_mefiltered), num_overlap, num_overlap/nrow(df_ours_mefiltered)*100)
-#       df_summary <- rbind(df_summary, tmp)
-#       
-#     }
-#     
-#     
-#     
-#   }
-#   
-#   
-# }
-# 
-# df_summary <- as.data.frame(df_summary)
-# colnames(df_summary) <- c("Read_depth", "binomial_p","methylation_level_fileter","#sites_filtered","#sites_overlap_with_paper","%sites_overlap_with_paper")
-# rownames(df_summary) <- NULL
-
-
 READDEPTH_vec      <- c(10, 15, 20)
 p_cutoff_str_vec   <- c("0.01", "0.001", "0.0001")
 methylation_vec    <- c(0, 0.05, 0.1)
@@ -189,3 +135,8 @@ grid.arrange(
 
 
 
+
+
+# Conclusion 
+
+Based on the results above, we'll use p < 0.001, depth > 10, and methy. level > 0.05 as thresholds 

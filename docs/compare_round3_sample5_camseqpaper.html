@@ -411,7 +411,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-02-02
+<strong>Last updated:</strong> 2026-02-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -545,15 +545,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree47d3d299dce9deb9896d823c9a345d9fa2a8912etargetblank47d3d29a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree64ca4b29e735c018788ccb720a7900305ed33d83targetblank64ca4b2a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/47d3d299dce9deb9896d823c9a345d9fa2a8912e" target="_blank">47d3d29</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/64ca4b29e735c018788ccb720a7900305ed33d83" target="_blank">64ca4b2</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree47d3d299dce9deb9896d823c9a345d9fa2a8912etargetblank47d3d29a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree64ca4b29e735c018788ccb720a7900305ed33d83targetblank64ca4b2a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -563,7 +563,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/47d3d299dce9deb9896d823c9a345d9fa2a8912e" target="_blank">47d3d29</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/64ca4b29e735c018788ccb720a7900305ed33d83" target="_blank">64ca4b2</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/64ca4b29e735c018788ccb720a7900305ed33d83/analysis/compare_round3_sample5_camseqpaper.Rmd" target="_blank">64ca4b2</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-02
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/64ca4b29e735c018788ccb720a7900305ed33d83/docs/compare_round3_sample5_camseqpaper.html" target="_blank">64ca4b2</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-02
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -714,61 +748,7 @@ DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39
 <p>We vary the read depth (10, 15, 20)/ methylation level (0, 0.05,0.1)
 / p-value (0.01, 0.001, 0.0001) for our data, then compare the m6a sites
 with the paper.</p>
-<pre class="r"><code># READDEPTH_vec &lt;- c(10, 15, 20)
-# p_cutoff_str_vec &lt;- c(&quot;0.01&quot;, &quot;0.001&quot;, &quot;0.0001&quot;)
-# methylation_vec &lt;- c(0, 0.05, 0.1)
-# 
-# df_summary &lt;- c()
-# p &lt;- list()
-# for (rd in READDEPTH_vec) {
-#   
-#   for (p_cutoff_str in p_cutoff_str_vec){
-#     
-#     for (methylation_level in methylation_vec){
-#       
-#       file_ours &lt;- paste0(&quot;/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_&quot;, p_cutoff_str,&quot;_1n/sample05_with_id_read&quot;, rd,&quot;_binomp&quot;, p_cutoff_str,&quot;.tsv&quot;)
-#       df_ours_raw &lt;- fread(file_ours)
-#       df_ours_raw$methylation_mepct &lt;- df_ours_raw$methylation_mepct/100
-#       df_ours_mefiltered &lt;- df_ours_raw[df_ours_raw$methylation_mepct &gt;= methylation_level,]
-#       
-#       df_ours_mefiltered$site &lt;- paste0(df_ours_mefiltered$ref,&quot;-&quot;,df_ours_mefiltered$pos)
-#       df_paper_raw$site &lt;- paste0(df_paper_raw$Chrom,&quot;-&quot;,df_paper_raw$Pos)
-#       df_paper_raw$methylation_level &lt;- df_paper_raw$Uncon / df_paper_raw$Depth
-#       
-#       df_merge &lt;- merge(df_ours_mefiltered, df_paper_raw, by=&quot;site&quot;)
-#       
-#       p[[length(p) + 1]] &lt;- ggplot(df_merge, aes(x = methylation_level, y = methylation_mepct)) +
-#         geom_point(alpha = 0.6, size = 2) +
-#         geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;, color = &quot;grey40&quot;) +
-#         labs(
-#           x = &quot;Paper methylation level&quot;,
-#           y = &quot;Our methylation level&quot;,
-#           title = sprintf(&quot;read depth %s, p-val %s, methylation level %s&quot;,rd,p_cutoff_str, methylation_level)
-#         ) +
-#         coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-#         theme_classic(base_size = 14)
-#       
-#       
-#       num_overlap &lt;- sum(df_ours_mefiltered$site %in% df_paper_raw$site)
-#       
-#       tmp &lt;- c(rd, p_cutoff_str, methylation_level, nrow(df_ours_mefiltered), num_overlap, num_overlap/nrow(df_ours_mefiltered)*100)
-#       df_summary &lt;- rbind(df_summary, tmp)
-#       
-#     }
-#     
-#     
-#     
-#   }
-#   
-#   
-# }
-# 
-# df_summary &lt;- as.data.frame(df_summary)
-# colnames(df_summary) &lt;- c(&quot;Read_depth&quot;, &quot;binomial_p&quot;,&quot;methylation_level_fileter&quot;,&quot;#sites_filtered&quot;,&quot;#sites_overlap_with_paper&quot;,&quot;%sites_overlap_with_paper&quot;)
-# rownames(df_summary) &lt;- NULL
-
-
-READDEPTH_vec      &lt;- c(10, 15, 20)
+<pre class="r"><code>READDEPTH_vec      &lt;- c(10, 15, 20)
 p_cutoff_str_vec   &lt;- c(&quot;0.01&quot;, &quot;0.001&quot;, &quot;0.0001&quot;)
 methylation_vec    &lt;- c(0, 0.05, 0.1)
 
@@ -858,6 +838,48 @@ DT::datatable(df_summary,caption = htmltools::tags$caption( style = &#39;caption
      ncol = 3
 )</code></pre>
 <p><img src="figure/compare_round3_sample5_camseqpaper.Rmd/unnamed-chunk-2-2.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-2">
+Past versions of unnamed-chunk-2-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/64ca4b29e735c018788ccb720a7900305ed33d83/docs/figure/compare_round3_sample5_camseqpaper.Rmd/unnamed-chunk-2-2.png" target="_blank">64ca4b2</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Based on the results above, we’ll use p &lt; 0.001, depth &gt; 10,
+and methy. level &gt; 0.05 as thresholds</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

@@ -287,18 +287,19 @@ The background probability is set to 0.005
 ref: PMID: 40247118 SI page3
 
 
-### read depth 20, p-value < 0.001 (The background probability is set to 0.005)
+### Merged samples: read depth 10, p-value < 0.001, methylation level > 0.05 (The background probability is set to 0.005)
 
 
 ```{r warning=F, message=F, fig.height=5, fig.width=6}
 
-read_depth <-  20
+read_depth <-  10
 binomp <- "0.001"
+methy_level <- 0.05
 
 folder_countsites <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites_merged/processed_binomp_",binomp,"_1n/")
 
 ### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_binomp",binomp),full.names = T)
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_binomp",binomp,"_methy",methy_level),full.names = T)
 
 processed_motif_data <- process_motif_data_merged(file_list)
 create_motif_plot(processed_motif_data,
@@ -311,7 +312,7 @@ create_motif_plot(processed_motif_data,
 
 ```{r warning=F, message=F, fig.height=4, fig.width=5}
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_binomp",binomp),full.names = T)
+file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_binomp",binomp,"_methy",methy_level),full.names = T)
 
 p <- list()
 for (i in 1:length(file_list)){
@@ -338,22 +339,24 @@ for (i in 1:length(file_list)){
 combined <- arrangeGrob(
   grobs = p,
   nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", binomial p-value < ",binomp), gp = gpar(fontsize = 14))
+  top = textGrob(paste0("Cutoff: read depth =",read_depth,", binomial p-value < ",binomp,", \nmethylation level >=",methy_level), gp = gpar(fontsize = 14))
 )
 grid.draw(combined)
 
 ```
 
+### Samples not merged: read depth 10, p-value < 0.001, methylation level > 0.05 (The background probability is set to 0.005)
 
 ```{r warning=F, message=F, fig.height=5, fig.width=6}
 
-read_depth <-  20
+read_depth <-  10
 binomp <- "0.001"
+methy_level <- 0.05
 
 folder_countsites <- paste0("/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_",binomp,"_1n/")
 
 ### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_binomp",binomp),full.names = T)
+file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_binomp",binomp,"_methy",methy_level),full.names = T)
 
 processed_motif_data <- process_motif_data(file_list)
 create_motif_plot(processed_motif_data,
@@ -364,9 +367,9 @@ create_motif_plot(processed_motif_data,
 ```
 
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
+```{r warning=F, message=F, fig.height=4, fig.width=20}
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_binomp",binomp),full.names = T)
+file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_binomp",binomp,"_methy",methy_level),full.names = T)
 
 p <- list()
 for (i in 1:length(file_list)){
@@ -375,10 +378,9 @@ for (i in 1:length(file_list)){
   data <- read.table(file_list[i],
                    header = TRUE, sep = "\t")
 
-  
+
   sample <- basename(file_list[i]) %>%
     str_extract("^sample\\d+")
-  
 
   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
@@ -393,7 +395,7 @@ for (i in 1:length(file_list)){
 combined <- arrangeGrob(
   grobs = p,
   nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", binomial p-value < ",binomp), gp = gpar(fontsize = 14))
+  top = textGrob(paste0("Cutoff: read depth =",read_depth,", binomial p-value < ",binomp,", \nmethylation level >=",methy_level), gp = gpar(fontsize = 14))
 )
 grid.draw(combined)
 
@@ -401,431 +403,434 @@ grid.draw(combined)
 
 
 
-## Filter the M6A sites by read depth and methylation level
 
 
-To reduce false positives and low-confidence sites, the following thresholds are applied before motif analysis:
 
-| Filter                    | Threshold  |
-| ------------------------- | ---------- |
-| Minimum read depth        | ≥ 10/20/30/40 reads |
-| Minimum methylation level | ≥ 10/20/30%      |
+<!-- ## Filter the M6A sites by read depth and methylation level -->
 
 
-Definitions:
+<!-- To reduce false positives and low-confidence sites, the following thresholds are applied before motif analysis: -->
 
-- Read depth: total number of reads covering a genomic position
-- Methylation level:converted reads / total reads * 100%
+<!-- | Filter                    | Threshold  | -->
+<!-- | ------------------------- | ---------- | -->
+<!-- | Minimum read depth        | ≥ 10/20/30/40 reads | -->
+<!-- | Minimum methylation level | ≥ 10/20/30%      | -->
 
-Only sites passing both criteria are retained 
 
+<!-- Definitions: -->
 
-### cutoff: read depth 10, methelytion level = 10%
+<!-- - Read depth: total number of reads covering a genomic position -->
+<!-- - Methylation level:converted reads / total reads * 100% -->
 
+<!-- Only sites passing both criteria are retained  -->
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
 
-read_depth <-  10
-mepct <- 10
+<!-- ### cutoff: read depth 10, methelytion level = 10% -->
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/"
 
-### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
 
-processed_motif_data <- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
-                  point_size = 4,
-                  text_size = 3.5)
+<!-- read_depth <-  10 -->
+<!-- mepct <- 10 -->
 
-# ### site overlap
-# file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-# 
-# overlap_count <- count_overlap(file_list)
-# cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count))
+<!-- folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/" -->
 
-```
+<!-- ### motif percentage -->
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
+<!-- processed_motif_data <- process_motif_data(file_list) -->
+<!-- create_motif_plot(processed_motif_data, -->
+<!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
+<!--                   point_size = 4, -->
+<!--                   text_size = 3.5) -->
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
+<!-- # ### site overlap -->
+<!-- # file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- #  -->
+<!-- # overlap_count <- count_overlap(file_list) -->
+<!-- # cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count)) -->
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ``` -->
 
-p <- list()
-for (i in 1:length(file_list)){
 
-  # Read the data
-  data <- read.table(file_list[i],
-                   header = TRUE, sep = "\t")
+<!-- ```{r warning=F, message=F, fig.height=4, fig.width=16} -->
 
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-  sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>%
-      str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+<!-- p <- list() -->
+<!-- for (i in 1:length(file_list)){ -->
 
+<!--   # Read the data -->
+<!--   data <- read.table(file_list[i], -->
+<!--                    header = TRUE, sep = "\t") -->
 
-  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
-    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-    labs(title = sample,
-         x = "Methylation Percentage (%)",
-         y = "Frequency") +
-    theme_minimal()
 
+<!--   sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>% -->
+<!--       str_remove(".genome.tsv") %>% -->
+<!--       str_remove("^_+") %>% -->
+<!--       str_remove("_+$") -->
 
-}
 
-combined <- arrangeGrob(
-  grobs = p,
-  nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+<!--   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) + -->
+<!--     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") + -->
+<!--     labs(title = sample, -->
+<!--          x = "Methylation Percentage (%)", -->
+<!--          y = "Frequency") + -->
+<!--     theme_minimal() -->
 
-```
 
+<!-- } -->
 
-### cutoff: read depth 10, methelytion level = 20%
+<!-- combined <- arrangeGrob( -->
+<!--   grobs = p, -->
+<!--   nrow = 1, -->
+<!--   top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14)) -->
+<!-- ) -->
+<!-- grid.draw(combined) -->
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
+<!-- ``` -->
 
-read_depth <-  10
-mepct <-20
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/"
+<!-- ### cutoff: read depth 10, methelytion level = 20% -->
 
-### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
 
-processed_motif_data <- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
-                  point_size = 4,
-                  text_size = 3.5)
+<!-- read_depth <-  10 -->
+<!-- mepct <-20 -->
 
-# ### site overlap
-# file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-# 
-# overlap_count <- count_overlap(file_list)
-# cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count))
+<!-- folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/" -->
 
+<!-- ### motif percentage -->
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
+<!-- processed_motif_data <- process_motif_data(file_list) -->
+<!-- create_motif_plot(processed_motif_data, -->
+<!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
+<!--                   point_size = 4, -->
+<!--                   text_size = 3.5) -->
 
-```
+<!-- # ### site overlap -->
+<!-- # file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- #  -->
+<!-- # overlap_count <- count_overlap(file_list) -->
+<!-- # cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count)) -->
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
 
-p <- list()
-for (i in 1:length(file_list)){
+<!-- ``` -->
 
-  # Read the data
-  data <- read.table(file_list[i],
-                   header = TRUE, sep = "\t")
+<!-- ```{r warning=F, message=F, fig.height=4, fig.width=16} -->
 
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-  sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>%
-      str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+<!-- p <- list() -->
+<!-- for (i in 1:length(file_list)){ -->
 
+<!--   # Read the data -->
+<!--   data <- read.table(file_list[i], -->
+<!--                    header = TRUE, sep = "\t") -->
 
-  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
-    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-    labs(title = sample,
-         x = "Methylation Percentage (%)",
-         y = "Frequency") +
-    theme_minimal()
 
+<!--   sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>% -->
+<!--       str_remove(".genome.tsv") %>% -->
+<!--       str_remove("^_+") %>% -->
+<!--       str_remove("_+$") -->
 
-}
 
-combined <- arrangeGrob(
-  grobs = p,
-  nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+<!--   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) + -->
+<!--     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") + -->
+<!--     labs(title = sample, -->
+<!--          x = "Methylation Percentage (%)", -->
+<!--          y = "Frequency") + -->
+<!--     theme_minimal() -->
 
-```
 
-### cutoff: read depth 10, methelytion level = 30%
+<!-- } -->
 
+<!-- combined <- arrangeGrob( -->
+<!--   grobs = p, -->
+<!--   nrow = 1, -->
+<!--   top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14)) -->
+<!-- ) -->
+<!-- grid.draw(combined) -->
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
+<!-- ``` -->
 
-read_depth <-  10
-mepct <-30
+<!-- ### cutoff: read depth 10, methelytion level = 30% -->
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/"
 
-### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
 
-processed_motif_data <- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
-                  point_size = 4,
-                  text_size = 3.5)
+<!-- read_depth <-  10 -->
+<!-- mepct <-30 -->
 
-# ### site overlap
-# file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-# 
-# overlap_count <- count_overlap(file_list)
-# cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count))
+<!-- folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/" -->
 
+<!-- ### motif percentage -->
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-```
+<!-- processed_motif_data <- process_motif_data(file_list) -->
+<!-- create_motif_plot(processed_motif_data, -->
+<!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
+<!--                   point_size = 4, -->
+<!--                   text_size = 3.5) -->
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
+<!-- # ### site overlap -->
+<!-- # file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- #  -->
+<!-- # overlap_count <- count_overlap(file_list) -->
+<!-- # cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count)) -->
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
 
-p <- list()
-for (i in 1:length(file_list)){
+<!-- ``` -->
 
-  # Read the data
-  data <- read.table(file_list[i],
-                   header = TRUE, sep = "\t")
+<!-- ```{r warning=F, message=F, fig.height=4, fig.width=16} -->
 
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-  data <- data[!data$methylation < mepct,]
+<!-- p <- list() -->
+<!-- for (i in 1:length(file_list)){ -->
 
-  sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>%
-      str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+<!--   # Read the data -->
+<!--   data <- read.table(file_list[i], -->
+<!--                    header = TRUE, sep = "\t") -->
 
 
-  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
-    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-    labs(title = sample,
-         x = "Methylation Percentage (%)",
-         y = "Frequency") +
-    theme_minimal()
+<!--   data <- data[!data$methylation < mepct,] -->
 
+<!--   sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>% -->
+<!--       str_remove(".genome.tsv") %>% -->
+<!--       str_remove("^_+") %>% -->
+<!--       str_remove("_+$") -->
 
-}
 
-combined <- arrangeGrob(
-  grobs = p,
-  nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+<!--   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) + -->
+<!--     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") + -->
+<!--     labs(title = sample, -->
+<!--          x = "Methylation Percentage (%)", -->
+<!--          y = "Frequency") + -->
+<!--     theme_minimal() -->
 
-```
 
-### cutoff: read depth 20, methelytion level = 10%
+<!-- } -->
 
+<!-- combined <- arrangeGrob( -->
+<!--   grobs = p, -->
+<!--   nrow = 1, -->
+<!--   top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14)) -->
+<!-- ) -->
+<!-- grid.draw(combined) -->
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
+<!-- ``` -->
 
-read_depth <-  20
-mepct <-10
+<!-- ### cutoff: read depth 20, methelytion level = 10% -->
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/"
 
-### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
 
-processed_motif_data <- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
-                  point_size = 4,
-                  text_size = 3.5)
+<!-- read_depth <-  20 -->
+<!-- mepct <-10 -->
 
-# ### site overlap
-# file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-# 
-# overlap_count <- count_overlap(file_list)
-# cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count))
+<!-- folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/" -->
 
+<!-- ### motif percentage -->
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-```
+<!-- processed_motif_data <- process_motif_data(file_list) -->
+<!-- create_motif_plot(processed_motif_data, -->
+<!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
+<!--                   point_size = 4, -->
+<!--                   text_size = 3.5) -->
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
+<!-- # ### site overlap -->
+<!-- # file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- #  -->
+<!-- # overlap_count <- count_overlap(file_list) -->
+<!-- # cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count)) -->
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
 
-p <- list()
-for (i in 1:length(file_list)){
+<!-- ``` -->
 
-  # Read the data
-  data <- read.table(file_list[i],
-                   header = TRUE, sep = "\t")
+<!-- ```{r warning=F, message=F, fig.height=4, fig.width=16} -->
 
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-  data <- data[!data$methylation < mepct,]
+<!-- p <- list() -->
+<!-- for (i in 1:length(file_list)){ -->
 
-  sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>%
-      str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+<!--   # Read the data -->
+<!--   data <- read.table(file_list[i], -->
+<!--                    header = TRUE, sep = "\t") -->
 
 
-  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
-    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-    labs(title = sample,
-         x = "Methylation Percentage (%)",
-         y = "Frequency") +
-    theme_minimal()
+<!--   data <- data[!data$methylation < mepct,] -->
 
+<!--   sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>% -->
+<!--       str_remove(".genome.tsv") %>% -->
+<!--       str_remove("^_+") %>% -->
+<!--       str_remove("_+$") -->
 
-}
 
-combined <- arrangeGrob(
-  grobs = p,
-  nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+<!--   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) + -->
+<!--     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") + -->
+<!--     labs(title = sample, -->
+<!--          x = "Methylation Percentage (%)", -->
+<!--          y = "Frequency") + -->
+<!--     theme_minimal() -->
 
-```
 
-### cutoff: read depth 30, methelytion level = 10%
+<!-- } -->
 
+<!-- combined <- arrangeGrob( -->
+<!--   grobs = p, -->
+<!--   nrow = 1, -->
+<!--   top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14)) -->
+<!-- ) -->
+<!-- grid.draw(combined) -->
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
+<!-- ``` -->
 
-read_depth <-  30
-mepct <-10
+<!-- ### cutoff: read depth 30, methelytion level = 10% -->
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/"
 
-### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
 
-processed_motif_data <- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
-                  point_size = 4,
-                  text_size = 3.5)
+<!-- read_depth <-  30 -->
+<!-- mepct <-10 -->
 
-# ### site overlap
-# file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-# 
-# overlap_count <- count_overlap(file_list)
-# cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count))
+<!-- folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/" -->
 
+<!-- ### motif percentage -->
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-```
+<!-- processed_motif_data <- process_motif_data(file_list) -->
+<!-- create_motif_plot(processed_motif_data, -->
+<!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
+<!--                   point_size = 4, -->
+<!--                   text_size = 3.5) -->
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
+<!-- # ### site overlap -->
+<!-- # file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- #  -->
+<!-- # overlap_count <- count_overlap(file_list) -->
+<!-- # cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count)) -->
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
 
-p <- list()
-for (i in 1:length(file_list)){
+<!-- ``` -->
 
-  # Read the data
-  data <- read.table(file_list[i],
-                   header = TRUE, sep = "\t")
+<!-- ```{r warning=F, message=F, fig.height=4, fig.width=16} -->
 
-  data <- data[!data$methylation < mepct,]
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-  sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>%
-      str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+<!-- p <- list() -->
+<!-- for (i in 1:length(file_list)){ -->
 
+<!--   # Read the data -->
+<!--   data <- read.table(file_list[i], -->
+<!--                    header = TRUE, sep = "\t") -->
 
-  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
-    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-    labs(title = sample,
-         x = "Methylation Percentage (%)",
-         y = "Frequency") +
-    theme_minimal()
+<!--   data <- data[!data$methylation < mepct,] -->
 
+<!--   sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>% -->
+<!--       str_remove(".genome.tsv") %>% -->
+<!--       str_remove("^_+") %>% -->
+<!--       str_remove("_+$") -->
 
-}
 
-combined <- arrangeGrob(
-  grobs = p,
-  nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+<!--   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) + -->
+<!--     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") + -->
+<!--     labs(title = sample, -->
+<!--          x = "Methylation Percentage (%)", -->
+<!--          y = "Frequency") + -->
+<!--     theme_minimal() -->
 
-```
 
-### cutoff: read depth 40, methelytion level = 10%
+<!-- } -->
 
+<!-- combined <- arrangeGrob( -->
+<!--   grobs = p, -->
+<!--   nrow = 1, -->
+<!--   top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14)) -->
+<!-- ) -->
+<!-- grid.draw(combined) -->
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
+<!-- ``` -->
 
-read_depth <-  40
-mepct <-10
+<!-- ### cutoff: read depth 40, methelytion level = 10% -->
 
-folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/"
 
-### motif percentage
-file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
+<!-- ```{r warning=F, message=F, fig.height=5, fig.width=6} -->
 
-processed_motif_data <- process_motif_data(file_list)
-create_motif_plot(processed_motif_data,
-                  title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"),
-                  point_size = 4,
-                  text_size = 3.5)
+<!-- read_depth <-  40 -->
+<!-- mepct <-10 -->
 
-# ### site overlap
-# file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-# 
-# overlap_count <- count_overlap(file_list)
-# cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count))
+<!-- folder_countsites <- "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_1/" -->
 
+<!-- ### motif percentage -->
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("motif_summary_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
-```
+<!-- processed_motif_data <- process_motif_data(file_list) -->
+<!-- create_motif_plot(processed_motif_data, -->
+<!--                   title = paste0("read depth = ",read_depth,", methylation level = ",mepct,"%"), -->
+<!--                   point_size = 4, -->
+<!--                   text_size = 3.5) -->
 
-```{r warning=F, message=F, fig.height=4, fig.width=16}
+<!-- # ### site overlap -->
+<!-- # file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- #  -->
+<!-- # overlap_count <- count_overlap(file_list) -->
+<!-- # cat(sprintf("The number of overlapping site for the two sample is %s\n",overlap_count)) -->
 
-file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T)
-file_list <- file_list[2:5]
 
-p <- list()
-for (i in 1:length(file_list)){
+<!-- ``` -->
 
-  # Read the data
-  data <- read.table(file_list[i],
-                   header = TRUE, sep = "\t")
+<!-- ```{r warning=F, message=F, fig.height=4, fig.width=16} -->
 
-  sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>%
-      str_remove(".genome.tsv") %>%
-      str_remove("^_+") %>%
-      str_remove("_+$")
+<!-- file_list <- list.files(path =  folder_countsites,pattern = paste0("with_id_read",read_depth,"_mepct",mepct),full.names = T) -->
+<!-- file_list <- file_list[2:5] -->
 
+<!-- p <- list() -->
+<!-- for (i in 1:length(file_list)){ -->
 
-  p[[i]] <- ggplot(data, aes(x = methylation_mepct)) +
-    geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-    labs(title = sample,
-         x = "Methylation Percentage (%)",
-         y = "Frequency") +
-    theme_minimal()
+<!--   # Read the data -->
+<!--   data <- read.table(file_list[i], -->
+<!--                    header = TRUE, sep = "\t") -->
 
+<!--   sample <- basename(file_list[i]) %>% str_remove("_with_id_read\\d+_mepct\\d+\\.tsv$") %>% -->
+<!--       str_remove(".genome.tsv") %>% -->
+<!--       str_remove("^_+") %>% -->
+<!--       str_remove("_+$") -->
 
-}
 
-combined <- arrangeGrob(
-  grobs = p,
-  nrow = 1,
-  top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14))
-)
-grid.draw(combined)
+<!--   p[[i]] <- ggplot(data, aes(x = methylation_mepct)) + -->
+<!--     geom_histogram(binwidth = 5, fill = "skyblue", color = "black") + -->
+<!--     labs(title = sample, -->
+<!--          x = "Methylation Percentage (%)", -->
+<!--          y = "Frequency") + -->
+<!--     theme_minimal() -->
 
-```
+
+<!-- } -->
+
+<!-- combined <- arrangeGrob( -->
+<!--   grobs = p, -->
+<!--   nrow = 1, -->
+<!--   top = textGrob(paste0("Cutoff: read depth =",read_depth,", methlation level = ",mepct), gp = gpar(fontsize = 14)) -->
+<!-- ) -->
+<!-- grid.draw(combined) -->
+
+<!-- ``` -->
 
 <!-- ## +- 2 nucleosides -->
 
