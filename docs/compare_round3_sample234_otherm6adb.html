@@ -497,16 +497,16 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbdtargetblank87fbf27a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/xsun1229/camseq-m6a/tree/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd" target="_blank">87fbf27</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreee39aa628f151137bfaa0c22086699592de77aea8targetblanke39aa62a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/xsun1229/camseq-m6a/tree/e39aa628f151137bfaa0c22086699592de77aea8" target="_blank">e39aa62</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbdtargetblank87fbf27a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreee39aa628f151137bfaa0c22086699592de77aea8targetblanke39aa62a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/xsun1229/camseq-m6a/tree/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd" target="_blank">87fbf27</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/xsun1229/camseq-m6a/tree/e39aa628f151137bfaa0c22086699592de77aea8" target="_blank">e39aa62</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -555,6 +555,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e39aa628f151137bfaa0c22086699592de77aea8/analysis/compare_round3_sample234_otherm6adb.Rmd" target="_blank">e39aa62</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/e39aa628f151137bfaa0c22086699592de77aea8/docs/compare_round3_sample234_otherm6adb.html" target="_blank">e39aa62</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -895,9 +929,9 @@ df_paper_raw &lt;- df_paper_raw[!duplicated(df_paper_raw$site),]
 
 paper_sites &lt;- df_paper_raw$site
 
-DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by camseq paper&#39;),options = list(pageLength = 10) )</code></pre>
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by the paper&#39;),options = list(pageLength = 10) )</code></pre>
 <div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-c71357163c4076450eea" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by camseq paper<\/caption>","data":[["1","2","3","4","5","6"],["1","1","1","1","1","1"],[629885,630012,630356,631316,632043,632134],["+","+","+","+","+","+"],[34.479,14.5373,11.4856,4.1313,21.5373,18.5981],["GGACA","UGACA","UGACU","UGACU","UGACU","UGACU"],["1-629885","1-630012","1-630356","1-631316","1-632043","1-632134"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Chrom<\/th>\n      <th>Position<\/th>\n      <th>Strand<\/th>\n      <th>m6A fracrion (%)<\/th>\n      <th>5-mer<\/th>\n      <th>site<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by the paper<\/caption>","data":[["1","2","3","4","5","6"],["1","1","1","1","1","1"],[629885,630012,630356,631316,632043,632134],["+","+","+","+","+","+"],[34.479,14.5373,11.4856,4.1313,21.5373,18.5981],["GGACA","UGACA","UGACU","UGACU","UGACU","UGACU"],["1-629885","1-630012","1-630356","1-631316","1-632043","1-632134"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Chrom<\/th>\n      <th>Position<\/th>\n      <th>Strand<\/th>\n      <th>m6A fracrion (%)<\/th>\n      <th>5-mer<\/th>\n      <th>site<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>print(paste0(&quot;Total number of m6a sites reported by the paper &quot;, nrow(df_paper_raw)))</code></pre>
 <pre><code>[1] &quot;Total number of m6a sites reported by the paper 58488&quot;</code></pre>
 <pre class="r"><code>inter_sites &lt;- intersect(our_sites, paper_sites)
@@ -1017,9 +1051,15 @@ XSun
 </div>
 <div id="compare-with-paper-2-mono-mac-6" class="section level1">
 <h1>Compare with Paper 2, MONO-MAC-6</h1>
+<p>We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.</p>
 <pre class="r"><code>df_paper_raw &lt;- fread(&quot;/project/xinhe/xsun/camseq/pipeline/data/m6a_REPIC_MONO-MAC-6_hg38.txt&quot;)
 
-gr_ours &lt;- GRanges(
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by REPIC&#39;),options = list(pageLength = 10) )</code></pre>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4e8d7a94295e256b0a38" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4e8d7a94295e256b0a38">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by REPIC<\/caption>","data":[["1","2","3","4","5","6"],["chr1:853836-853997[+]","chr1:944743-945337[-]","chr1:945651-946261[-]","chr1:956923-957157[-]","chr1:964503-965026[+]","chr1:1014144-1014274[+]"],[1.51e-07,1e-43,1e-17,1e-82,0.000148,3.98e-10],[1.51e-06,7.94e-42,2.51e-16,2e-80,0.001,5.13e-09],[10.4,4.64,2.85,6.01,3.26,24.4],["exon","cds|exon","cds|exon","cds|exon","cds|utr3","cds"],["SRP067910","SRP067910","SRP067910","SRP067910","SRP067910","SRP067910"],["SRX1508219_SRX1508220","SRX1508219_SRX1508220","SRX1508219_SRX1508220","SRX1508219_SRX1508220","SRX1508219_SRX1508220","SRX1508219_SRX1508220"],["exomePeak","exomePeak","exomePeak","exomePeak","exomePeak","exomePeak"],["MONO-MAC-6","MONO-MAC-6","MONO-MAC-6","MONO-MAC-6","MONO-MAC-6","MONO-MAC-6"],["human","human","human","human","human","human"],["hg38","hg38","hg38","hg38","hg38","hg38"],["ENSG00000228794.8","ENSG00000188976.10","ENSG00000188976.10","ENSG00000188976.10","ENSG00000187961.13","ENSG00000187608.8"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pos<\/th>\n      <th>pvalue<\/th>\n      <th>fdr<\/th>\n      <th>fold_enrichment<\/th>\n      <th>region<\/th>\n      <th>dataset<\/th>\n      <th>sample<\/th>\n      <th>tool<\/th>\n      <th>cell/tissue<\/th>\n      <th>species<\/th>\n      <th>assembly<\/th>\n      <th>geneid<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>print(paste0(&quot;Total number of m6a peaks reported by the paper &quot;, nrow(df_paper_raw)))</code></pre>
+<pre><code>[1] &quot;Total number of m6a peaks reported by the paper 277345&quot;</code></pre>
+<pre class="r"><code>gr_ours &lt;- GRanges(
   seqnames = paste0(&quot;chr&quot;, df_ours_f$ref),
   ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
   strand   = df_ours_f$strand
@@ -1077,13 +1117,19 @@ p_bar &lt;- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
   )
 
 p_bar</code></pre>
-<p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="compare-with-paper-3-mono-mac-6" class="section level1">
 <h1>Compare with Paper 3, MONO-MAC-6</h1>
+<p>We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.</p>
 <pre class="r"><code>df_paper_raw &lt;- fread(&quot;/project/xinhe/xsun/camseq/pipeline/data/m6a_Atlas2_MONO-MAC-6.txt&quot;)
 
-gr_ours &lt;- GRanges(
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by m6a atlas&#39;),options = list(pageLength = 10) )</code></pre>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-5c1357f460f66bba8794" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5c1357f460f66bba8794">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by m6a atlas<\/caption>","data":[["1","2","3","4","5","6"],["m6A_hg38_exomePeak2_peak_3035","m6A_hg38_exomePeak2_peak_339440","m6A_hg38_exomePeak2_peak_339597","m6A_hg38_exomePeak2_peak_341380","m6A_hg38_exomePeak2_peak_342990","m6A_hg38_exomePeak2_peak_4853"],["chr1","chr1","chr1","chr1","chr1","chr1"],[1065899,1081817,1082242,1292764,1318756,1328516],[1065974,1081917,1082467,1292839,1318981,1328791],[76,101,226,76,226,276],["+","-","-","-","-","+"],["AGRN","C1orf159","C1orf159","ACAP3","CPSF3L","CPTP"],[3.46264,3.53609,3.47487,2.45317,2.8283,3.21554],[7.52513e-06,5.18567e-05,2.84207e-11,5.78413e-06,6.90504e-10,1.072e-09],["-","C1orf159(C1orf159):3.857116","C1orf159(C1orf159):3.857116","ACAP3(ACAP3):11.563948","CPSF3L(CPSF3L):38.68259","CPTP(CPTP):4.87951"],["yes","yes","yes","yes","yes","yes"],["Exon","3'UTR/Exon","3'UTR/Exon","3'UTR/Exon","3'UTR/Exon","3'UTR/Exon"],["exomePeak2|MACS2","exomePeak2|MACS2|TRESS","exomePeak2|MACS2|TRESS","exomePeak2|MACS2|TRESS","exomePeak2|MACS2","exomePeak2|MACS2|TRESS"],["exomePeak2","exomePeak2","exomePeak2","exomePeak2","exomePeak2","exomePeak2"],["GSE76414;MONO-MAC-6;FTOOE","GSE76414;MONO-MAC-6;FTOOE","GSE76414;MONO-MAC-6;FTOOE","GSE76414;MONO-MAC-6;FTOOE","GSE76414;MONO-MAC-6;FTOOE","GSE76414;MONO-MAC-6;FTOOE"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Peak_ID<\/th>\n      <th>seqnames<\/th>\n      <th>start<\/th>\n      <th>end<\/th>\n      <th>width<\/th>\n      <th>strand<\/th>\n      <th>geneId<\/th>\n      <th>log2FC<\/th>\n      <th>pvalue<\/th>\n      <th>TPM<\/th>\n      <th>DRACH<\/th>\n      <th>annotation<\/th>\n      <th>Support_Methods<\/th>\n      <th>CallPeak_Methods<\/th>\n      <th>GSE_CellLine_Treatment<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[3,4,5,8,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>print(paste0(&quot;Total number of m6a peaks reported by the paper &quot;, nrow(df_paper_raw)))</code></pre>
+<pre><code>[1] &quot;Total number of m6a peaks reported by the paper 7205&quot;</code></pre>
+<pre class="r"><code>gr_ours &lt;- GRanges(
   seqnames = paste0(&quot;chr&quot;, df_ours_f$ref),
   ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
   strand   = df_ours_f$strand
@@ -1120,7 +1166,7 @@ p_bar &lt;- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
   theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5))
 
 p_bar</code></pre>
-<p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

@@ -164,7 +164,7 @@ df_paper_raw <- df_paper_raw[!duplicated(df_paper_raw$site),]
 
 paper_sites <- df_paper_raw$site
 
-DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by the paper'),options = list(pageLength = 10) )
 
 print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
 
@@ -219,9 +219,16 @@ p_venn
 
 # Compare with Paper 2, MONO-MAC-6
 
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
 ```{r message=F, warning=F}
 
 df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_REPIC_MONO-MAC-6_hg38.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by REPIC'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
 
 gr_ours <- GRanges(
   seqnames = paste0("chr", df_ours_f$ref),
@@ -288,9 +295,16 @@ p_bar
 
 # Compare with Paper 3, MONO-MAC-6
 
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
 ```{r message=F, warning=F}
 
 df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_Atlas2_MONO-MAC-6.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by m6a atlas'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
 
 gr_ours <- GRanges(
   seqnames = paste0("chr", df_ours_f$ref),
