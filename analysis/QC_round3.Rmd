@@ -290,7 +290,7 @@ ref: PMID: 40247118 SI page3
 ### Merged samples: read depth 10, p-value < 0.001, methylation level > 0.05 (The background probability is set to 0.005)
 
 
-```{r warning=F, message=F, fig.height=5, fig.width=6}
+```{r warning=F, message=F, fig.height=5, fig.width=10}
 
 read_depth <-  10
 binomp <- "0.001"
