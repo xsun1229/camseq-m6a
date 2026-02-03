@@ -2,14 +2,33 @@
 title: "Comparing m6a sites from sample5 with camseq paper"
 author: "XSun"
 date: "2026-02-03"
-output: workflowr::wflow_html
-editor_options:
-  chunk_output_type: console
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
 ---
+
+```{r message=F, warning=F}
+
+library(data.table)
+library(gridExtra)
+library(ggplot2)
+library(eulerr)
+
+# Helper to build file paths
+make_file <- function(rd, p_cutoff_str) {
+  sprintf(
+    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv",
+    p_cutoff_str, rd, p_cutoff_str
+  )
+}
+
+```
+
 
 # Introduction
 
-We compare the m6a sites called from sample 2-4 (https://xsun1229.github.io/camseq-m6a/QC_round3.html) with some other databases.
+We compare the m6a sites called from sample 2-4 (at p<0.001, methylation level > 0.05, read depth >=10, https://xsun1229.github.io/camseq-m6a/QC_round3.html) with some other databases.
 
 Paper1: [m6A RNA modifications are measured at single-base resolution across the mammalian transcriptome, PMID: 35288668](https://pubmed.ncbi.nlm.nih.gov/35288668/)
 
@@ -41,6 +60,173 @@ Paper 3: [m6a-atlas](https://rnamd.org/m6a/merip.php)
 peak-level calls, not single-nucleotide–resolution sites.
 
 MONO-MAC-6. 
+
+
+# Compare with Paper 1, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
+
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.05
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+paper_sites <- df_paper_raw$site
+
+file_ours <- make_file(rd, pc)
+df_ours_raw <- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, "-", pos)]
+
+df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
+
+our_sites <- df_ours_f$site
+inter_sites <- intersect(our_sites, paper_sites)
+
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+
+
+
+
+# Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw1 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 6)
+df_paper_raw2 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 7)
+df_paper_raw3 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- rbind(df_paper_raw1,df_paper_raw2,df_paper_raw3)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+df_paper_raw <- df_paper_raw[!duplicated(df_paper_raw$site),]
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.05
+
+paper_sites <- df_paper_raw$site
+
+file_ours <- make_file(rd, pc)
+df_ours_raw <- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, "-", pos)]
+
+df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
+
+our_sites <- df_ours_f$site
+inter_sites <- intersect(our_sites, paper_sites)
+
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
 
 
 

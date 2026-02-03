@@ -24,7 +24,7 @@ library(data.table)
 library(gridExtra)
 library(ggplot2)
 
-df_paper_raw <- fread("/project/xinhe/xsun/camseq/data/data_campaper/sum_d20_p30.tsv")
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_camseqpaper_PMID40247118.tsv")
 
 DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
 
@@ -62,7 +62,7 @@ param_dt <- CJ(
 # Helper to build file paths
 make_file <- function(rd, p_cutoff_str) {
   sprintf(
-    "/project/xinhe/xsun/camseq/data/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv",
+    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv",
     p_cutoff_str, rd, p_cutoff_str
   )
 }
