@@ -1,5 +1,5 @@
 ---
-title: "Comparing m6a sites from sample5 with camseq paper"
+title: "Comparing m6a sites from merged sample2-4 with camseq paper"
 author: "XSun"
 date: "2026-02-03"
 output:
