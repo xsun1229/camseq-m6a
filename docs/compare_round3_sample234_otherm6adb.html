@@ -497,16 +497,16 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreef0132bdeeb1a5746c183dae8746d94e352678af3targetblankf0132bda"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/xsun1229/camseq-m6a/tree/f0132bdeeb1a5746c183dae8746d94e352678af3" target="_blank">f0132bd</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbdtargetblank87fbf27a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/xsun1229/camseq-m6a/tree/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd" target="_blank">87fbf27</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreef0132bdeeb1a5746c183dae8746d94e352678af3targetblankf0132bda" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbdtargetblank87fbf27a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/xsun1229/camseq-m6a/tree/f0132bdeeb1a5746c183dae8746d94e352678af3" target="_blank">f0132bd</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/xsun1229/camseq-m6a/tree/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd" target="_blank">87fbf27</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -517,7 +517,6 @@ Ignored files:
 
 Unstaged changes:
     Modified:   analysis/compare_round3_sample234_otherm6adb.Rmd
-    Modified:   analysis/compare_round3_sample5_camseqpaper.Rmd
 
 </code></pre>
 <p>
@@ -556,6 +555,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd/analysis/compare_round3_sample234_otherm6adb.Rmd" target="_blank">87fbf27</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd/docs/compare_round3_sample234_otherm6adb.html" target="_blank">87fbf27</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -601,6 +634,7 @@ update
 library(gridExtra)
 library(ggplot2)
 library(eulerr)
+library(GenomicRanges)
 
 # Helper to build file paths
 make_file &lt;- function(rd, p_cutoff_str) {
@@ -608,7 +642,21 @@ make_file &lt;- function(rd, p_cutoff_str) {
     &quot;/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv&quot;,
     p_cutoff_str, rd, p_cutoff_str
   )
-}</code></pre>
+}
+
+rd &lt;- 10
+pc &lt;- &quot;0.001&quot;
+me0 &lt;- 0.05
+
+file_ours &lt;- make_file(rd, pc)
+df_ours_raw &lt;- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, &quot;-&quot;, pos)]
+
+df_ours_f &lt;- df_ours_raw[methylation_mepct &gt;= me0*100]
+
+our_sites &lt;- df_ours_f$site</code></pre>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>We compare the m6a sites called from sample 2-4 (at p&lt;0.001, methylation level &gt; 0.05, read depth &gt;=10, <a href="https://xsun1229.github.io/camseq-m6a/QC_round3.html" class="uri">https://xsun1229.github.io/camseq-m6a/QC_round3.html</a>) with some other databases.</p>
@@ -702,32 +750,22 @@ make_file &lt;- function(rd, p_cutoff_str) {
 <h1>Compare with Paper 1, HSPC ribo– d9</h1>
 <pre class="r"><code>df_paper_raw &lt;- readxl::read_excel(&quot;/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx&quot;, sheet = 8)
 
-DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by camseq paper&#39;),options = list(pageLength = 10) )</code></pre>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-72df6e256503a04e505c" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-72df6e256503a04e505c">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by camseq paper<\/caption>","data":[["1","2","3","4","5","6"],["chr1","chr1","chr1","chr1","chr1","chr1"],[629180,629885,630356,631114,631193,944575],["+","+","+","+","+","-"],[12.7125,55.2161,7.7449,77.9256,100,76.1003],["AAACA","GGACA","UGACU","AGACA","GAACU","GGACA"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Chrom<\/th>\n      <th>Position<\/th>\n      <th>Strand<\/th>\n      <th>m6A fracrion (%)<\/th>\n      <th>5-mer<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<pre class="r"><code>print(paste0(&quot;Total number of m6a sites reported by the paper &quot;, nrow(df_paper_raw)))</code></pre>
-<pre><code>[1] &quot;Total number of m6a sites reported by the paper 23833&quot;</code></pre>
-<pre class="r"><code>rd &lt;- 10
-pc &lt;- &quot;0.001&quot;
-me0 &lt;- 0.05
-
 df_paper_raw &lt;- as.data.table(df_paper_raw)
 df_paper_raw$Chrom &lt;- gsub(df_paper_raw$Chrom, pattern = &quot;chr&quot;, replacement = &quot;&quot;)
 df_paper_raw[, site := paste0(Chrom, &quot;-&quot;, Position)]
 
 paper_sites &lt;- df_paper_raw$site
 
-file_ours &lt;- make_file(rd, pc)
-df_ours_raw &lt;- fread(file_ours)
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by camseq paper&#39;),options = list(pageLength = 10) )</code></pre>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-72df6e256503a04e505c" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-72df6e256503a04e505c">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by camseq paper<\/caption>","data":[["1","2","3","4","5","6"],["1","1","1","1","1","1"],[629180,629885,630356,631114,631193,944575],["+","+","+","+","+","-"],[12.7125,55.2161,7.7449,77.9256,100,76.1003],["AAACA","GGACA","UGACU","AGACA","GAACU","GGACA"],["1-629180","1-629885","1-630356","1-631114","1-631193","1-944575"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Chrom<\/th>\n      <th>Position<\/th>\n      <th>Strand<\/th>\n      <th>m6A fracrion (%)<\/th>\n      <th>5-mer<\/th>\n      <th>site<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>print(paste0(&quot;Total number of m6a sites reported by the paper &quot;, nrow(df_paper_raw)))</code></pre>
+<pre><code>[1] &quot;Total number of m6a sites reported by the paper 23833&quot;</code></pre>
+<pre class="r"><code>rd &lt;- 10
+pc &lt;- &quot;0.001&quot;
+me0 &lt;- 0.05
 
-# normalize methylation once; build site once
-df_ours_raw[, site := paste0(ref, &quot;-&quot;, pos)]
-
-df_ours_f &lt;- df_ours_raw[methylation_mepct &gt;= me0*100]
-
-our_sites &lt;- df_ours_f$site
 inter_sites &lt;- intersect(our_sites, paper_sites)
-
 
 # merge only the needed columns from paper (smaller/faster)
 df_merge &lt;- merge(
@@ -764,8 +802,82 @@ p_venn &lt;- plot(
 
 p</code></pre>
 <p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd/docs/figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-3-1.png" target="_blank">87fbf27</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>p_venn</code></pre>
 <p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-3-2.png" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-2">
+Past versions of unnamed-chunk-3-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd/docs/figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-3-2.png" target="_blank">87fbf27</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="compare-with-paper-1-hspc-ribo-d3-hspc-ribo-d6-hspc-ribo-d9" class="section level1">
 <h1>Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9</h1>
@@ -781,27 +893,14 @@ df_paper_raw[, site := paste0(Chrom, &quot;-&quot;, Position)]
 
 df_paper_raw &lt;- df_paper_raw[!duplicated(df_paper_raw$site),]
 
+paper_sites &lt;- df_paper_raw$site
+
 DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = &#39;caption-side: left; text-align: left; color:black;  font-size:150% ;&#39;,&#39;Several sites reported by camseq paper&#39;),options = list(pageLength = 10) )</code></pre>
 <div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-c71357163c4076450eea" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-c71357163c4076450eea">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black;  font-size:150% ;\">Several sites reported by camseq paper<\/caption>","data":[["1","2","3","4","5","6"],["1","1","1","1","1","1"],[629885,630012,630356,631316,632043,632134],["+","+","+","+","+","+"],[34.479,14.5373,11.4856,4.1313,21.5373,18.5981],["GGACA","UGACA","UGACU","UGACU","UGACU","UGACU"],["1-629885","1-630012","1-630356","1-631316","1-632043","1-632134"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Chrom<\/th>\n      <th>Position<\/th>\n      <th>Strand<\/th>\n      <th>m6A fracrion (%)<\/th>\n      <th>5-mer<\/th>\n      <th>site<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>print(paste0(&quot;Total number of m6a sites reported by the paper &quot;, nrow(df_paper_raw)))</code></pre>
 <pre><code>[1] &quot;Total number of m6a sites reported by the paper 58488&quot;</code></pre>
-<pre class="r"><code>rd &lt;- 10
-pc &lt;- &quot;0.001&quot;
-me0 &lt;- 0.05
-
-paper_sites &lt;- df_paper_raw$site
-
-file_ours &lt;- make_file(rd, pc)
-df_ours_raw &lt;- fread(file_ours)
-
-# normalize methylation once; build site once
-df_ours_raw[, site := paste0(ref, &quot;-&quot;, pos)]
-
-df_ours_f &lt;- df_ours_raw[methylation_mepct &gt;= me0*100]
-
-our_sites &lt;- df_ours_f$site
-inter_sites &lt;- intersect(our_sites, paper_sites)
+<pre class="r"><code>inter_sites &lt;- intersect(our_sites, paper_sites)
 
 
 # merge only the needed columns from paper (smaller/faster)
@@ -839,8 +938,189 @@ p_venn &lt;- plot(
 
 p</code></pre>
 <p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd/docs/figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-5-1.png" target="_blank">87fbf27</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>p_venn</code></pre>
 <p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-5-2.png" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
+Past versions of unnamed-chunk-5-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/87fbf2735e01ca72b8fda6ad7a04b2e608fc0bbd/docs/figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-5-2.png" target="_blank">87fbf27</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="compare-with-paper-2-mono-mac-6" class="section level1">
+<h1>Compare with Paper 2, MONO-MAC-6</h1>
+<pre class="r"><code>df_paper_raw &lt;- fread(&quot;/project/xinhe/xsun/camseq/pipeline/data/m6a_REPIC_MONO-MAC-6_hg38.txt&quot;)
+
+gr_ours &lt;- GRanges(
+  seqnames = paste0(&quot;chr&quot;, df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+df_paper &lt;- copy(df_paper_raw)
+
+# remove strand brackets
+df_paper[, strand := sub(&quot;.*\\[|\\]&quot;, &quot;&quot;, pos)]
+
+# remove strand part
+coord &lt;- sub(&quot;\\[.*\\]&quot;, &quot;&quot;, df_paper$pos)
+
+df_paper[, chr   := sub(&quot;:.*&quot;, &quot;&quot;, coord)]
+df_paper[, start := as.integer(sub(&quot;.*:(\\d+)-.*&quot;, &quot;\\1&quot;, coord))]
+df_paper[, end   := as.integer(sub(&quot;.*-(\\d+)&quot;, &quot;\\1&quot;, coord))]
+
+gr_paper &lt;- GRanges(
+  seqnames = df_paper$chr,
+  ranges   = IRanges(start = df_paper$start, end = df_paper$end)
+)
+
+hits &lt;- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+
+n_sites_covered &lt;- length(unique(queryHits(hits)))
+n_sites_total   &lt;- length(gr_ours)
+
+df_bar &lt;- data.table(
+  status = c(&quot;Covered by REPIC peak&quot;, &quot;Not covered&quot;),
+  count  = c(
+    n_sites_covered,
+    n_sites_total - n_sites_covered
+  )
+)
+
+df_bar[, percent := count / n_sites_total * 100]
+
+p_bar &lt;- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.8) +
+  geom_text(
+    aes(label = sprintf(&quot;%d\n(%.1f%%)&quot;, count, percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c(&quot;#0072B2&quot;, &quot;grey70&quot;)) +
+  labs(
+    y = &quot;Number of sites&quot;,
+    x = NULL,
+    title = &quot;Coverage of our sites by REPIC m6A peaks&quot;
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = &quot;none&quot;,
+    plot.title = element_text(hjust = 0.5)
+  )
+
+p_bar</code></pre>
+<p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="compare-with-paper-3-mono-mac-6" class="section level1">
+<h1>Compare with Paper 3, MONO-MAC-6</h1>
+<pre class="r"><code>df_paper_raw &lt;- fread(&quot;/project/xinhe/xsun/camseq/pipeline/data/m6a_Atlas2_MONO-MAC-6.txt&quot;)
+
+gr_ours &lt;- GRanges(
+  seqnames = paste0(&quot;chr&quot;, df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+gr_paper &lt;- GRanges(
+  seqnames = df_paper_raw$seqnames,
+  ranges   = IRanges(df_paper_raw$start, df_paper_raw$end),
+  strand   = df_paper_raw$strand
+)
+
+hits &lt;- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+n_sites_covered &lt;- length(unique(queryHits(hits)))
+n_sites_total   &lt;- length(gr_ours)
+n_sites_covered / n_sites_total</code></pre>
+<pre><code>[1] 0.04339423</code></pre>
+<pre class="r"><code>df_bar &lt;- data.table(
+  status = c(&quot;Covered by m6A-Atlas peak&quot;, &quot;Not covered&quot;),
+  count  = c(n_sites_covered, n_sites_total - n_sites_covered)
+)
+df_bar[, percent := 100 * count / n_sites_total]
+
+p_bar &lt;- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_text(
+    aes(label = sprintf(&quot;%s\n(%.1f%%)&quot;, format(count, big.mark=&quot;,&quot;), percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c(&quot;#0072B2&quot;, &quot;grey70&quot;)) +
+  labs(x = NULL, y = &quot;Number of sites&quot;,
+       title = &quot;Coverage of our sites by m6A-Atlas peak&quot;) +
+  theme_classic(base_size = 14) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5))
+
+p_bar</code></pre>
+<p><img src="figure/compare_round3_sample234_otherm6adb.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -865,27 +1145,36 @@ locale:
 [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
 
 other attached packages:
-[1] eulerr_7.0.4      ggplot2_3.4.2     gridExtra_2.3     data.table_1.14.4
+[1] GenomicRanges_1.50.2 GenomeInfoDb_1.34.9  IRanges_2.32.0      
+[4] S4Vectors_0.36.2     BiocGenerics_0.44.0  eulerr_7.0.4        
+[7] ggplot2_3.4.2        gridExtra_2.3        data.table_1.14.4   
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.0  xfun_0.38         bslib_0.3.1       colorspace_2.0-3 
- [5] vctrs_0.6.1       generics_0.1.3    htmltools_0.5.7   yaml_2.3.5       
- [9] utf8_1.2.2        rlang_1.1.7       jquerylib_0.1.4   later_1.3.0      
-[13] pillar_1.9.0      glue_1.6.2        withr_3.0.2       readxl_1.4.2     
-[17] lifecycle_1.0.4   stringr_1.5.0     munsell_0.5.0     gtable_0.3.0     
-[21] workflowr_1.7.1   cellranger_1.1.0  htmlwidgets_1.6.2 evaluate_1.0.5   
-[25] labeling_0.4.2    knitr_1.42        fastmap_1.1.0     httpuv_1.6.5     
-[29] crosstalk_1.2.0   fansi_1.0.3       highr_0.9         Rcpp_1.0.14      
-[33] promises_1.2.0.1  scales_1.2.0      DT_0.22           jsonlite_2.0.0   
-[37] farver_2.1.0      fs_1.6.6          digest_0.6.29     stringi_1.7.6    
-[41] dplyr_1.1.2       polyclip_1.10-0   grid_4.2.0        rprojroot_2.1.1  
-[45] cli_3.6.5         tools_4.2.0       magrittr_2.0.3    sass_0.4.1       
-[49] tibble_3.2.1      whisker_0.4       pkgconfig_2.0.3   ellipsis_0.3.2   
-[53] polylabelr_1.0.0  rmarkdown_2.21    rstudioapi_0.14   R6_2.6.1         
-[57] git2r_0.30.1      compiler_4.2.0   </code></pre>
+ [1] tidyselect_1.2.0       xfun_0.38              bslib_0.3.1           
+ [4] colorspace_2.0-3       vctrs_0.6.1            generics_0.1.3        
+ [7] htmltools_0.5.7        yaml_2.3.5             utf8_1.2.2            
+[10] rlang_1.1.7            jquerylib_0.1.4        later_1.3.0           
+[13] pillar_1.9.0           glue_1.6.2             withr_3.0.2           
+[16] readxl_1.4.2           GenomeInfoDbData_1.2.9 lifecycle_1.0.4       
+[19] zlibbioc_1.44.0        stringr_1.5.0          cellranger_1.1.0      
+[22] munsell_0.5.0          gtable_0.3.0           workflowr_1.7.1       
+[25] htmlwidgets_1.6.2      evaluate_1.0.5         labeling_0.4.2        
+[28] knitr_1.42             fastmap_1.1.0          crosstalk_1.2.0       
+[31] httpuv_1.6.5           fansi_1.0.3            highr_0.9             
+[34] Rcpp_1.0.14            DT_0.22                promises_1.2.0.1      
+[37] scales_1.2.0           XVector_0.38.0         jsonlite_2.0.0        
+[40] farver_2.1.0           fs_1.6.6               digest_0.6.29         
+[43] stringi_1.7.6          dplyr_1.1.2            polyclip_1.10-0       
+[46] grid_4.2.0             rprojroot_2.1.1        cli_3.6.5             
+[49] tools_4.2.0            bitops_1.0-7           magrittr_2.0.3        
+[52] sass_0.4.1             RCurl_1.98-1.12        tibble_3.2.1          
+[55] whisker_0.4            pkgconfig_2.0.3        ellipsis_0.3.2        
+[58] polylabelr_1.0.0       rmarkdown_2.21         rstudioapi_0.14       
+[61] R6_2.6.1               git2r_0.30.1           compiler_4.2.0        </code></pre>
 </div>
 </div>
 
