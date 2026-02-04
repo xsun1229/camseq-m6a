@@ -1,5 +1,5 @@
 ---
-title: "Comparing m6a sites from merged sample2-4 with camseq paper"
+title: "Comparing m6a sites from sample2-4 (merged and separate) with camseq paper"
 author: "XSun"
 date: "2026-02-03"
 output:
@@ -17,26 +17,20 @@ library(eulerr)
 library(GenomicRanges)
 
 # Helper to build file paths
-make_file <- function(rd, p_cutoff_str) {
+make_file_sample2 <- function(rd, p_cutoff_str) {
   sprintf(
-    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv",
+    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample02_with_id_read%d_binomp%s.tsv",
     p_cutoff_str, rd, p_cutoff_str
   )
 }
 
-rd <- 10
-pc <- "0.001"
-me0 <- 0.05
+make_file_sample234 <- function(rd, p_cutoff_str) {
+  sprintf(
+    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites_merged/processed_binomp_%s_1n/merged_sample020304_with_id_read%d_binomp%s.tsv",
+    p_cutoff_str, rd, p_cutoff_str
+  )
+}
 
-file_ours <- make_file(rd, pc)
-df_ours_raw <- fread(file_ours)
-
-# normalize methylation once; build site once
-df_ours_raw[, site := paste0(ref, "-", pos)]
-
-df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
-
-our_sites <- df_ours_f$site
 
 ```
 
@@ -77,7 +71,30 @@ peak-level calls, not single-nucleotide–resolution sites.
 MONO-MAC-6. 
 
 
-# Compare with Paper 1, HSPC ribo– d9
+
+# Merged Sample 2-4, cutoffs for our data: p<0.001, read depth >=20, methylation level >= 0.05
+
+
+```{r}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.05
+
+file_ours <- make_file_sample234(rd, pc)
+df_ours_raw <- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, "-", pos)]
+
+df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
+
+our_sites <- df_ours_f$site
+
+```
+
+
+## Compare with Paper 1, HSPC ribo– d9
 
 
 ```{r message=F, warning=F}
@@ -99,10 +116,6 @@ print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_r
 
 
 ```{r message=F, warning=F, fig.height=4, fig.width=5}
-
-rd <- 10
-pc <- "0.001"
-me0 <- 0.05
 
 inter_sites <- intersect(our_sites, paper_sites)
 
@@ -145,7 +158,7 @@ p_venn
 ```
 
 
-# Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9
+## Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9
 
 
 ```{r message=F, warning=F}
@@ -217,7 +230,7 @@ p_venn
 
 
 
-# Compare with Paper 2, MONO-MAC-6
+## Compare with Paper 2, MONO-MAC-6
 
 We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
 
@@ -293,7 +306,880 @@ p_bar
 
 
 
-# Compare with Paper 3, MONO-MAC-6
+## Compare with Paper 3, MONO-MAC-6
+
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_Atlas2_MONO-MAC-6.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by m6a atlas'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
+
+gr_ours <- GRanges(
+  seqnames = paste0("chr", df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+gr_paper <- GRanges(
+  seqnames = df_paper_raw$seqnames,
+  ranges   = IRanges(df_paper_raw$start, df_paper_raw$end),
+  strand   = df_paper_raw$strand
+)
+
+hits <- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+n_sites_covered <- length(unique(queryHits(hits)))
+n_sites_total   <- length(gr_ours)
+n_sites_covered / n_sites_total
+
+df_bar <- data.table(
+  status = c("Covered by m6A-Atlas peak", "Not covered"),
+  count  = c(n_sites_covered, n_sites_total - n_sites_covered)
+)
+df_bar[, percent := 100 * count / n_sites_total]
+
+p_bar <- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_text(
+    aes(label = sprintf("%s\n(%.1f%%)", format(count, big.mark=","), percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c("#0072B2", "grey70")) +
+  labs(x = NULL, y = "Number of sites",
+       title = "Coverage of our sites by m6A-Atlas peak") +
+  theme_classic(base_size = 14) +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+
+p_bar
+
+```
+
+
+
+
+# Merged Sample 2-4, cutoffs for our data: p<0.001, read depth >=20, methylation level >= 0.1
+
+
+```{r}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.1
+
+file_ours <- make_file_sample234(rd, pc)
+df_ours_raw <- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, "-", pos)]
+
+df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
+
+our_sites <- df_ours_f$site
+
+```
+
+
+## Compare with Paper 1, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+paper_sites <- df_paper_raw$site
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
+
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+inter_sites <- intersect(our_sites, paper_sites)
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+## Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw1 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 6)
+df_paper_raw2 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 7)
+df_paper_raw3 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- rbind(df_paper_raw1,df_paper_raw2,df_paper_raw3)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+df_paper_raw <- df_paper_raw[!duplicated(df_paper_raw$site),]
+
+paper_sites <- df_paper_raw$site
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by the paper'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+
+inter_sites <- intersect(our_sites, paper_sites)
+
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+
+## Compare with Paper 2, MONO-MAC-6
+
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_REPIC_MONO-MAC-6_hg38.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by REPIC'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
+
+gr_ours <- GRanges(
+  seqnames = paste0("chr", df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+df_paper <- copy(df_paper_raw)
+
+# remove strand brackets
+df_paper[, strand := sub(".*\\[|\\]", "", pos)]
+
+# remove strand part
+coord <- sub("\\[.*\\]", "", df_paper$pos)
+
+df_paper[, chr   := sub(":.*", "", coord)]
+df_paper[, start := as.integer(sub(".*:(\\d+)-.*", "\\1", coord))]
+df_paper[, end   := as.integer(sub(".*-(\\d+)", "\\1", coord))]
+
+gr_paper <- GRanges(
+  seqnames = df_paper$chr,
+  ranges   = IRanges(start = df_paper$start, end = df_paper$end)
+)
+
+hits <- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+
+n_sites_covered <- length(unique(queryHits(hits)))
+n_sites_total   <- length(gr_ours)
+
+df_bar <- data.table(
+  status = c("Covered by REPIC peak", "Not covered"),
+  count  = c(
+    n_sites_covered,
+    n_sites_total - n_sites_covered
+  )
+)
+
+df_bar[, percent := count / n_sites_total * 100]
+
+p_bar <- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.8) +
+  geom_text(
+    aes(label = sprintf("%d\n(%.1f%%)", count, percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c("#0072B2", "grey70")) +
+  labs(
+    y = "Number of sites",
+    x = NULL,
+    title = "Coverage of our sites by REPIC m6A peaks"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5)
+  )
+
+p_bar
+
+```
+
+
+
+## Compare with Paper 3, MONO-MAC-6
+
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_Atlas2_MONO-MAC-6.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by m6a atlas'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
+
+gr_ours <- GRanges(
+  seqnames = paste0("chr", df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+gr_paper <- GRanges(
+  seqnames = df_paper_raw$seqnames,
+  ranges   = IRanges(df_paper_raw$start, df_paper_raw$end),
+  strand   = df_paper_raw$strand
+)
+
+hits <- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+n_sites_covered <- length(unique(queryHits(hits)))
+n_sites_total   <- length(gr_ours)
+n_sites_covered / n_sites_total
+
+df_bar <- data.table(
+  status = c("Covered by m6A-Atlas peak", "Not covered"),
+  count  = c(n_sites_covered, n_sites_total - n_sites_covered)
+)
+df_bar[, percent := 100 * count / n_sites_total]
+
+p_bar <- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_text(
+    aes(label = sprintf("%s\n(%.1f%%)", format(count, big.mark=","), percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c("#0072B2", "grey70")) +
+  labs(x = NULL, y = "Number of sites",
+       title = "Coverage of our sites by m6A-Atlas peak") +
+  theme_classic(base_size = 14) +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+
+p_bar
+
+```
+
+
+
+
+# Sample 2 only, cutoffs for our data: p<0.001, read depth >=20, methylation level >= 0.05
+
+our merged data has LPS treatment, which probably add more m6A sites. So we limit to sample 2 only (NI)
+
+
+```{r}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.05
+
+file_ours <- make_file_sample2(rd, pc)
+df_ours_raw <- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, "-", pos)]
+
+df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
+
+our_sites <- df_ours_f$site
+
+```
+
+
+## Compare with Paper 1, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+paper_sites <- df_paper_raw$site
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
+
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+inter_sites <- intersect(our_sites, paper_sites)
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+## Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw1 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 6)
+df_paper_raw2 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 7)
+df_paper_raw3 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- rbind(df_paper_raw1,df_paper_raw2,df_paper_raw3)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+df_paper_raw <- df_paper_raw[!duplicated(df_paper_raw$site),]
+
+paper_sites <- df_paper_raw$site
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by the paper'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+
+inter_sites <- intersect(our_sites, paper_sites)
+
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+
+## Compare with Paper 2, MONO-MAC-6
+
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_REPIC_MONO-MAC-6_hg38.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by REPIC'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
+
+gr_ours <- GRanges(
+  seqnames = paste0("chr", df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+df_paper <- copy(df_paper_raw)
+
+# remove strand brackets
+df_paper[, strand := sub(".*\\[|\\]", "", pos)]
+
+# remove strand part
+coord <- sub("\\[.*\\]", "", df_paper$pos)
+
+df_paper[, chr   := sub(":.*", "", coord)]
+df_paper[, start := as.integer(sub(".*:(\\d+)-.*", "\\1", coord))]
+df_paper[, end   := as.integer(sub(".*-(\\d+)", "\\1", coord))]
+
+gr_paper <- GRanges(
+  seqnames = df_paper$chr,
+  ranges   = IRanges(start = df_paper$start, end = df_paper$end)
+)
+
+hits <- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+
+n_sites_covered <- length(unique(queryHits(hits)))
+n_sites_total   <- length(gr_ours)
+
+df_bar <- data.table(
+  status = c("Covered by REPIC peak", "Not covered"),
+  count  = c(
+    n_sites_covered,
+    n_sites_total - n_sites_covered
+  )
+)
+
+df_bar[, percent := count / n_sites_total * 100]
+
+p_bar <- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.8) +
+  geom_text(
+    aes(label = sprintf("%d\n(%.1f%%)", count, percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c("#0072B2", "grey70")) +
+  labs(
+    y = "Number of sites",
+    x = NULL,
+    title = "Coverage of our sites by REPIC m6A peaks"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5)
+  )
+
+p_bar
+
+```
+
+
+
+## Compare with Paper 3, MONO-MAC-6
+
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_Atlas2_MONO-MAC-6.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by m6a atlas'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
+
+gr_ours <- GRanges(
+  seqnames = paste0("chr", df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+gr_paper <- GRanges(
+  seqnames = df_paper_raw$seqnames,
+  ranges   = IRanges(df_paper_raw$start, df_paper_raw$end),
+  strand   = df_paper_raw$strand
+)
+
+hits <- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+n_sites_covered <- length(unique(queryHits(hits)))
+n_sites_total   <- length(gr_ours)
+n_sites_covered / n_sites_total
+
+df_bar <- data.table(
+  status = c("Covered by m6A-Atlas peak", "Not covered"),
+  count  = c(n_sites_covered, n_sites_total - n_sites_covered)
+)
+df_bar[, percent := 100 * count / n_sites_total]
+
+p_bar <- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_text(
+    aes(label = sprintf("%s\n(%.1f%%)", format(count, big.mark=","), percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c("#0072B2", "grey70")) +
+  labs(x = NULL, y = "Number of sites",
+       title = "Coverage of our sites by m6A-Atlas peak") +
+  theme_classic(base_size = 14) +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+
+p_bar
+
+```
+
+
+
+# Sample 2 only, cutoffs for our data: p<0.001, read depth >=20, methylation level >= 0.1
+
+our merged data has LPS treatment, which probably add more m6A sites. So we limit to sample 2 only (NI)
+
+
+```{r}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.1
+
+file_ours <- make_file_sample2(rd, pc)
+df_ours_raw <- fread(file_ours)
+
+# normalize methylation once; build site once
+df_ours_raw[, site := paste0(ref, "-", pos)]
+
+df_ours_f <- df_ours_raw[methylation_mepct >= me0*100]
+
+our_sites <- df_ours_f$site
+
+```
+
+
+## Compare with Paper 1, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+paper_sites <- df_paper_raw$site
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by camseq paper'),options = list(pageLength = 10) )
+
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+inter_sites <- intersect(our_sites, paper_sites)
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+## Compare with Paper 1, HSPC ribo– d3, HSPC ribo– d6, HSPC ribo– d9
+
+
+```{r message=F, warning=F}
+
+df_paper_raw1 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 6)
+df_paper_raw2 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 7)
+df_paper_raw3 <- readxl::read_excel("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", sheet = 8)
+
+df_paper_raw <- rbind(df_paper_raw1,df_paper_raw2,df_paper_raw3)
+
+df_paper_raw <- as.data.table(df_paper_raw)
+df_paper_raw$Chrom <- gsub(df_paper_raw$Chrom, pattern = "chr", replacement = "")
+df_paper_raw[, site := paste0(Chrom, "-", Position)]
+
+df_paper_raw <- df_paper_raw[!duplicated(df_paper_raw$site),]
+
+paper_sites <- df_paper_raw$site
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by the paper'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a sites reported by the paper ", nrow(df_paper_raw)))
+
+```
+
+
+```{r message=F, warning=F, fig.height=4, fig.width=5}
+
+
+inter_sites <- intersect(our_sites, paper_sites)
+
+
+# merge only the needed columns from paper (smaller/faster)
+df_merge <- merge(
+  df_ours_f,
+  df_paper_raw[, .(site, `m6A fracrion (%)`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = `m6A fracrion (%)`, y = methylation_mepct)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Paper methylation level (%)",
+    y = "Our methylation level (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Paper = length(paper_sites) - length(inter_sites),
+  Ours  = length(our_sites) - length(inter_sites),
+  "Paper&Ours" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+
+## Compare with Paper 2, MONO-MAC-6
+
+We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
+
+
+```{r message=F, warning=F}
+
+df_paper_raw <- fread("/project/xinhe/xsun/camseq/pipeline/data/m6a_REPIC_MONO-MAC-6_hg38.txt")
+
+DT::datatable(head(df_paper_raw),caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Several sites reported by REPIC'),options = list(pageLength = 10) )
+
+print(paste0("Total number of m6a peaks reported by the paper ", nrow(df_paper_raw)))
+
+gr_ours <- GRanges(
+  seqnames = paste0("chr", df_ours_f$ref),
+  ranges   = IRanges(start = df_ours_f$pos, end = df_ours_f$pos),
+  strand   = df_ours_f$strand
+)
+
+df_paper <- copy(df_paper_raw)
+
+# remove strand brackets
+df_paper[, strand := sub(".*\\[|\\]", "", pos)]
+
+# remove strand part
+coord <- sub("\\[.*\\]", "", df_paper$pos)
+
+df_paper[, chr   := sub(":.*", "", coord)]
+df_paper[, start := as.integer(sub(".*:(\\d+)-.*", "\\1", coord))]
+df_paper[, end   := as.integer(sub(".*-(\\d+)", "\\1", coord))]
+
+gr_paper <- GRanges(
+  seqnames = df_paper$chr,
+  ranges   = IRanges(start = df_paper$start, end = df_paper$end)
+)
+
+hits <- findOverlaps(gr_ours, gr_paper, ignore.strand = FALSE)
+
+n_sites_covered <- length(unique(queryHits(hits)))
+n_sites_total   <- length(gr_ours)
+
+df_bar <- data.table(
+  status = c("Covered by REPIC peak", "Not covered"),
+  count  = c(
+    n_sites_covered,
+    n_sites_total - n_sites_covered
+  )
+)
+
+df_bar[, percent := count / n_sites_total * 100]
+
+p_bar <- ggplot(df_bar, aes(x = status, y = count, fill = status)) +
+  geom_col(width = 0.6, alpha = 0.8) +
+  geom_text(
+    aes(label = sprintf("%d\n(%.1f%%)", count, percent)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_fill_manual(values = c("#0072B2", "grey70")) +
+  labs(
+    y = "Number of sites",
+    x = NULL,
+    title = "Coverage of our sites by REPIC m6A peaks"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5)
+  )
+
+p_bar
+
+```
+
+
+
+## Compare with Paper 3, MONO-MAC-6
 
 We check the coverage of our sites by the m6a peaks identified in MONO-MAC-6.
 
