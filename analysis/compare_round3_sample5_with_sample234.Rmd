@@ -1,0 +1,116 @@
+---
+title: "Comparing m6a sites from sample5 with merged sample2-4"
+author: "XSun"
+date: "2026-02-04"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r message=F, warning=F}
+
+library(data.table)
+library(gridExtra)
+library(ggplot2)
+library(eulerr)
+
+# Helper to build file paths
+make_file_sample5 <- function(rd, p_cutoff_str) {
+  sprintf(
+    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites/pileup/processed_binomp_%s_1n/sample05_with_id_read%d_binomp%s.tsv",
+    p_cutoff_str, rd, p_cutoff_str
+  )
+}
+
+make_file_sample234 <- function(rd, p_cutoff_str) {
+  sprintf(
+    "/project/xinhe/xsun/camseq/pipeline/workspace_round3/count_sites_merged/processed_binomp_%s_1n/merged_sample020304_with_id_read%d_binomp%s.tsv",
+    p_cutoff_str, rd, p_cutoff_str
+  )
+}
+
+
+```
+
+
+We compare the sample 5 with merged sample 2-4 here. The cutoffs are p<0.001, read depth >=20, methylation level >= 0.05
+
+
+```{r}
+
+rd <- 10
+pc <- "0.001"
+me0 <- 0.05
+
+file_sample234 <- make_file_sample234(rd, pc)
+df_sample234 <- fread(file_sample234)
+
+# normalize methylation once; build site once
+df_sample234[, site := paste0(ref, "-", pos)]
+df_sample234 <- df_sample234[methylation_mepct >= me0*100]
+
+sites_sample234 <- df_sample234$site
+
+file_sample5 <- make_file_sample5(rd, pc)
+df_sample5 <- fread(file_sample5)
+
+# normalize methylation once; build site once
+df_sample5[, site := paste0(ref, "-", pos)]
+df_sample5 <- df_sample5[methylation_mepct >= me0*100]
+
+sites_sample5 <- df_sample5$site
+
+inter_sites <- intersect(sites_sample234, sites_sample5)
+
+df_merge <- merge(
+  df_sample234,
+  df_sample5[, .(site, `methylation_mepct`)],
+  by = "site",
+  all = FALSE
+)
+
+p <-  ggplot(df_merge, aes(x = methylation_mepct.x, y = methylation_mepct.y)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  #coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "methylation level -- merged sample 2-4(%)",
+    y = "methylation level -- sample 5 (%)",
+    title = sprintf("read depth %s, p-val %s,\n methylation >= %s", rd, pc, me0)
+  ) +
+  theme_classic(base_size = 14)
+  
+fit <- euler(c(
+  Sample5 = length(sites_sample5) - length(inter_sites),
+  Sample234  = length(sites_sample234) - length(inter_sites),
+  "Sample5&Sample234" = length(inter_sites)
+))
+
+p_venn <- plot(
+    fit,
+    fills = c("#0072B2", "#D55E00"),
+    alpha = 0.6,
+    labels = TRUE,
+    quantities = TRUE,
+  )
+
+p
+
+p_venn
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

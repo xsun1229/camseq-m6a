@@ -22,4 +22,6 @@ editor_options:
 
 [Comparing m6a sites from sample2-4 (merged and separate) with other data bases](https://xsun1229.github.io/camseq-m6a/compare_round3_sample234_otherm6adb.html)
 
+[Comparing m6a sites from sample5 with merged sample2-4](https://xsun1229.github.io/camseq-m6a/compare_round3_sample5_with_sample234.html)
+
 [QC -- multi cell types, from Kinga, has some quality issues](https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html)
