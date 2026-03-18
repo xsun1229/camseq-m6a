@@ -1,0 +1,93 @@
+---
+title: "QC -- sample 04 from round 3, checking the pipeline 030926"
+author: "XSun"
+date: "2026-03-18"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+
+# Output from multiqc 
+
+https://xsun1229.github.io/camseq-m6a/multiqc_report_genome_all_round3_sample4.html
+
+
+# Site calling 
+
+```{r , fig.height=5, fig.width=10}
+
+library(data.table) 
+
+file <- "/project/xinhe/xsun/camseq/pipeline030926/workspace_round3/report_sites/filtered/genome.tsv.gz"
+df <- fread(file)
+
+DT::datatable(df,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Sites'),options = list(pageLength = 10) )
+
+```
+
+
+
+<!-- # Motif counting -->
+
+<!-- ## read depth 10, p-value < 0.001, methylation level > 0.05 -->
+
+<!-- ```{r , fig.height=5, fig.width=10} -->
+
+<!-- library(data.table) -->
+<!-- library(ggplot2) -->
+
+<!-- file <- "/project/xinhe/xsun/camseq/pipeline030926/workspace_round3/report_sites/filtered/genome.tsv.gz" -->
+
+<!-- df <- fread(file) -->
+
+
+<!-- df_filtered <- df[df$Ratio_sample01 > 0.05 & df$pval_sample01 < 0.001,] -->
+
+<!-- df_filtered[, motif_3mer := substr(motif, 2, 4)] -->
+
+<!-- rev_comp <- function(x) { -->
+<!--   chartr("ACGT", "TGCA", paste(rev(strsplit(x, "")[[1]]), collapse = "")) -->
+<!-- } -->
+
+<!-- convert_motif <- function(m) { -->
+<!--   if (substr(m, 2, 2) == "T") { -->
+<!--     return(rev_comp(m)) -->
+<!--   } else { -->
+<!--     return(m) -->
+<!--   } -->
+<!-- } -->
+
+<!-- df_filtered[, motif_3mer_norm := sapply(motif_3mer, convert_motif)] -->
+
+<!-- dt_plot <- df_filtered[, .( -->
+<!--   percentage = sum(Uncon_sample01) / sum(Depth_sample01) * 100 -->
+<!-- ), by = motif_3mer_norm] -->
+
+<!-- dt_plot[, sample_label := paste0("sample01\n",nrow(df_filtered),"sites")] -->
+
+<!-- ggplot(dt_plot, aes(x = percentage, y = sample_label)) + -->
+<!--   geom_point( -->
+<!--     aes(color = motif_3mer_norm), -->
+<!--     size = 3, -->
+<!--     position = position_jitter(height = 0.15), -->
+<!--     show.legend = FALSE -->
+<!--   ) + -->
+<!--   geom_text( -->
+<!--     aes(label = motif_3mer_norm, color = motif_3mer_norm), -->
+<!--     position = position_jitter(height = 0.15), -->
+<!--     vjust = -0.7, -->
+<!--     size = 4, -->
+<!--     show.legend = FALSE -->
+<!--   ) + -->
+<!--   labs( -->
+<!--     #title = "read depth = 10, binomial p-value < 0.001", -->
+<!--     x = "Percentage (%)", -->
+<!--     y = "Sample \nTotal site passing filter" -->
+<!--   ) + -->
+<!--   theme_minimal() -->
+
+
+
+<!-- ``` -->
