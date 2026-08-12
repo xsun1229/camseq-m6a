@@ -1,0 +1,197 @@
+---
+title: "Comparing m6a sites from round 5 samples (JLK07/JLK08/JLK09) with published m6A databases"
+author: "XSun"
+date: "2026-08-12"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+Same methodology and reference databases as
+[Comparing m6a sites from sample2-4 with other databases](compare_round3_sample234_otherm6adb.html),
+applied to round 5's samples individually (no merging across samples).
+
+Round 5's samples are the same macrophage conditions as round 3's samples
+02-04, resequenced independently: `JLK07`=Mfs_NI/RIH014 (= `JL-CAM-02`),
+`JLK08`=Mfs_LPS/RIH004 (= `JL-CAM-03`), `JLK09`=Mfs_LPS/RIH007 (= `JL-CAM-04`).
+
+Paper1: [m6A RNA modifications are measured at single-base resolution across the mammalian transcriptome, PMID: 35288668](https://pubmed.ncbi.nlm.nih.gov/35288668/) --
+single-nucleotide resolution. Compared against HSPC ribo d9 alone (closest
+proxy to macrophages) and against d3+d6+d9 combined.
+
+Paper 2: [REPIC: a database for exploring the N6-methyladenosine methylome, PMID: 32345346](https://pubmed.ncbi.nlm.nih.gov/32345346/) --
+peak-level calls, MONO-MAC-6.
+
+Paper 3: [m6A-Atlas2](https://rnamd.org/m6a/merip.php) -- peak-level calls, MONO-MAC-6.
+
+Sites are called at `p<0.001` (fixed) swept over methylation ratio (`Uncon/Depth`)
+`>= 5%/10%/20%`, `min_depth=10`, `min_uncon=1` -- the same
+[binomial p-value / methylation-ratio sweep](QC_round3_JL_v3.html) used in the
+per-round v3 QC docs, read directly from its pre-computed
+`report_sites/qc_sweep/` output (no new statistics computed here).
+
+```{r setup, message=FALSE, warning=FALSE}
+source("/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R")
+source("/project/xinhe/xsun/website/camseq-m6a/code/compare_db_helpers.R")
+library(knitr)
+library(kableExtra)
+
+BASE <- "/project/xinhe/xsun/camseq/processed_new/round5_JL_merged"
+SAMPLES <- c("JLK07", "JLK08", "JLK09")
+RATIOS <- c("0.05", "0.10", "0.20")
+PVAL <- "0.001"
+
+DATA_DIR <- "/project/xinhe/xsun/camseq/pipeline/data"
+paper1_d9 <- load_paper1_sheet(file.path(DATA_DIR, "m6a_PMID35288668.xlsx"), 8)
+paper1_combined <- load_paper1_combined(file.path(DATA_DIR, "m6a_PMID35288668.xlsx"))
+repic_peaks <- load_repic_peaks(file.path(DATA_DIR, "m6a_REPIC_MONO-MAC-6_hg38.txt"))
+atlas2_peaks <- load_atlas2_peaks(file.path(DATA_DIR, "m6a_Atlas2_MONO-MAC-6.txt"))
+
+# Compute every sample x cutoff combination once; the summary table and the
+# detailed per-sample sections below both read from this, so nothing is
+# recomputed.
+results <- list()
+for (s in SAMPLES) {
+  for (r in RATIOS) {
+    our <- qc_our_sites(BASE, "genome", s, r, PVAL)
+    results[[s]][[r]] <- list(
+      our = our,
+      n_sites = nrow(our),
+      d9 = compare_site_level(our, paper1_d9, "Paper1_d9", sprintf("%s, p<%s, methylation>=%s%%", s, PVAL, as.numeric(r) * 100)),
+      combined = compare_site_level(our, paper1_combined, "Paper1_combined", sprintf("%s, p<%s, methylation>=%s%%", s, PVAL, as.numeric(r) * 100)),
+      repic = compare_peak_level(our, repic_peaks, "REPIC"),
+      atlas2 = compare_peak_level(our, atlas2_peaks, "m6A-Atlas2")
+    )
+  }
+}
+```
+
+# Summary of the overlap
+
+```{r message=FALSE, warning=FALSE}
+summary_rows <- lapply(SAMPLES, function(s) {
+  lapply(RATIOS, function(r) {
+    x <- results[[s]][[r]]
+    data.table(
+      sample = s, pvalue = paste0("<", PVAL), methylation_ratio = paste0(">=", as.numeric(r) * 100, "%"),
+      n_m6a_sites = x$n_sites,
+      overlap_paper1_d9 = sprintf("%.1f%%", x$d9$pct_ours_covered),
+      overlap_paper1_combined = sprintf("%.1f%%", x$combined$pct_ours_covered),
+      overlap_repic = sprintf("%.1f%%", x$repic$pct_covered),
+      overlap_atlas2 = sprintf("%.1f%%", x$atlas2$pct_covered)
+    )
+  })
+})
+kable(rbindlist(unlist(summary_rows, recursive = FALSE))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+# JLK07 (Mfs_NI/RIH014)
+
+## methylation ratio >= 5%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK07"]][["0.05"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+## methylation ratio >= 10%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK07"]][["0.10"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+## methylation ratio >= 20%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK07"]][["0.20"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+# JLK08 (Mfs_LPS/RIH004)
+
+## methylation ratio >= 5%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK08"]][["0.05"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+## methylation ratio >= 10%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK08"]][["0.10"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+## methylation ratio >= 20%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK08"]][["0.20"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+# JLK09 (Mfs_LPS/RIH007)
+
+## methylation ratio >= 5%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK09"]][["0.05"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+## methylation ratio >= 10%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK09"]][["0.10"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```
+
+## methylation ratio >= 20%
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+x <- results[["JLK09"]][["0.20"]]
+cat(sprintf("Our m6A sites: %d\n", x$n_sites))
+x$d9$scatter; x$d9$venn
+x$combined$scatter; x$combined$venn
+x$repic$bar
+x$atlas2$bar
+```

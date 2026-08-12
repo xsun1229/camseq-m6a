@@ -20,6 +20,7 @@ editor_options:
 * [QC -- round 3, from Jiahao (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round3_JL_v3.html)
 * [QC -- round 4, from Jiahao (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round4_JL_v3.html)
 * [QC -- round 5, from Jiahao (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round5_JL_v3.html)
+* [Comparing round 5 sites (per sample) with published m6A databases (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/compare_round5_otherm6adb.html)
 
 
 
