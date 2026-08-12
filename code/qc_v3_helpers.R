@@ -52,17 +52,36 @@ qc_sample_passing <- function(dt, sample, r, p, u = 1, d = 10) {
   ]
 }
 
+#' Derive a shorter k-mer from the pipeline's 5-mer motif column (annotated
+#' with motif_flanking=2, i.e. +-2nt around the called base at the center).
+#' width=3 takes the +-1nt window (the middle 3 characters); width=5 is a
+#' no-op. Every motif is confirmed 5 characters with an "A" center (the
+#' called base), so substr(motif, 2, 4) is always well-defined.
+qc_motif_kmer <- function(motif5, width = 5) {
+  if (width == 5) {
+    return(motif5)
+  }
+  if (width == 3) {
+    return(substr(motif5, 2, 4))
+  }
+  stop("qc_motif_kmer: unsupported width ", width, " (use 3 or 5)")
+}
+
 #' Per-sample motif percentage table from a "persample" sweep file, in the
 #' shape the old QC docs' create_motif_plot() expects (sample_label, motif,
-#' percentage columns; one panel per sample).
-qc_motif_table <- function(dt, samples, r, p, u = 1, d = 10) {
+#' percentage columns; one panel per sample). Restricted to the `top_n`
+#' motifs by total count summed across samples, so every sample's panel
+#' shows the same motif categories (comparable dodge positions) instead of
+#' each other's independent top-N, which for a 5-mer can otherwise clutter
+#' the plot with dozens of near-zero categories.
+qc_motif_table <- function(dt, samples, r, p, u = 1, d = 10, width = 5, top_n = 10) {
   rows <- lapply(samples, function(s) {
     sub <- qc_sample_passing(dt, s, r, p, u, d)
     n <- nrow(sub)
     if (n == 0) {
       return(NULL)
     }
-    tab <- sub[, .N, by = motif][, percentage := N / n * 100]
+    tab <- data.table(motif = qc_motif_kmer(sub$motif, width))[, .N, by = motif][, percentage := N / n * 100]
     tab[, `:=`(sample = s, total_n = n)]
     tab
   })
@@ -70,21 +89,62 @@ qc_motif_table <- function(dt, samples, r, p, u = 1, d = 10) {
   if (nrow(out) == 0) {
     return(out)
   }
+  keep <- out[, .(total_N = sum(N)), by = motif][order(-total_N)][seq_len(min(top_n, .N)), motif]
+  out <- out[motif %in% keep]
   out[, sample_label := paste0(sample, " (n=", format(total_n, big.mark = ","), ")")]
   out[, sample_label := fct_reorder(sample_label, total_n)]
   out
 }
 
 #' Motif percentage table from a "pooled" sweep file -- already just the
-#' passing rows for the single pooled ("ALL") sample.
-qc_motif_table_pooled <- function(dt) {
+#' passing rows for the single pooled ("ALL") sample. Restricted to the
+#' top_n motifs by count.
+qc_motif_table_pooled <- function(dt, width = 5, top_n = 10) {
   n <- nrow(dt)
   if (n == 0) {
     return(dt[, .(motif = character(), percentage = numeric())])
   }
-  tab <- dt[, .N, by = motif][, percentage := N / n * 100]
+  tab <- data.table(motif = qc_motif_kmer(dt$motif, width))[, .N, by = motif][, percentage := N / n * 100]
+  tab <- tab[order(-N)][seq_len(min(top_n, .N))]
   tab[, sample_label := paste0("all samples pooled (n=", format(n, big.mark = ","), ")")]
   tab
+}
+
+#' All possible motifs of a given width (3 or 5) that the pipeline's
+#' annotate_motif.py can produce: A/C/G/T at every flanking position, "A" (the
+#' called base) fixed at the center. 16 for width=3, 256 for width=5.
+qc_motif_universe <- function(width) {
+  bases <- c("A", "C", "G", "T")
+  if (width == 3) {
+    g <- expand.grid(x1 = bases, x2 = bases, KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+    return(sort(paste0(g$x1, "A", g$x2)))
+  }
+  if (width == 5) {
+    g <- expand.grid(x1 = bases, x2 = bases, x3 = bases, x4 = bases, KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+    return(sort(paste0(g$x1, g$x2, "A", g$x3, g$x4)))
+  }
+  stop("qc_motif_universe: unsupported width ", width, " (use 3 or 5)")
+}
+
+#' Deterministic color for a motif string: same motif -> same color on every
+#' call, in every plot, round, and cutoff -- unlike ggplot's default
+#' discrete scale, which reassigns hues per plot based on whichever motifs
+#' happen to appear in that particular top-N subset, making colors
+#' meaningless to compare across plots. Hues are evenly spaced across the
+#' full universe of possible motifs at this width (indexed alphabetically),
+#' not hashed -- a hash can (and, on a 16-motif 3-mer universe, did) collide
+#' two different motifs onto the same hue. Lightness alternates between two
+#' bands by index parity so alphabetically-adjacent motifs (nearby hues)
+#' stay visually separable too.
+qc_motif_color <- function(motif) {
+  width <- unique(nchar(motif))
+  stopifnot("qc_motif_color: motif strings of mixed width" = length(width) == 1)
+  universe <- qc_motif_universe(width)
+  idx0 <- match(motif, universe) - 1L
+  stopifnot("qc_motif_color: motif outside the expected A/C/G/T universe" = !anyNA(idx0))
+  hue <- idx0 / length(universe) * 360
+  lightness <- ifelse(idx0 %% 2 == 0, 45, 65)
+  hcl(h = hue, c = 100, l = lightness)
 }
 
 #' Dot plot of motif percentages, one row per sample_label (reused for both
@@ -97,6 +157,8 @@ qc_motif_plot <- function(motif_dt, title) {
         theme_void()
     )
   }
+  motifs <- sort(unique(motif_dt$motif))
+  pal <- setNames(qc_motif_color(motifs), motifs)
   ggplot(motif_dt, aes(x = percentage, y = sample_label)) +
     geom_point(
       aes(color = motif),
@@ -105,7 +167,52 @@ qc_motif_plot <- function(motif_dt, title) {
         jitter.width = 0.15, jitter.height = 0.08, dodge.width = 0.6
       )
     ) +
+    scale_color_manual(values = pal) +
     labs(title = title, x = "Percentage (%)", y = NULL, color = "motif") +
+    theme_minimal()
+}
+
+#' Number of called sites for every sample across the full (p, r) cutoff
+#' grid, in long format (one row per sample x cutoff) -- the input to
+#' qc_heatmap_plot(). Set include_pooled=TRUE to add a "pooled" row (the
+#' replicates-merged view); off by default -- for now the QC docs focus on
+#' per-sample results only.
+qc_sweep_counts <- function(base_dir, reftype, samples, pvals, ratios, u = 1, d = 10, include_pooled = FALSE) {
+  grid <- expand.grid(p = pvals, r = ratios, stringsAsFactors = FALSE)
+  rows <- lapply(seq_len(nrow(grid)), function(i) {
+    p <- grid$p[i]
+    r <- grid$r[i]
+    dt_persample <- qc_read_sweep(base_dir, reftype, "persample", p, r)
+    ns <- sapply(samples, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p), u, d)))
+    sample <- samples
+    n_sites <- ns
+    if (include_pooled) {
+      dt_pooled <- qc_read_sweep(base_dir, reftype, "pooled", p, r)
+      sample <- c(sample, "pooled")
+      n_sites <- c(n_sites, nrow(dt_pooled))
+    }
+    data.table(sample = sample, n_sites = n_sites, p = p, r = r)
+  })
+  out <- rbindlist(rows)
+  out[, cutoff := sprintf("p<%s\nr>=%s%%", p, as.numeric(r) * 100)]
+  out[, cutoff := factor(cutoff, levels = unique(cutoff[order(-as.numeric(p), as.numeric(r))]))]
+  sample_levels <- setdiff(unique(out$sample), "pooled")
+  if (include_pooled) sample_levels <- c(sample_levels, "pooled")
+  out[, sample := factor(sample, levels = sample_levels)]
+  out
+}
+
+#' Heatmap of qc_sweep_counts() output: sample (+ pooled) x cutoff grid,
+#' tile color and label = number of sites called. Low end of the fill scale
+#' is a pale blue, not pure white -- a low-value tile with a white fill is
+#' indistinguishable from the page background (this bit us in an earlier
+#' draft: the single lowest-count tile visually vanished).
+qc_heatmap_plot <- function(dt, title) {
+  ggplot(dt, aes(x = cutoff, y = sample, fill = n_sites)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = format(n_sites, big.mark = ",")), size = 3) +
+    scale_fill_gradient(low = "#cde2fb", high = "#0d366b") +
+    labs(title = title, x = NULL, y = NULL, fill = "n sites") +
     theme_minimal()
 }
 
