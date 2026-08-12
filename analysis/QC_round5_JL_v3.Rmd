@@ -89,6 +89,11 @@ ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
 kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+}
 ```
 
 ### p < 0.05, methylation ratio >= 10%
@@ -106,6 +111,11 @@ ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
 kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+}
 ```
 
 ### p < 0.05, methylation ratio >= 20%
@@ -123,6 +133,11 @@ ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
 kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+}
 ```
 
 ### p < 0.001, methylation ratio >= 5%
@@ -140,6 +155,11 @@ ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
 kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+}
 ```
 
 ### p < 0.001, methylation ratio >= 10%
@@ -157,6 +177,11 @@ ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
 kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+}
 ```
 
 ### p < 0.001, methylation ratio >= 20%
@@ -174,6 +199,11 @@ ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
 kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+}
 ```
 
 ## Genes (rRNA reference) sites

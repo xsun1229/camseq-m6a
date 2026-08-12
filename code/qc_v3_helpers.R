@@ -238,3 +238,53 @@ qc_overlap <- function(dt, samples, r, p, u = 1, d = 10) {
   }
   list(all_way = all_way, pairwise = pm, n_sites = lengths(site_sets))
 }
+
+#' Sites where BOTH sample_a and sample_b individually pass the cutoff (a
+#' pairwise special case of qc_overlap's site sets), with each sample's own
+#' methylation level (Ratio*100) at those sites -- the input to
+#' qc_methylation_scatter(). Computed with boolean masks directly (not by
+#' intersecting two qc_sample_passing() subsets) since we need each sample's
+#' own Ratio value at the shared rows, not just the shared row count.
+qc_common_sites <- function(dt, sample_a, sample_b, r, p, u = 1, d = 10) {
+  r <- as.numeric(r)
+  p <- as.numeric(p)
+  passes <- function(s) {
+    dt[[paste0("Depth_", s)]] >= d &
+      dt[[paste0("Uncon_", s)]] >= u &
+      dt[[paste0("Ratio_", s)]] >= r &
+      dt[[paste0("pval_", s)]] <= p
+  }
+  keep <- passes(sample_a) & passes(sample_b)
+  data.table(
+    chrom = dt$chrom[keep], pos = dt$pos[keep], strand = dt$strand[keep], motif = dt$motif[keep],
+    methylation_a = dt[[paste0("Ratio_", sample_a)]][keep] * 100,
+    methylation_b = dt[[paste0("Ratio_", sample_b)]][keep] * 100
+  )
+}
+
+#' 2D-density plot of methylation level at sites both samples call, with a
+#' Pearson correlation annotated in the title -- do sites confidently called
+#' in both samples actually agree on how methylated they are, not just on
+#' whether they clear the cutoff. Tens of thousands of common sites is
+#' typical here, so this bins into a 2D histogram (geom_bin2d) rather than
+#' plotting individual points -- a plain scatter at this n is just an
+#' overplotted blob and the density pattern is the actually useful signal.
+qc_methylation_scatter <- function(common_dt, label_a, label_b, title) {
+  if (nrow(common_dt) == 0) {
+    return(
+      ggplot() +
+        annotate("text", x = 0, y = 0, label = "no common sites") +
+        theme_void()
+    )
+  }
+  r <- cor(common_dt$methylation_a, common_dt$methylation_b, method = "pearson")
+  ggplot(common_dt, aes(x = methylation_a, y = methylation_b)) +
+    geom_bin2d(bins = 60) +
+    scale_fill_gradient(low = "#cde2fb", high = "#0d366b", trans = "log10", name = "n sites") +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+    labs(
+      x = paste0(label_a, " methylation (%)"), y = paste0(label_b, " methylation (%)"),
+      title = sprintf("%s\nn=%s common sites, Pearson r=%.2f", title, format(nrow(common_dt), big.mark = ","), r)
+    ) +
+    theme_classic(base_size = 13)
+}
