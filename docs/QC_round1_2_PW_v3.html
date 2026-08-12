@@ -451,10 +451,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -573,15 +573,15 @@ code/qc_v3_helpers.R
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree89b443e8d124f0cacae2309b4977ee142525bbc9targetblank89b443ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree91a558e0ae4cb7f332699091d6ab6fb8ef1a66bftargetblank91a558ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/89b443e8d124f0cacae2309b4977ee142525bbc9" target="_blank">89b443e</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf" target="_blank">91a558e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree89b443e8d124f0cacae2309b4977ee142525bbc9targetblank89b443ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree91a558e0ae4cb7f332699091d6ab6fb8ef1a66bftargetblank91a558ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -591,7 +591,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/89b443e8d124f0cacae2309b4977ee142525bbc9" target="_blank">89b443e</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf" target="_blank">91a558e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -607,20 +607,10 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
-    Ignored:    analysis/figure/
-
-Untracked files:
-    Untracked:  analysis/QC_round1_2_PW_v3.Rmd
-    Untracked:  analysis/QC_round3_JL_v3.Rmd
-    Untracked:  analysis/QC_round4_JL_v3.Rmd
-    Untracked:  analysis/QC_round5.Rmd
-    Untracked:  analysis/QC_round5_JL_v3.Rmd
-    Untracked:  analysis/data_overview.Rmd
-    Untracked:  analysis/pipeline_overview.Rmd
-    Untracked:  code/qc_v3_helpers.R
 
 Unstaged changes:
-    Modified:   analysis/index.Rmd
+    Modified:   analysis/QC_round1_2_PW_v3.Rmd
+    Modified:   analysis/QC_round5_JL_v3.Rmd
 
 </code></pre>
 <p>
@@ -635,10 +625,74 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/QC_round1_2_PW_v3.Rmd</code>) and
+HTML (<code>docs/QC_round1_2_PW_v3.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/analysis/QC_round1_2_PW_v3.Rmd" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/QC_round1_2_PW_v3.html" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -757,93 +811,145 @@ report – round 1+2, v3 pipeline</a></p>
 </div>
 <div id="site-calling-qc" class="section level1">
 <h1>Site calling QC</h1>
+<p>Swept over binomial p-value cutoff x methylation-ratio
+(<code>Uncon/Depth</code>) cutoff, with the pipeline’s other two
+defaults held fixed (<code>min_uncon=1</code>,
+<code>min_depth=10</code>), focusing on per-sample results for now (no
+pooled/replicates-merged view). Motif plots show the top 10 motifs by
+count for both the 5-mer (<code>motif_flanking=2</code>, the pipeline’s
+own annotation) and the derived +-1nt 3-mer; colors are assigned once
+per motif string and reused everywhere, so the same motif is always the
+same color across every plot in this doc.</p>
 <div id="genome-sites" class="section level2">
 <h2>Genome sites</h2>
-<div id="p-0.05-methylation-ratio-5" class="section level3">
-<h3>p &lt; 0.05, methylation ratio &gt;= 5%</h3>
-<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.05&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
-
-n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<p>Number of called sites across the full cutoff grid:</p>
+<pre class="r"><code>qc_heatmap_plot(
+  qc_sweep_counts(BASE, &quot;genome&quot;, SAMPLES, c(&quot;0.05&quot;, &quot;0.001&quot;), c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;)),
+  &quot;Genome sites called, round 1+2&quot;
+)</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-2-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
 <thead>
 <tr>
-<th style="text-align:left;">
-sample
+<th>
+Version
 </th>
-<th style="text-align:right;">
-n_sites
+<th>
+Author
+</th>
+<th>
+Date
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-12-1-1
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-2-1.png" target="_blank">2a83c70</a>
 </td>
-<td style="text-align:right;">
-5409
+<td>
+XSun
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-2
-</td>
-<td style="text-align:right;">
-27934
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-3
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-7
-</td>
-<td style="text-align:right;">
-22001
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-8
-</td>
-<td style="text-align:right;">
-19656
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pooled (replicates merged)
-</td>
-<td style="text-align:right;">
-96075
+<td>
+2026-08-12
 </td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-2-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-2-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="p-0.05-methylation-ratio-5" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 5%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.05&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-3-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-3-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-2">
+Past versions of unnamed-chunk-3-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 0</code></pre>
@@ -1023,87 +1129,87 @@ Pairwise overlap (row/col: n sites shared)
 <h3>p &lt; 0.05, methylation ratio &gt;= 10%</h3>
 <pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.10&quot;
 dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
 
-n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-4-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
 <thead>
 <tr>
-<th style="text-align:left;">
-sample
+<th>
+Version
 </th>
-<th style="text-align:right;">
-n_sites
+<th>
+Author
+</th>
+<th>
+Date
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-12-1-1
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">2a83c70</a>
 </td>
-<td style="text-align:right;">
-4269
+<td>
+XSun
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-2
-</td>
-<td style="text-align:right;">
-21908
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-3
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-7
-</td>
-<td style="text-align:right;">
-18561
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-8
-</td>
-<td style="text-align:right;">
-15423
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pooled (replicates merged)
-</td>
-<td style="text-align:right;">
-71995
+<td>
+2026-08-12
 </td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-3-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-3-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-4-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
+Past versions of unnamed-chunk-4-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 0</code></pre>
@@ -1283,87 +1389,87 @@ Pairwise overlap (row/col: n sites shared)
 <h3>p &lt; 0.05, methylation ratio &gt;= 20%</h3>
 <pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.20&quot;
 dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
 
-n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
 <thead>
 <tr>
-<th style="text-align:left;">
-sample
+<th>
+Version
 </th>
-<th style="text-align:right;">
-n_sites
+<th>
+Author
+</th>
+<th>
+Date
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-12-1-1
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">2a83c70</a>
 </td>
-<td style="text-align:right;">
-2944
+<td>
+XSun
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-2
-</td>
-<td style="text-align:right;">
-14339
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-3
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-7
-</td>
-<td style="text-align:right;">
-9298
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-8
-</td>
-<td style="text-align:right;">
-7988
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pooled (replicates merged)
-</td>
-<td style="text-align:right;">
-34390
+<td>
+2026-08-12
 </td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-4-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-4-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-5-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
+Past versions of unnamed-chunk-5-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 0</code></pre>
@@ -1543,87 +1649,87 @@ Pairwise overlap (row/col: n sites shared)
 <h3>p &lt; 0.001, methylation ratio &gt;= 5%</h3>
 <pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.05&quot;
 dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
 
-n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
 <thead>
 <tr>
-<th style="text-align:left;">
-sample
+<th>
+Version
 </th>
-<th style="text-align:right;">
-n_sites
+<th>
+Author
+</th>
+<th>
+Date
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-12-1-1
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">2a83c70</a>
 </td>
-<td style="text-align:right;">
-3561
+<td>
+XSun
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-2
-</td>
-<td style="text-align:right;">
-18292
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-3
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-7
-</td>
-<td style="text-align:right;">
-9547
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-8
-</td>
-<td style="text-align:right;">
-8681
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pooled (replicates merged)
-</td>
-<td style="text-align:right;">
-40164
+<td>
+2026-08-12
 </td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-5-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-6-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
+Past versions of unnamed-chunk-6-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 0</code></pre>
@@ -1803,87 +1909,87 @@ Pairwise overlap (row/col: n sites shared)
 <h3>p &lt; 0.001, methylation ratio &gt;= 10%</h3>
 <pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.10&quot;
 dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
 
-n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-7-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
 <thead>
 <tr>
-<th style="text-align:left;">
-sample
+<th>
+Version
 </th>
-<th style="text-align:right;">
-n_sites
+<th>
+Author
+</th>
+<th>
+Date
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-12-1-1
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">2a83c70</a>
 </td>
-<td style="text-align:right;">
-3327
+<td>
+XSun
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-2
-</td>
-<td style="text-align:right;">
-16881
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-3
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-7
-</td>
-<td style="text-align:right;">
-9204
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-8
-</td>
-<td style="text-align:right;">
-8313
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pooled (replicates merged)
-</td>
-<td style="text-align:right;">
-37388
+<td>
+2026-08-12
 </td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-6-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-7-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-2">
+Past versions of unnamed-chunk-7-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 0</code></pre>
@@ -2063,87 +2169,13 @@ Pairwise overlap (row/col: n sites shared)
 <h3>p &lt; 0.001, methylation ratio &gt;= 20%</h3>
 <pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.20&quot;
 dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
 
-n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-sample
-</th>
-<th style="text-align:right;">
-n_sites
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-12-1-1
-</td>
-<td style="text-align:right;">
-2794
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-2
-</td>
-<td style="text-align:right;">
-13823
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-3
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-4
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-7
-</td>
-<td style="text-align:right;">
-7999
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-12-1-8
-</td>
-<td style="text-align:right;">
-7157
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pooled (replicates merged)
-</td>
-<td style="text-align:right;">
-30405
-</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-7-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-7-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-8-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-8-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 0</code></pre>
@@ -2324,225 +2356,11 @@ Pairwise overlap (row/col: n sites shared)
 <h2>Genes (rRNA reference) sites</h2>
 <p>Secondary reference (rRNA depletion target) – site counts only,
 across the same cutoff grid:</p>
-<pre class="r"><code>grid &lt;- expand.grid(p = c(&quot;0.05&quot;, &quot;0.001&quot;), r = c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;), stringsAsFactors = FALSE)
-rows &lt;- lapply(seq_len(nrow(grid)), function(i) {
-  p &lt;- grid$p[i]; r &lt;- grid$r[i]
-  dt_persample &lt;- qc_read_sweep(BASE, &quot;genes&quot;, &quot;persample&quot;, p, r)
-  dt_pooled &lt;- qc_read_sweep(BASE, &quot;genes&quot;, &quot;pooled&quot;, p, r)
-  n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-  data.table(p = p, methylation_ratio = r, t(as.list(setNames(n_sites, SAMPLES))), pooled = nrow(dt_pooled))
-})
-kable(rbindlist(rows)) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-p
-</th>
-<th style="text-align:left;">
-methylation_ratio
-</th>
-<th style="text-align:left;">
-12-1-1
-</th>
-<th style="text-align:left;">
-12-1-2
-</th>
-<th style="text-align:left;">
-12-1-3
-</th>
-<th style="text-align:left;">
-12-1-4
-</th>
-<th style="text-align:left;">
-12-1-7
-</th>
-<th style="text-align:left;">
-12-1-8
-</th>
-<th style="text-align:right;">
-pooled
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-0.05
-</td>
-<td style="text-align:left;">
-0.05
-</td>
-<td style="text-align:left;">
-29
-</td>
-<td style="text-align:left;">
-38
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-59
-</td>
-<td style="text-align:left;">
-36
-</td>
-<td style="text-align:right;">
-66
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-0.001
-</td>
-<td style="text-align:left;">
-0.05
-</td>
-<td style="text-align:left;">
-15
-</td>
-<td style="text-align:left;">
-27
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-26
-</td>
-<td style="text-align:left;">
-20
-</td>
-<td style="text-align:right;">
-46
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-0.05
-</td>
-<td style="text-align:left;">
-0.10
-</td>
-<td style="text-align:left;">
-9
-</td>
-<td style="text-align:left;">
-9
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-20
-</td>
-<td style="text-align:left;">
-12
-</td>
-<td style="text-align:right;">
-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-0.001
-</td>
-<td style="text-align:left;">
-0.10
-</td>
-<td style="text-align:left;">
-5
-</td>
-<td style="text-align:left;">
-7
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-9
-</td>
-<td style="text-align:left;">
-8
-</td>
-<td style="text-align:right;">
-12
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-0.05
-</td>
-<td style="text-align:left;">
-0.20
-</td>
-<td style="text-align:left;">
-2
-</td>
-<td style="text-align:left;">
-4
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-7
-</td>
-<td style="text-align:left;">
-3
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-0.001
-</td>
-<td style="text-align:left;">
-0.20
-</td>
-<td style="text-align:left;">
-2
-</td>
-<td style="text-align:left;">
-4
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-5
-</td>
-<td style="text-align:left;">
-3
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-</tbody>
-</table>
+<pre class="r"><code>qc_heatmap_plot(
+  qc_sweep_counts(BASE, &quot;genes&quot;, SAMPLES, c(&quot;0.05&quot;, &quot;0.001&quot;), c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;)),
+  &quot;Genes (rRNA) sites called, round 1+2&quot;
+)</code></pre>
+<p><img src="figure/QC_round1_2_PW_v3.Rmd/unnamed-chunk-9-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

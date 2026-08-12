@@ -60,23 +60,36 @@ DT::datatable(
 
 # Site calling QC
 
+Swept over binomial p-value cutoff x methylation-ratio (`Uncon/Depth`) cutoff,
+with the pipeline's other two defaults held fixed (`min_uncon=1`,
+`min_depth=10`), focusing on per-sample results for now (no
+pooled/replicates-merged view). Motif plots show the top 10 motifs by count
+for both the 5-mer (`motif_flanking=2`, the pipeline's own annotation) and
+the derived +-1nt 3-mer; colors are assigned once per motif string and
+reused everywhere, so the same motif is always the same color across every
+plot in this doc.
+
 ## Genome sites
+
+Number of called sites across the full cutoff grid:
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=9}
+qc_heatmap_plot(
+  qc_sweep_counts(BASE, "genome", SAMPLES, c("0.05", "0.001"), c("0.05", "0.10", "0.20")),
+  "Genome sites called, round 1+2"
+)
+```
 
 ### p < 0.05, methylation ratio >= 5%
 
 ```{r warning=FALSE, message=FALSE, fig.height=6, fig.width=7}
 p <- "0.05"; r <- "0.05"
 dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
-dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
 
-n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
-qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0("5-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0("3-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
 
 ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
@@ -89,16 +102,11 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 ```{r warning=FALSE, message=FALSE, fig.height=6, fig.width=7}
 p <- "0.05"; r <- "0.10"
 dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
-dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
 
-n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
-qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0("5-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0("3-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
 
 ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
@@ -111,16 +119,11 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 ```{r warning=FALSE, message=FALSE, fig.height=6, fig.width=7}
 p <- "0.05"; r <- "0.20"
 dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
-dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
 
-n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
-qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0("5-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0("3-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
 
 ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
@@ -133,16 +136,11 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 ```{r warning=FALSE, message=FALSE, fig.height=6, fig.width=7}
 p <- "0.001"; r <- "0.05"
 dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
-dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
 
-n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
-qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0("5-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0("3-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
 
 ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
@@ -155,16 +153,11 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 ```{r warning=FALSE, message=FALSE, fig.height=6, fig.width=7}
 p <- "0.001"; r <- "0.10"
 dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
-dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
 
-n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
-qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0("5-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0("3-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
 
 ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
@@ -177,16 +170,11 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 ```{r warning=FALSE, message=FALSE, fig.height=6, fig.width=7}
 p <- "0.001"; r <- "0.20"
 dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
-dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
 
-n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
-              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
-qc_motif_plot(qc_motif_table_pooled(dt_pooled),
-              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0("5-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0("3-mer, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
 
 ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
@@ -199,15 +187,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 Secondary reference (rRNA depletion target) -- site counts only, across the
 same cutoff grid:
 
-```{r warning=FALSE, message=FALSE}
-grid <- expand.grid(p = c("0.05", "0.001"), r = c("0.05", "0.10", "0.20"), stringsAsFactors = FALSE)
-rows <- lapply(seq_len(nrow(grid)), function(i) {
-  p <- grid$p[i]; r <- grid$r[i]
-  dt_persample <- qc_read_sweep(BASE, "genes", "persample", p, r)
-  dt_pooled <- qc_read_sweep(BASE, "genes", "pooled", p, r)
-  n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
-  data.table(p = p, methylation_ratio = r, t(as.list(setNames(n_sites, SAMPLES))), pooled = nrow(dt_pooled))
-})
-kable(rbindlist(rows)) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=9}
+qc_heatmap_plot(
+  qc_sweep_counts(BASE, "genes", SAMPLES, c("0.05", "0.001"), c("0.05", "0.10", "0.20")),
+  "Genes (rRNA) sites called, round 1+2"
+)
 ```

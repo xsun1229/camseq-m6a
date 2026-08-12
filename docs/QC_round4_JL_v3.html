@@ -415,9 +415,9 @@ aria-hidden="true"></span> </a>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 2
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>camseq-m6a/</code> <span
@@ -440,21 +440,18 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
-changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges"
+<div id="strongRMarkdownfilestronguptodate"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
-<code>wflow_publish</code> to commit the R Markdown file and build the
-HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
@@ -571,15 +568,15 @@ code/qc_v3_helpers.R
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree2a83c70d620f0f6d538964e906d67c8cc05027f7targetblank2a83c70a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree91a558e0ae4cb7f332699091d6ab6fb8ef1a66bftargetblank91a558ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/2a83c70d620f0f6d538964e906d67c8cc05027f7" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf" target="_blank">91a558e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree2a83c70d620f0f6d538964e906d67c8cc05027f7targetblank2a83c70a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree91a558e0ae4cb7f332699091d6ab6fb8ef1a66bftargetblank91a558ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -589,7 +586,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/2a83c70d620f0f6d538964e906d67c8cc05027f7" target="_blank">2a83c70</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf" target="_blank">91a558e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -607,8 +604,8 @@ Ignored files:
     Ignored:    .Rhistory
 
 Unstaged changes:
-    Modified:   analysis/QC_round4_JL_v3.Rmd
-    Modified:   code/qc_v3_helpers.R
+    Modified:   analysis/QC_round1_2_PW_v3.Rmd
+    Modified:   analysis/QC_round5_JL_v3.Rmd
 
 </code></pre>
 <p>
@@ -654,6 +651,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/analysis/QC_round4_JL_v3.Rmd" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/QC_round4_JL_v3.html" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -744,6 +775,43 @@ pipeline’s own annotation) and the derived +-1nt 3-mer are shown.</p>
 <pre class="r"><code>sc &lt;- qc_sweep_counts(BASE, &quot;genome&quot;, SAMPLES, c(&quot;0.05&quot;, &quot;0.001&quot;), c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;))
 qc_heatmap_plot(sc, &quot;Genome sites called -- JLE21&quot;)</code></pre>
 <p><img src="figure/QC_round4_JL_v3.Rmd/unnamed-chunk-2-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-2-1.png" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="p-0.05-methylation-ratio-5" class="section level3">
 <h3>p &lt; 0.05, methylation ratio &gt;= 5%</h3>
 <pre class="r"><code>dt &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, &quot;0.05&quot;, &quot;0.05&quot;)
@@ -773,6 +841,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">2a83c70</a>
 </td>
 <td>
@@ -788,6 +867,43 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt, SAMPLES, 0.05, 0.05, width = 3), title = &quot;JLE21, 3-mer, p&lt;0.05, methylation&gt;=5%&quot;)</code></pre>
 <p><img src="figure/QC_round4_JL_v3.Rmd/unnamed-chunk-3-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-2">
+Past versions of unnamed-chunk-3-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="p-0.001-methylation-ratio-20" class="section level3">
 <h3>p &lt; 0.001, methylation ratio &gt;= 20%</h3>
@@ -818,6 +934,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">2a83c70</a>
 </td>
 <td>
@@ -833,6 +960,43 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt, SAMPLES, 0.20, 0.001, width = 3), title = &quot;JLE21, 3-mer, p&lt;0.001, methylation&gt;=20%&quot;)</code></pre>
 <p><img src="figure/QC_round4_JL_v3.Rmd/unnamed-chunk-4-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
+Past versions of unnamed-chunk-4-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div id="genes-rrna-reference-sites" class="section level2">
@@ -841,6 +1005,43 @@ XSun
 <pre class="r"><code>sc_genes &lt;- qc_sweep_counts(BASE, &quot;genes&quot;, SAMPLES, c(&quot;0.05&quot;, &quot;0.001&quot;), c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;))
 qc_heatmap_plot(sc_genes, &quot;Genes (rRNA) sites called -- JLE21&quot;)</code></pre>
 <p><img src="figure/QC_round4_JL_v3.Rmd/unnamed-chunk-5-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/91a558e0ae4cb7f332699091d6ab6fb8ef1a66bf/docs/figure/QC_round4_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">91a558e</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
