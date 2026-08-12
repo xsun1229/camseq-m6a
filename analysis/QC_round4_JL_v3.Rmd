@@ -1,0 +1,89 @@
+---
+title: "Quality Control -- data round 4, from Jiahao (v3 pipeline)"
+author: "XSun"
+date: "2026-08-12"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+Single sample (`JLE21`, INLINE library, Mfs_NI/RIH014). See
+[QC -- round 3](QC_round3_JL_v3.html) for the full explanation of the
+binomial p-value / methylation-ratio sweep used below -- with only one
+sample, the "per sample" and "pooled" views are mathematically identical, so
+this doc only shows one, and there's no cross-sample overlap to compute.
+
+```{r setup, message=FALSE, warning=FALSE}
+source("/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R")
+library(knitr)
+library(kableExtra)
+library(DT)
+
+BASE <- "/project/xinhe/xsun/camseq/processed_new/round4_JL"
+SAMPLES <- c("JLE21")
+```
+
+# Sample information
+
+`JLE21`, i7 index TCGAAGAT, INLINE library type, Mfs_NI/RIH014.
+
+# MultiQC
+
+[MultiQC report -- round 4, v3 pipeline](https://xsun1229.github.io/camseq-m6a/multiqc_round4_JL_v3.html)
+
+# Read processing summary
+
+```{r message=FALSE, warning=FALSE}
+DT::datatable(
+  qc_read_counts(BASE),
+  caption = htmltools::tags$caption(
+    style = "caption-side: left; text-align: left; color:black; font-size:150%;",
+    "Reads at each pipeline stage"
+  ),
+  options = list(pageLength = 10)
+)
+```
+
+# Site calling QC
+
+## Genome sites
+
+```{r warning=FALSE, message=FALSE}
+grid <- expand.grid(p = c("0.05", "0.001"), r = c("0.05", "0.10", "0.20"), stringsAsFactors = FALSE)
+rows <- lapply(seq_len(nrow(grid)), function(i) {
+  p <- grid$p[i]; r <- grid$r[i]
+  dt <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+  data.table(p = p, methylation_ratio = r, n_sites = nrow(dt))
+})
+kable(rbindlist(rows)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+### p < 0.05, methylation ratio >= 5%
+
+```{r warning=FALSE, message=FALSE, fig.height=3, fig.width=7}
+qc_motif_plot(qc_motif_table_pooled(qc_read_sweep(BASE, "genome", "pooled", "0.05", "0.05")),
+              title = "JLE21, p<0.05, methylation>=5%")
+```
+
+### p < 0.001, methylation ratio >= 20%
+
+```{r warning=FALSE, message=FALSE, fig.height=3, fig.width=7}
+qc_motif_plot(qc_motif_table_pooled(qc_read_sweep(BASE, "genome", "pooled", "0.001", "0.20")),
+              title = "JLE21, p<0.001, methylation>=20%")
+```
+
+## Genes (rRNA reference) sites
+
+```{r warning=FALSE, message=FALSE}
+rows <- lapply(seq_len(nrow(grid)), function(i) {
+  p <- grid$p[i]; r <- grid$r[i]
+  dt <- qc_read_sweep(BASE, "genes", "pooled", p, r)
+  data.table(p = p, methylation_ratio = r, n_sites = nrow(dt))
+})
+kable(rbindlist(rows)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```

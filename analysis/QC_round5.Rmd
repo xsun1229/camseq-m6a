@@ -1,0 +1,25 @@
+---
+title: "Quality Control -- data round 5"
+author: "XSun"
+date: "2026-05-13"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+## Introduction
+
+```{r}
+
+```
+
+# Sample information 
+
+
+| Sample ID      | JLK ID | NEBNext Index | Sequence Components             |
+| -------------- | ------ | ------------- | ------------------------------- |
+| Mfs_NI_RIH014  | JLK07_S7 (sample02 in round 3)  | Index 25      | ACTGATAT / SR primer / GGGGGGGG |
+| Mfs_LPS_RIH004 | JLK08_S8 (sample03 in round 3)   | Index 26      | ATGAGCAT / SR primer / GGGGGGGG |
+| Mfs_LPS_RIH007 | JLK09_S9 (sample04 in round 3)   | Index 27      | ATTCCTTT / SR primer / GGGGGGGG |
+

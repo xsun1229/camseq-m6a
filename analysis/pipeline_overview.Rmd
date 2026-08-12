@@ -1,0 +1,215 @@
+---
+title: "Pipeline overview"
+author: "XSun"
+date: "2026-08-12"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## What the pipeline is
+
+We run [m6A-CAMseq](https://github.com/y9c/m6A-CAMseq), a Snakemake pipeline that calls m6A
+sites from CAMseq/SAC-seq chemical-conversion data (A→G conversion at unmodified A; m6A sites
+are chemically protected and show up as unconverted, i.e. still "A", at high frequency).
+
+The pipeline is distributed as a container image rather than a checkout of the repo, so all
+of its code, reference tools (hisat-3n, samtools, UMICollapse, Picard, cutseq) and Python
+scripts live inside a single `.sif` (Singularity/Apptainer image format) file. We never
+install or edit pipeline code directly — we only change the YAML config we hand to the
+container, and swap in a newer `.sif` when the developer ships an update.
+
+## The `.sif` file: what it is and how we get it
+
+The image is published to GitHub Container Registry as a Docker image
+(`ghcr.io/y9c/camseq`) and converted to an Apptainer `.sif` on pull, since Midway3 compute
+nodes have no internet access and Docker itself isn't available:
+
+```
+module load apptainer
+apptainer pull --disable-cache --force camseq_v3_<date>.sif docker://ghcr.io/y9c/camseq:latest
+```
+
+`--disable-cache` matters: without it, `apptainer pull --force` can silently reuse
+previously-downloaded image layers and produce a byte-identical `.sif` even when the
+upstream `:latest` tag has moved — we hit this directly while re-running the pipeline
+(2026-08-11), where two pulls minutes apart returned the same file until cache was disabled.
+
+We keep the `.sif` under `/project/xinhe/xsun/camseq/data/`, named by pull date, and never
+overwrite an existing one — each pipeline re-run picks a specific `.sif` explicitly, so a
+`.sif` update never silently changes results for an in-progress or already-finished round.
+
+| File | Pulled | Notes |
+|---|---|---|
+| `camseq.sif` | 2025-05-19 | v1. Docker CMD was the pipeline entrypoint itself, so `apptainer run camseq.sif -c data.yaml -j 24` worked directly. |
+| `camseq_v2_20260311.sif` | 2026-03-11 | v2. |
+| `camseq_v3_20260811.sif` | 2026-08-11 | v3 (current). Several breaking changes from v1/v2 — see below. |
+
+## Invoking the container
+
+v3's Docker `CMD` is `uv` (the Python launcher), not the pipeline entrypoint, so
+`apptainer run sif -c config.yaml ...` no longer works — Apptainer passes `-c config.yaml`
+straight to `uv`, which doesn't understand it. We call the entrypoint explicitly with
+`apptainer exec` instead:
+
+```
+apptainer exec -B /project camseq_v3_20260811.sif \
+  /pipeline/entrypoint -c configs/round5_JL.yaml -j 22 -p
+```
+
+`-B /project` bind-mounts the project filesystem into the container (needed since all our
+data, references, and output dirs live under `/project`); `-j` sets the number of parallel
+Snakemake jobs; `-p` prints shell commands as they run.
+
+## Pipeline steps (inside the container)
+
+The entrypoint runs a Snakemake workflow with two rule files,
+`external/trichromat/workflow/{mapping,calling}.smk`:
+
+**Mapping (`mapping.smk`)**, per sample:
+
+1. `cutadapt_PE`/`cutadapt_SE` — adapter trimming
+2. `hisat2_3n_mapping_contamination_*` — optional: map to a contamination reference and drop hits (skipped if not configured)
+3. `hisat2_3n_mapping_genes_*` — map remaining reads to the `reference.genes` FASTA (rRNA depletion reference in our case) with `hisat-3n`
+4. `filter_and_sort_bam_genes` / `extract_unmapped_reads_*_from_genes` — split into genes-mapped vs. still-unmapped reads
+5. `hisat2_3n_mapping_genome_*` — map the unmapped-from-genes reads to the genome index (splice-aware)
+6. `combine_runs` — merge BAMs when a sample has reads split across multiple raw FASTQ pairs (e.g. deeper re-sequencing of the same library)
+7. `drop_duplicates` — deduplication, chosen per sample from the config:
+   - **with UMI** (`with_umi`, inferred from `libtype`): `UMICollapse` — Java, bktree-based UMI dedup
+   - **no UMI, `markdup: true`**: Picard `MarkDuplicates`
+   - **`markdup: false`**: no-op copy
+8. `stat_dedup`, `collect_read_counts` — QC counts at each stage, written to `report_reads/`
+
+**Site calling (`calling.smk`)**, per sample × strand × reference type (genes/genome):
+
+9. `pileup_by_fwd_strand` / `pileup_by_rev_strand` — `hisat-3n-table` computes per-position
+   converted/unconverted base counts from the deduplicated BAM, filtered by
+   `samtools view -e "..."` (mapped length, MAPQ ≥ 20, and hisat-3n's own per-read
+   conversion-count tags `Zf`/`Yf` when the BAM was mapped with `hisat-3n`)
+10. `pileup_to_arrow` — convert each per-strand TSV to Arrow
+11. `join_pileup_table` — outer-join all samples' fwd/rev Arrow tables into one
+    `report_sites/joined/{reftype}.arrow`, one row per (chrom, pos, strand, motif) site,
+    columns `Uncon_<sample>`/`Depth_<sample>` per sample
+12. `filter_sites` — compute `Ratio_<sample> = Uncon/Depth`, a background rate
+    `Bg_<sample>`, and a one-sided binomial p-value against that background; keep sites
+    passing all of:
+
+    | cutoff | default | meaning |
+    |---|---|---|
+    | `min_uncon` | 1 | ≥1 unconverted read at the site, in at least one sample |
+    | `min_depth` | 10 | ≥10x coverage, in at least one sample |
+    | `min_ratio` | 0.05 | unconverted fraction ≥5%, in at least one sample |
+    | `min_pval` | 0.05 | binomial p-value ≤0.05, in at least one sample |
+
+    Final output: `report_sites/filtered/{genes,genome}.tsv.gz`, one row per called site
+    with `chrom, pos, strand, motif` plus `Uncon_/Depth_/Ratio_/Bg_/pval_<sample>` for every
+    sample in the config, side by side.
+
+### How `Bg` (background) and the binomial p-value are actually computed
+
+From `filter_sites.py` inside the container (`/pipeline/script/filter_sites.py`):
+
+```python
+df_input.with_columns(
+    (pl.col(f"Uncon_{name}") / pl.col(f"Depth_{name}")).alias(f"Ratio_{name}")
+    for name in names
+).with_columns(
+    pl.col(f"Ratio_{name}").drop_nans().mean().alias(f"Bg_{name}")
+    for name in names
+)
+```
+
+`Bg_<sample>` is a **single number per sample**: the mean of `Ratio_<sample>` (unconverted
+fraction) taken across essentially every covered site genome-wide for that sample — computed
+on the full, unfiltered joined table, *before* any of the depth/ratio/p-value cutoffs are
+applied. Two things follow from that:
+
+- Since the vast majority of covered sites are not true m6A sites, this genome-wide mean is a
+  good estimate of the sample's baseline (non-m6A) conversion error rate — the handful of
+  real m6A sites barely move it.
+- `.drop_nans()` excludes sites with `Depth_<sample> = 0` (where `Ratio = 0/0 = NaN`) from the
+  mean, so a sample's `Bg` only reflects sites it actually covers.
+
+This "drop_nans" detail is why merging is safe when a round is split across multiple pipeline
+runs (as round 5 was, run as JLK07 alone and JLK08+JLK09 together — see the round5 merge
+notes): outer-joining the raw per-site tables gives a sample `Depth = 0` (→ `NaN`, dropped)
+at sites only covered by other samples, so each sample's `Bg` is identical whether it's
+computed standalone or after the join.
+
+The p-value is a one-sided binomial test, vectorized over all rows:
+
+```python
+def binom_sf_vectorized(seq):
+    successes = seq[0].to_numpy()   # Uncon_<sample>
+    trials = seq[1].to_numpy()      # Depth_<sample>
+    p = seq[2].to_numpy()           # Bg_<sample>
+    return np.where(
+        (successes == 0) | (trials == 0),
+        1.0,
+        binom.sf(successes - 1, trials, p),
+    )
+```
+
+For each site: `trials = Depth_<sample>`, `successes = Uncon_<sample>`, and
+`p = Bg_<sample>`. `pval_<sample> = binom.sf(successes - 1, trials, p)` is the probability of
+seeing **at least** `Uncon` unconverted reads out of `Depth`, if the true per-read
+unconversion probability were just the sample's background rate — i.e. "how surprising is
+this much protection at this site, given how noisy this sample's conversion normally is."
+The `successes - 1` offset makes `sf` (which is `P(X > k)`) compute `P(X ≥ Uncon)` instead;
+per the script's own comment, this is bit-identical to
+`scipy.stats.binomtest(Uncon, Depth, Bg, alternative="greater").pvalue`, just ~700x faster
+since it's vectorized over the whole table instead of looped row-by-row.
+
+## Config format (v3)
+
+```yaml
+workdir: /project/xinhe/xsun/camseq/1.preprocessing/processed_new/round5_JL
+
+path:
+  # only needed to override a tool path/JVM flags baked into the image, e.g. Java heap size
+  umicollapse: java -server -Xss8m -Xms8g -Xmx90g -Djava.io.tmpdir=.tmp -jar /pipeline/UMICollapse/umicollapse.jar bam
+
+libtype: INLINE       # or ECLIP10, ECLIP6, TAKARAV3, SACSEQV3, STRANDED
+markdup: true         # required in v3; false skips dedup entirely when with_umi is false
+strandness: true      # required in v3
+
+genome_index: /project/xinhe/xsun/camseq/data/reference/genome/hisat2_tx_3n/GRCh38.release110
+reference:
+  genes:
+    - /project/xinhe/xsun/camseq/data/reference/gene/Human_rRNA_5S_250123.fa
+  genome:
+    - /project/xinhe/xsun/camseq/data/reference/genome/GRCh38.release110.fa
+
+samples:
+  JLK07:
+    data:                     # v3 requires reads nested under `data:`; v1/v2 took a bare list
+      - R1: /project/xinhe/xsun/camseq/data/raw_reads/round5_JL/CHe-JL-15s-JLK07_S7_L005_R1_001.fastq.gz
+        R2: /project/xinhe/xsun/camseq/data/raw_reads/round5_JL/CHe-JL-15s-JLK07_S7_L005_R2_001.fastq.gz
+      # a second/third/... list entry here merges additional FASTQ pairs into the same sample
+      # (used to combine round1_PW + round2_PW resequencing of the same libraries)
+```
+
+<!-- ## Known breaking changes across `.sif` versions -->
+
+<!-- Hit while re-running all rounds on v3 (2026-08); recorded here so a future update doesn't -->
+<!-- require re-discovering the same failures: -->
+
+<!-- - **Sample YAML schema**: v1/v2 took a bare list of `R1`/`R2` per sample; v3 requires it -->
+<!--   nested under a `data:` key (`Snakemake` error: `'list' object has no attribute 'get'`). -->
+<!-- - **Required top-level fields**: v3's config schema validation requires `markdup` and -->
+<!--   `strandness` to be set explicitly, even to their defaults. -->
+<!-- - **`apptainer run` broken**: v3's Docker `CMD` is `uv`, not the pipeline entrypoint — must -->
+<!--   use `apptainer exec sif /pipeline/entrypoint ...` instead (see above). -->
+<!-- - **UMICollapse jar path changed case between builds**: `/pipeline/umicollapse/umicollapse.jar` -->
+<!--   (lowercase, one 2026-08-10 build) vs. `/pipeline/UMICollapse/umicollapse.jar` (uppercase, -->
+<!--   the 2026-08-11 build we use now) — worth a `find /pipeline -iname umicollapse.jar` check -->
+<!--   after any `.sif` update, since a mismatch fails with `Unable to access jarfile`. -->
+<!-- - **UMICollapse OOM on large samples**: the image's default JVM heap (`-Xmx64g`) is too small -->
+<!--   for genome-wide dedup on samples with 100M+ read pairs; we override it per-round in -->
+<!--   `path.umicollapse` (see config example above) and size `--mem` on the SLURM job well above -->
+<!--   the `-Xmx` value to leave headroom for the rest of the JVM and OS. -->
+<!-- - **A specific 2026-08-10 nightly build had a broken `hisat-3n-build`** binary that was -->
+<!--   actually a copy of plain `hisat2-build-s` (identical md5sum) — silently produced a genome -->
+<!--   index missing the 3n conversion info, surfacing much later as -->
+<!--   `Encountered internal HISAT2 exception (#1)`. Confirmed via `md5sum` against the mapping -->
+<!--   tool; the fix was pulling again once the developer corrected the image. -->

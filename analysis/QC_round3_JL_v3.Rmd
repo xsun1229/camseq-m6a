@@ -1,0 +1,226 @@
+---
+title: "Quality Control -- data round 3, from Jiahao (v3 pipeline)"
+author: "XSun"
+date: "2026-08-12"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+This redoes the round 3 QC using the v3 pipeline re-run (see
+[Pipeline overview](pipeline_overview.html) for what changed vs. the original
+`QC_round3.Rmd`). The main methodological difference: instead of a manual
+depth x methylation-% grid with a fixed background rate, sites are now called
+by the pipeline's own `filter_sites.py`, which estimates `Bg` (background
+conversion rate) **per sample** from that sample's own genome-wide site
+coverage, and tests each site with a one-sided binomial p-value against it
+(formulas in [Pipeline overview](pipeline_overview.html#how-bg-background-and-the-binomial-p-value-are-actually-computed)).
+Here that's swept over a small p-value x methylation-ratio grid, in both a
+"per sample" view and a "pooled" (replicates summed before testing) view.
+
+```{r setup, message=FALSE, warning=FALSE}
+source("/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R")
+library(knitr)
+library(kableExtra)
+library(DT)
+
+BASE <- "/project/xinhe/xsun/camseq/processed_new/round3_JL"
+SAMPLES <- c("JL-CAM-01", "JL-CAM-02", "JL-CAM-03", "JL-CAM-04", "JL-CAM-05")
+```
+
+# Sample information
+
+| Condition / Description | Sample ID            | i7 Index Name | i7 Index Seq | i5 Index Name | i5 Index Seq | i5 Rev Comp | Manufacturer | Input |
+|------------------------|-----------------------|---------------|--------------|---------------|--------------|-------------|-----------|-------|
+| HEK293T input          | JL-CAM-1(sample01)    | NEB S773      | ATCTGACC     | NEB S593      | CTCGACTT     | AAGTCGAG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| Mfs_NI_RIH014 treat    | JL-CAM-2(sample02)    | NEB S714      | AACCAGAG     | NEB S520      | CTTCGGTT     | AACCGAAG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| Mfs_LPS_RIH004 treat   | JL-CAM-3(sample03)    | NEB S761      | GTACCACA     | NEB S533      | CCACAACA     | TGTTGTGG    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| Mfs_LPS_RIH007 treat   | JL-CAM-4(sample04)    | NEB S721      | CGAGAGAA     | NEB S508      | GGAAGAGA     | TCTCTTCC    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+| HEK293T treat          | JL-CAM-5(sample05)    | NEB S792      | CAGCATAC     | NEB S534      | GCGTTAGA     | TCTAACGC    | NEBNext® Multiplex Oligos for Illumina® | 10M |
+
+# MultiQC
+
+Ran directly against `report_reads/` (cutadapt trimming, HISAT-3N mapping, and
+UMICollapse dedup reports are all natively recognized -- no manual parsing
+needed for this section):
+
+[MultiQC report -- round 3, v3 pipeline](https://xsun1229.github.io/camseq-m6a/multiqc_round3_JL_v3.html)
+
+# Read processing summary
+
+From the pipeline's own `report_reads/read_counts_summary.tsv`:
+
+```{r message=FALSE, warning=FALSE}
+DT::datatable(
+  qc_read_counts(BASE),
+  caption = htmltools::tags$caption(
+    style = "caption-side: left; text-align: left; color:black; font-size:150%;",
+    "Reads at each pipeline stage"
+  ),
+  options = list(pageLength = 10)
+)
+```
+
+# Site calling QC
+
+Swept over binomial p-value cutoff x methylation-ratio (`Uncon/Depth`) cutoff,
+with the pipeline's other two defaults held fixed (`min_uncon=1`,
+`min_depth=10`). For each combination: number of sites called per sample and
+pooled (replicates summed before testing), the motif distribution of called
+sites (5-mer, `motif_flanking=2`, same as the pipeline default), and the
+overlap of called sites across samples.
+
+## Genome sites
+
+### p < 0.05, methylation ratio >= 5%
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=7}
+p <- "0.05"; r <- "0.05"
+dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
+dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+
+n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+
+ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
+kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+### p < 0.05, methylation ratio >= 10%
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=7}
+p <- "0.05"; r <- "0.10"
+dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
+dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+
+n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+
+ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
+kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+### p < 0.05, methylation ratio >= 20%
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=7}
+p <- "0.05"; r <- "0.20"
+dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
+dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+
+n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+
+ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
+kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+### p < 0.001, methylation ratio >= 5%
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=7}
+p <- "0.001"; r <- "0.05"
+dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
+dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+
+n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+
+ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
+kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+### p < 0.001, methylation ratio >= 10%
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=7}
+p <- "0.001"; r <- "0.10"
+dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
+dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+
+n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+
+ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
+kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+### p < 0.001, methylation ratio >= 20%
+
+```{r warning=FALSE, message=FALSE, fig.height=5, fig.width=7}
+p <- "0.001"; r <- "0.20"
+dt_persample <- qc_read_sweep(BASE, "genome", "persample", p, r)
+dt_pooled <- qc_read_sweep(BASE, "genome", "pooled", p, r)
+
+n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, "pooled (replicates merged)"), n_sites = c(n_sites, nrow(dt_pooled)))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0("per sample, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0("pooled, p<", p, ", methylation>=", as.numeric(r) * 100, "%"))
+
+ov <- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf("All-way overlap (site called in every sample): %d\n", ov$all_way))
+kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+## Genes (rRNA reference) sites
+
+Secondary reference (rRNA depletion target) -- site counts only, across the
+same cutoff grid:
+
+```{r warning=FALSE, message=FALSE}
+grid <- expand.grid(p = c("0.05", "0.001"), r = c("0.05", "0.10", "0.20"), stringsAsFactors = FALSE)
+rows <- lapply(seq_len(nrow(grid)), function(i) {
+  p <- grid$p[i]; r <- grid$r[i]
+  dt_persample <- qc_read_sweep(BASE, "genes", "persample", p, r)
+  dt_pooled <- qc_read_sweep(BASE, "genes", "pooled", p, r)
+  n_sites <- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+  data.table(p = p, methylation_ratio = r, t(as.list(setNames(n_sites, SAMPLES))), pooled = nrow(dt_pooled))
+})
+kable(rbindlist(rows)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```

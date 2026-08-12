@@ -10,6 +10,8 @@ editor_options:
 
 # Processing raw data
 
+[Pipeline overview -- what the .sif is, how it's run, config format, known version-to-version gotchas](https://xsun1229.github.io/camseq-m6a/pipeline_overview.html)
+
 [QC -- data round 1, from Pingluan](https://xsun1229.github.io/camseq-m6a/QC.html)
 
 [QC -- deeper sequencing, from Pingluan](https://xsun1229.github.io/camseq-m6a/QC_deeper.html)
@@ -29,3 +31,18 @@ editor_options:
 [Comparing m6a sites from sample5 with merged sample2-4](https://xsun1229.github.io/camseq-m6a/compare_round3_sample5_with_sample234.html)
 
 [QC -- multi cell types, from Kinga, has some quality issues](https://xsun1229.github.io/camseq-m6a/QC_multicelltypes.html)
+
+# Quality control (v3 pipeline re-run)
+
+Redone using the v3 pipeline's own binomial p-value / methylation-ratio site
+calling, swept over a small cutoff grid, with MultiQC and motif checks per
+round. See [Pipeline overview](https://xsun1229.github.io/camseq-m6a/pipeline_overview.html)
+for what changed vs. the docs above.
+
+[QC -- round 1+2, from Pingluan (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round1_2_PW_v3.html)
+
+[QC -- round 3, from Jiahao (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round3_JL_v3.html)
+
+[QC -- round 4, from Jiahao (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round4_JL_v3.html)
+
+[QC -- round 5, from Jiahao (v3 pipeline)](https://xsun1229.github.io/camseq-m6a/QC_round5_JL_v3.html)

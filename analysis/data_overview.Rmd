@@ -1,0 +1,21 @@
+---
+title: "Data Overview"
+author: "XSun"
+date: "2026-07-28"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r message=FALSE, warning=FALSE}
+library(data.table)
+library(knitr)
+library(kableExtra)
+```
+
+```{r}
+samples <- fread("/project/xinhe/xsun/camseq/data/sample_meta/samples.tsv", sep = "\t")
+
+kable(samples) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```

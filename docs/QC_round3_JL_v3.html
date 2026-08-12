@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="XSun" />
+
+<meta name="date" content="2026-08-12" />
+
+<title>Quality Control – data round 3, from Jiahao (v3 pipeline)</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.22/datatables.js"></script>
+<link href="site_libs/dt-core-1.11.3/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.11.3/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.11.3/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.2.1/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.2.1/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">camseq-m6a</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/xsun1229/camseq-m6a">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Quality Control – data round 3, from Jiahao
+(v3 pipeline)</h1>
+<h4 class="author">XSun</h4>
+<h4 class="date">2026-08-12</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-12
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>camseq-m6a/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20250226code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20250226)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20250226code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20250226)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R
+</td>
+<td style="text-align:left;">
+code/qc_v3_helpers.R
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree89b443e8d124f0cacae2309b4977ee142525bbc9targetblank89b443ea">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/89b443e8d124f0cacae2309b4977ee142525bbc9" target="_blank">89b443e</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree89b443e8d124f0cacae2309b4977ee142525bbc9targetblank89b443ea"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/xsun1229/camseq-m6a/tree/89b443e8d124f0cacae2309b4977ee142525bbc9" target="_blank">89b443e</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/QC_round1_2_PW_v3.Rmd
+    Untracked:  analysis/QC_round3_JL_v3.Rmd
+    Untracked:  analysis/QC_round4_JL_v3.Rmd
+    Untracked:  analysis/QC_round5.Rmd
+    Untracked:  analysis/QC_round5_JL_v3.Rmd
+    Untracked:  analysis/data_overview.Rmd
+    Untracked:  analysis/pipeline_overview.Rmd
+    Untracked:  code/qc_v3_helpers.R
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<p>This redoes the round 3 QC using the v3 pipeline re-run (see <a
+href="pipeline_overview.html">Pipeline overview</a> for what changed
+vs. the original <code>QC_round3.Rmd</code>). The main methodological
+difference: instead of a manual depth x methylation-% grid with a fixed
+background rate, sites are now called by the pipeline’s own
+<code>filter_sites.py</code>, which estimates <code>Bg</code>
+(background conversion rate) <strong>per sample</strong> from that
+sample’s own genome-wide site coverage, and tests each site with a
+one-sided binomial p-value against it (formulas in <a
+href="pipeline_overview.html#how-bg-background-and-the-binomial-p-value-are-actually-computed">Pipeline
+overview</a>). Here that’s swept over a small p-value x
+methylation-ratio grid, in both a “per sample” view and a “pooled”
+(replicates summed before testing) view.</p>
+<pre class="r"><code>source(&quot;/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R&quot;)
+library(knitr)
+library(kableExtra)
+library(DT)
+
+BASE &lt;- &quot;/project/xinhe/xsun/camseq/processed_new/round3_JL&quot;
+SAMPLES &lt;- c(&quot;JL-CAM-01&quot;, &quot;JL-CAM-02&quot;, &quot;JL-CAM-03&quot;, &quot;JL-CAM-04&quot;, &quot;JL-CAM-05&quot;)</code></pre>
+<div id="sample-information" class="section level1">
+<h1>Sample information</h1>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="16%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="10%" />
+<col width="9%" />
+<col width="8%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condition / Description</th>
+<th>Sample ID</th>
+<th>i7 Index Name</th>
+<th>i7 Index Seq</th>
+<th>i5 Index Name</th>
+<th>i5 Index Seq</th>
+<th>i5 Rev Comp</th>
+<th>Manufacturer</th>
+<th>Input</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HEK293T input</td>
+<td>JL-CAM-1(sample01)</td>
+<td>NEB S773</td>
+<td>ATCTGACC</td>
+<td>NEB S593</td>
+<td>CTCGACTT</td>
+<td>AAGTCGAG</td>
+<td>NEBNext® Multiplex Oligos for Illumina®</td>
+<td>10M</td>
+</tr>
+<tr class="even">
+<td>Mfs_NI_RIH014 treat</td>
+<td>JL-CAM-2(sample02)</td>
+<td>NEB S714</td>
+<td>AACCAGAG</td>
+<td>NEB S520</td>
+<td>CTTCGGTT</td>
+<td>AACCGAAG</td>
+<td>NEBNext® Multiplex Oligos for Illumina®</td>
+<td>10M</td>
+</tr>
+<tr class="odd">
+<td>Mfs_LPS_RIH004 treat</td>
+<td>JL-CAM-3(sample03)</td>
+<td>NEB S761</td>
+<td>GTACCACA</td>
+<td>NEB S533</td>
+<td>CCACAACA</td>
+<td>TGTTGTGG</td>
+<td>NEBNext® Multiplex Oligos for Illumina®</td>
+<td>10M</td>
+</tr>
+<tr class="even">
+<td>Mfs_LPS_RIH007 treat</td>
+<td>JL-CAM-4(sample04)</td>
+<td>NEB S721</td>
+<td>CGAGAGAA</td>
+<td>NEB S508</td>
+<td>GGAAGAGA</td>
+<td>TCTCTTCC</td>
+<td>NEBNext® Multiplex Oligos for Illumina®</td>
+<td>10M</td>
+</tr>
+<tr class="odd">
+<td>HEK293T treat</td>
+<td>JL-CAM-5(sample05)</td>
+<td>NEB S792</td>
+<td>CAGCATAC</td>
+<td>NEB S534</td>
+<td>GCGTTAGA</td>
+<td>TCTAACGC</td>
+<td>NEBNext® Multiplex Oligos for Illumina®</td>
+<td>10M</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="multiqc" class="section level1">
+<h1>MultiQC</h1>
+<p>Ran directly against <code>report_reads/</code> (cutadapt trimming,
+HISAT-3N mapping, and UMICollapse dedup reports are all natively
+recognized – no manual parsing needed for this section):</p>
+<p><a
+href="https://xsun1229.github.io/camseq-m6a/multiqc_round3_JL_v3.html">MultiQC
+report – round 3, v3 pipeline</a></p>
+</div>
+<div id="read-processing-summary" class="section level1">
+<h1>Read processing summary</h1>
+<p>From the pipeline’s own
+<code>report_reads/read_counts_summary.tsv</code>:</p>
+<pre class="r"><code>DT::datatable(
+  qc_read_counts(BASE),
+  caption = htmltools::tags$caption(
+    style = &quot;caption-side: left; text-align: left; color:black; font-size:150%;&quot;,
+    &quot;Reads at each pipeline stage&quot;
+  ),
+  options = list(pageLength = 10)
+)</code></pre>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-72df6e256503a04e505c" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-72df6e256503a04e505c">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: left; text-align: left; color:black; font-size:150%;\">Reads at each pipeline stage<\/caption>","data":[["1","2","3","4","5"],["JL-CAM-01","JL-CAM-02","JL-CAM-03","JL-CAM-04","JL-CAM-05"],[55084970,80643276,75825060,70857456,77186725],[52524652,18924734,44229588,33692514,43119994],[3635178,12916501,19928543,29343408,21926410],[11827208,151294,722306,182357,1778841],[37062266,5856939,23578739,4166749,19414743],[10969895,101840,346752,167650,1320345],[35213036,2428362,9297295,3630731,14304716]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sample<\/th>\n      <th>Raw_Reads<\/th>\n      <th>Clean_Reads<\/th>\n      <th>Unmap_Reads<\/th>\n      <th>Mapped_Genes_Reads<\/th>\n      <th>Mapped_Genome_Reads<\/th>\n      <th>Dedup_Genes_Reads<\/th>\n      <th>Dedup_Genome_Reads<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="site-calling-qc" class="section level1">
+<h1>Site calling QC</h1>
+<p>Swept over binomial p-value cutoff x methylation-ratio
+(<code>Uncon/Depth</code>) cutoff, with the pipeline’s other two
+defaults held fixed (<code>min_uncon=1</code>,
+<code>min_depth=10</code>). For each combination: number of sites called
+per sample and pooled (replicates summed before testing), the motif
+distribution of called sites (5-mer, <code>motif_flanking=2</code>, same
+as the pipeline default), and the overlap of called sites across
+samples.</p>
+<div id="genome-sites" class="section level2">
+<h2>Genome sites</h2>
+<div id="p-0.05-methylation-ratio-5" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 5%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.05&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
+
+n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+sample
+</th>
+<th style="text-align:right;">
+n_sites
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+5791
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+36295
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+12058
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+63694
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pooled (replicates merged)
+</td>
+<td style="text-align:right;">
+112229
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-2-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-2-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
+<pre><code>All-way overlap (site called in every sample): 0</code></pre>
+<pre class="r"><code>kable(ov$pairwise, caption = &quot;Pairwise overlap (row/col: n sites shared)&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Pairwise overlap (row/col: n sites shared)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+JL-CAM-01
+</th>
+<th style="text-align:right;">
+JL-CAM-02
+</th>
+<th style="text-align:right;">
+JL-CAM-03
+</th>
+<th style="text-align:right;">
+JL-CAM-04
+</th>
+<th style="text-align:right;">
+JL-CAM-05
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5791
+</td>
+<td style="text-align:right;">
+1703
+</td>
+<td style="text-align:right;">
+1309
+</td>
+<td style="text-align:right;">
+1149
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1703
+</td>
+<td style="text-align:right;">
+36295
+</td>
+<td style="text-align:right;">
+4803
+</td>
+<td style="text-align:right;">
+7653
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1309
+</td>
+<td style="text-align:right;">
+4803
+</td>
+<td style="text-align:right;">
+12058
+</td>
+<td style="text-align:right;">
+2538
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1149
+</td>
+<td style="text-align:right;">
+7653
+</td>
+<td style="text-align:right;">
+2538
+</td>
+<td style="text-align:right;">
+63694
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="p-0.05-methylation-ratio-10" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 10%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.10&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
+
+n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+sample
+</th>
+<th style="text-align:right;">
+n_sites
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+4299
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+29341
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+10147
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+50120
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pooled (replicates merged)
+</td>
+<td style="text-align:right;">
+83890
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-3-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-3-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
+<pre><code>All-way overlap (site called in every sample): 0</code></pre>
+<pre class="r"><code>kable(ov$pairwise, caption = &quot;Pairwise overlap (row/col: n sites shared)&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Pairwise overlap (row/col: n sites shared)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+JL-CAM-01
+</th>
+<th style="text-align:right;">
+JL-CAM-02
+</th>
+<th style="text-align:right;">
+JL-CAM-03
+</th>
+<th style="text-align:right;">
+JL-CAM-04
+</th>
+<th style="text-align:right;">
+JL-CAM-05
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4299
+</td>
+<td style="text-align:right;">
+1344
+</td>
+<td style="text-align:right;">
+1084
+</td>
+<td style="text-align:right;">
+888
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1344
+</td>
+<td style="text-align:right;">
+29341
+</td>
+<td style="text-align:right;">
+4056
+</td>
+<td style="text-align:right;">
+6432
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1084
+</td>
+<td style="text-align:right;">
+4056
+</td>
+<td style="text-align:right;">
+10147
+</td>
+<td style="text-align:right;">
+2105
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+888
+</td>
+<td style="text-align:right;">
+6432
+</td>
+<td style="text-align:right;">
+2105
+</td>
+<td style="text-align:right;">
+50120
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="p-0.05-methylation-ratio-20" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 20%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.20&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
+
+n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+sample
+</th>
+<th style="text-align:right;">
+n_sites
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+1639
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+12226
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+4228
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+22021
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pooled (replicates merged)
+</td>
+<td style="text-align:right;">
+36663
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-4-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-4-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
+<pre><code>All-way overlap (site called in every sample): 0</code></pre>
+<pre class="r"><code>kable(ov$pairwise, caption = &quot;Pairwise overlap (row/col: n sites shared)&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Pairwise overlap (row/col: n sites shared)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+JL-CAM-01
+</th>
+<th style="text-align:right;">
+JL-CAM-02
+</th>
+<th style="text-align:right;">
+JL-CAM-03
+</th>
+<th style="text-align:right;">
+JL-CAM-04
+</th>
+<th style="text-align:right;">
+JL-CAM-05
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1639
+</td>
+<td style="text-align:right;">
+823
+</td>
+<td style="text-align:right;">
+690
+</td>
+<td style="text-align:right;">
+537
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+823
+</td>
+<td style="text-align:right;">
+12226
+</td>
+<td style="text-align:right;">
+2744
+</td>
+<td style="text-align:right;">
+4234
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+690
+</td>
+<td style="text-align:right;">
+2744
+</td>
+<td style="text-align:right;">
+4228
+</td>
+<td style="text-align:right;">
+1352
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+537
+</td>
+<td style="text-align:right;">
+4234
+</td>
+<td style="text-align:right;">
+1352
+</td>
+<td style="text-align:right;">
+22021
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="p-0.001-methylation-ratio-5" class="section level3">
+<h3>p &lt; 0.001, methylation ratio &gt;= 5%</h3>
+<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.05&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
+
+n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+sample
+</th>
+<th style="text-align:right;">
+n_sites
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+1640
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+12611
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+3926
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+23845
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pooled (replicates merged)
+</td>
+<td style="text-align:right;">
+42279
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-5-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
+<pre><code>All-way overlap (site called in every sample): 0</code></pre>
+<pre class="r"><code>kable(ov$pairwise, caption = &quot;Pairwise overlap (row/col: n sites shared)&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Pairwise overlap (row/col: n sites shared)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+JL-CAM-01
+</th>
+<th style="text-align:right;">
+JL-CAM-02
+</th>
+<th style="text-align:right;">
+JL-CAM-03
+</th>
+<th style="text-align:right;">
+JL-CAM-04
+</th>
+<th style="text-align:right;">
+JL-CAM-05
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1640
+</td>
+<td style="text-align:right;">
+1110
+</td>
+<td style="text-align:right;">
+862
+</td>
+<td style="text-align:right;">
+719
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1110
+</td>
+<td style="text-align:right;">
+12611
+</td>
+<td style="text-align:right;">
+3312
+</td>
+<td style="text-align:right;">
+5111
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+862
+</td>
+<td style="text-align:right;">
+3312
+</td>
+<td style="text-align:right;">
+3926
+</td>
+<td style="text-align:right;">
+1613
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+719
+</td>
+<td style="text-align:right;">
+5111
+</td>
+<td style="text-align:right;">
+1613
+</td>
+<td style="text-align:right;">
+23845
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="p-0.001-methylation-ratio-10" class="section level3">
+<h3>p &lt; 0.001, methylation ratio &gt;= 10%</h3>
+<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.10&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
+
+n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+sample
+</th>
+<th style="text-align:right;">
+n_sites
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+1562
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+11966
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+3764
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+22770
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pooled (replicates merged)
+</td>
+<td style="text-align:right;">
+39558
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-6-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
+<pre><code>All-way overlap (site called in every sample): 0</code></pre>
+<pre class="r"><code>kable(ov$pairwise, caption = &quot;Pairwise overlap (row/col: n sites shared)&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Pairwise overlap (row/col: n sites shared)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+JL-CAM-01
+</th>
+<th style="text-align:right;">
+JL-CAM-02
+</th>
+<th style="text-align:right;">
+JL-CAM-03
+</th>
+<th style="text-align:right;">
+JL-CAM-04
+</th>
+<th style="text-align:right;">
+JL-CAM-05
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1562
+</td>
+<td style="text-align:right;">
+1028
+</td>
+<td style="text-align:right;">
+813
+</td>
+<td style="text-align:right;">
+673
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1028
+</td>
+<td style="text-align:right;">
+11966
+</td>
+<td style="text-align:right;">
+3132
+</td>
+<td style="text-align:right;">
+4880
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+813
+</td>
+<td style="text-align:right;">
+3132
+</td>
+<td style="text-align:right;">
+3764
+</td>
+<td style="text-align:right;">
+1536
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+673
+</td>
+<td style="text-align:right;">
+4880
+</td>
+<td style="text-align:right;">
+1536
+</td>
+<td style="text-align:right;">
+22770
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="p-0.001-methylation-ratio-20" class="section level3">
+<h3>p &lt; 0.001, methylation ratio &gt;= 20%</h3>
+<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.20&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+dt_pooled &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;pooled&quot;, p, r)
+
+n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+kable(data.table(sample = c(SAMPLES, &quot;pooled (replicates merged)&quot;), n_sites = c(n_sites, nrow(dt_pooled)))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+sample
+</th>
+<th style="text-align:right;">
+n_sites
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+1311
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+10015
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+3228
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+19014
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pooled (replicates merged)
+</td>
+<td style="text-align:right;">
+31824
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p)),
+              title = paste0(&quot;per sample, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-7-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qc_motif_plot(qc_motif_table_pooled(dt_pooled),
+              title = paste0(&quot;pooled, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round3_JL_v3.Rmd/unnamed-chunk-7-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
+cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
+<pre><code>All-way overlap (site called in every sample): 0</code></pre>
+<pre class="r"><code>kable(ov$pairwise, caption = &quot;Pairwise overlap (row/col: n sites shared)&quot;) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Pairwise overlap (row/col: n sites shared)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+JL-CAM-01
+</th>
+<th style="text-align:right;">
+JL-CAM-02
+</th>
+<th style="text-align:right;">
+JL-CAM-03
+</th>
+<th style="text-align:right;">
+JL-CAM-04
+</th>
+<th style="text-align:right;">
+JL-CAM-05
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+JL-CAM-01
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-02
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1311
+</td>
+<td style="text-align:right;">
+804
+</td>
+<td style="text-align:right;">
+663
+</td>
+<td style="text-align:right;">
+519
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-03
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+804
+</td>
+<td style="text-align:right;">
+10015
+</td>
+<td style="text-align:right;">
+2596
+</td>
+<td style="text-align:right;">
+4037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-04
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+663
+</td>
+<td style="text-align:right;">
+2596
+</td>
+<td style="text-align:right;">
+3228
+</td>
+<td style="text-align:right;">
+1257
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JL-CAM-05
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+519
+</td>
+<td style="text-align:right;">
+4037
+</td>
+<td style="text-align:right;">
+1257
+</td>
+<td style="text-align:right;">
+19014
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="genes-rrna-reference-sites" class="section level2">
+<h2>Genes (rRNA reference) sites</h2>
+<p>Secondary reference (rRNA depletion target) – site counts only,
+across the same cutoff grid:</p>
+<pre class="r"><code>grid &lt;- expand.grid(p = c(&quot;0.05&quot;, &quot;0.001&quot;), r = c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;), stringsAsFactors = FALSE)
+rows &lt;- lapply(seq_len(nrow(grid)), function(i) {
+  p &lt;- grid$p[i]; r &lt;- grid$r[i]
+  dt_persample &lt;- qc_read_sweep(BASE, &quot;genes&quot;, &quot;persample&quot;, p, r)
+  dt_pooled &lt;- qc_read_sweep(BASE, &quot;genes&quot;, &quot;pooled&quot;, p, r)
+  n_sites &lt;- sapply(SAMPLES, function(s) nrow(qc_sample_passing(dt_persample, s, as.numeric(r), as.numeric(p))))
+  data.table(p = p, methylation_ratio = r, t(as.list(setNames(n_sites, SAMPLES))), pooled = nrow(dt_pooled))
+})
+kable(rbindlist(rows)) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+p
+</th>
+<th style="text-align:left;">
+methylation_ratio
+</th>
+<th style="text-align:left;">
+JL-CAM-01
+</th>
+<th style="text-align:left;">
+JL-CAM-02
+</th>
+<th style="text-align:left;">
+JL-CAM-03
+</th>
+<th style="text-align:left;">
+JL-CAM-04
+</th>
+<th style="text-align:left;">
+JL-CAM-05
+</th>
+<th style="text-align:right;">
+pooled
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:left;">
+32
+</td>
+<td style="text-align:left;">
+28
+</td>
+<td style="text-align:left;">
+36
+</td>
+<td style="text-align:right;">
+36
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+19
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+26
+</td>
+<td style="text-align:right;">
+26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.20
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+0.20
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Red Hat Enterprise Linux 8.4 (Ootpa)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.3.13-el8-x86_64/lib/libopenblas_skylakexp-r0.3.13.so
+
+locale:
+ [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
+ [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
+ [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
+[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] DT_0.22           kableExtra_1.4.1  knitr_1.51        forcats_1.0.0    
+[5] ggplot2_3.4.2     data.table_1.14.4 workflowr_1.7.1  
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.0  xfun_0.59         bslib_0.3.1       colorspace_2.0-3 
+ [5] vctrs_0.6.1       generics_0.1.3    viridisLite_0.4.0 htmltools_0.5.7  
+ [9] yaml_2.3.5        utf8_1.2.2        rlang_1.1.2       R.oo_1.24.0      
+[13] later_1.3.0       pillar_1.9.0      jquerylib_0.1.4   R.utils_2.11.0   
+[17] glue_1.6.2        withr_2.5.0       lifecycle_1.0.4   stringr_1.5.0    
+[21] munsell_0.5.0     gtable_0.3.0      R.methodsS3_1.8.1 htmlwidgets_1.6.2
+[25] evaluate_0.15     labeling_0.4.2    callr_3.7.0       fastmap_1.1.0    
+[29] crosstalk_1.2.0   httpuv_1.6.5      ps_1.7.0          fansi_1.0.3      
+[33] Rcpp_1.1.1-1.1    promises_1.2.0.1  scales_1.2.0      jsonlite_2.0.0   
+[37] farver_2.1.0      systemfonts_1.0.4 otel_0.2.0        fs_1.5.2         
+[41] digest_0.6.29     stringi_1.7.6     processx_3.5.3    dplyr_1.1.2      
+[45] getPass_0.2-2     rprojroot_2.0.3   grid_4.2.0        cli_3.6.2        
+[49] tools_4.2.0       magrittr_2.0.3    sass_0.4.1        tibble_3.2.1     
+[53] whisker_0.4       pkgconfig_2.0.3   ellipsis_0.3.2    xml2_1.3.3       
+[57] svglite_2.1.0     rmarkdown_2.31    httr_1.4.8        rstudioapi_0.14  
+[61] R6_2.5.1          git2r_0.30.1      compiler_4.2.0   </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
