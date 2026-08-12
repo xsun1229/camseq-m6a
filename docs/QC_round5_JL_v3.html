@@ -417,9 +417,9 @@ aria-hidden="true"></span> </a>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 2
 </p>
 <p>
 <strong>Knit directory:</strong> <code>camseq-m6a/</code> <span
@@ -442,18 +442,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -570,15 +573,15 @@ code/qc_v3_helpers.R
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree7d7f9751da41495f4d9e26ad440c0fd8c16630fftargetblank7d7f975a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreec6376407c52ce7f97ed6f86d7918b6de36ab8517targetblankc637640a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/7d7f9751da41495f4d9e26ad440c0fd8c16630ff" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/c6376407c52ce7f97ed6f86d7918b6de36ab8517" target="_blank">c637640</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree7d7f9751da41495f4d9e26ad440c0fd8c16630fftargetblank7d7f975a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreec6376407c52ce7f97ed6f86d7918b6de36ab8517targetblankc637640a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -588,7 +591,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/7d7f9751da41495f4d9e26ad440c0fd8c16630ff" target="_blank">7d7f975</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/c6376407c52ce7f97ed6f86d7918b6de36ab8517" target="_blank">c637640</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -604,6 +607,9 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
+
+Unstaged changes:
+    Modified:   analysis/QC_round5_JL_v3.Rmd
 
 </code></pre>
 <p>
@@ -649,6 +655,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/6ed219c7409a87a441958de6a747acb965db6453/docs/QC_round5_JL_v3.html" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -725,16 +748,7 @@ update
 </div>
 </div>
 <p>Round 5 (INLINE library; JLK07=Mfs_NI/RIH014, JLK08=Mfs_LPS/RIH004,
-JLK09=Mfs_LPS/RIH007) had to be run as two separate pipeline jobs (JLK07
-alone, then JLK08+JLK09 together) due to a Snakemake directory-lock
-conflict, then merged back into one site table
-(<code>round5_JL_merged</code>) – see <a
-href="pipeline_overview.html">Pipeline overview</a> for why. Read-level
-stats (trimming/mapping/dedup) still live in the two original job
-directories, so this doc’s MultiQC and read-count sections read from
-both. See <a href="QC_round3_JL_v3.html">QC – round 3</a> for the full
-explanation of the binomial p-value / methylation-ratio sweep used
-below.</p>
+JLK09=Mfs_LPS/RIH007)</p>
 <pre class="r"><code>source(&quot;/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R&quot;)
 library(knitr)
 library(kableExtra)
@@ -837,6 +851,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-2-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-2-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -893,6 +918,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -942,6 +978,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">7d7f975</a>
@@ -1070,6 +1117,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -1119,6 +1177,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">7d7f975</a>
@@ -1247,6 +1316,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -1296,6 +1376,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">7d7f975</a>
@@ -1424,6 +1515,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -1473,6 +1575,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">7d7f975</a>
@@ -1601,6 +1714,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -1650,6 +1774,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">7d7f975</a>
@@ -1778,6 +1913,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
@@ -1816,6 +1962,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">7d7f975</a>
@@ -1933,6 +2090,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">7d7f975</a>

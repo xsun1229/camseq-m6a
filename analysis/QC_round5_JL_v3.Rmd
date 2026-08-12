@@ -11,14 +11,7 @@ editor_options:
 ---
 
 Round 5 (INLINE library; JLK07=Mfs_NI/RIH014, JLK08=Mfs_LPS/RIH004,
-JLK09=Mfs_LPS/RIH007) had to be run as two separate pipeline jobs (JLK07
-alone, then JLK08+JLK09 together) due to a Snakemake directory-lock conflict,
-then merged back into one site table (`round5_JL_merged`) -- see
-[Pipeline overview](pipeline_overview.html) for why. Read-level stats
-(trimming/mapping/dedup) still live in the two original job directories, so
-this doc's MultiQC and read-count sections read from both. See
-[QC -- round 3](QC_round3_JL_v3.html) for the full explanation of the
-binomial p-value / methylation-ratio sweep used below.
+JLK09=Mfs_LPS/RIH007) 
 
 ```{r setup, message=FALSE, warning=FALSE}
 source("/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R")
