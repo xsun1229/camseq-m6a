@@ -1,0 +1,162 @@
+---
+title: "Round 5: m6A sites in miRNA loci"
+author: "XSun"
+date: "2026-08-19"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+# What this is
+
+Round 5's called m6A sites ([QC -- round 5](QC_round5_JL_v3.html)), intersected
+with miRNA loci, per sample (JLK07, JLK08, JLK09) -- no merging across
+samples.
+
+**A note on terminology**, since this tripped us up while building this:
+there are three distinct levels of "miRNA" region, and only two of them are
+available in any standard annotation:
+
+| Level | What it is | Available here? |
+|---|---|---|
+| pri-miRNA | The full-length primary Pol II transcript (often kb-scale, capped/polyadenylated) | **No** -- not systematically annotated anywhere (Ensembl, UCSC, miRBase all lack it); boundaries aren't well characterized for most loci |
+| pre-miRNA (hairpin) | The ~60-100bp stem-loop released by Drosha cleavage from the pri-miRNA | **Yes** -- `premirna_hairpin` below |
+| Mature miRNA (5p/3p arm) | The ~20-24nt product after Dicer processing | **Yes** -- `mature_mirna` below |
+
+miRBase's own GFF3 calls the hairpin feature `miRNA_primary_transcript`,
+which is misleading -- despite the name, it is **not** the true pri-miRNA;
+miRBase's own file header says so explicitly ("these sequences do not
+represent the full primary transcript, rather a predicted stem-loop portion
+that includes the precursor miRNA").
+
+**Source**: miRBase v23, GRCh38 primary assembly (`hsa.gff3`,
+`NCBI_Assembly:GCA_000001405.15`) -- 1,858 pre-miRNA hairpin loci, 3,008
+mature 5p/3p arm loci.
+
+**Sites**: round 5's canonical filtered output
+(`report_sites/filtered/genome.tsv.gz`, all 3 samples, pipeline default
+cutoffs `min_uncon=1`, `min_depth=10`, `min_ratio=0.05`, `min_pval=0.05`),
+intersected via `GenomicRanges::findOverlaps` (strand-aware) against each
+resolution's loci separately.
+
+Extraction script:
+`/project/xinhe/xsun/camseq/2.qc/extract_mirna_sites.R` (in the pipeline
+directory, not this site's repo).
+
+```{r setup, message=FALSE, warning=FALSE}
+library(data.table)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(DT)
+
+MIRNA_DIR <- "/project/xinhe/xsun/camseq/processed_new/round5_JL_merged/report_sites/mirna"
+SAMPLES <- c("JLK07", "JLK08", "JLK09")
+RESOLUTIONS <- c(premirna_hairpin = "Pre-miRNA hairpin", mature_mirna = "Mature miRNA (5p/3p)")
+
+read_one <- function(sample, resolution) {
+  f <- file.path(MIRNA_DIR, sprintf("%s_%s_sites.tsv", sample, resolution))
+  dt <- fread(f)
+  dt[, `:=`(sample = sample, resolution = RESOLUTIONS[[resolution]])]
+  dt
+}
+
+all_sites <- rbindlist(lapply(SAMPLES, function(s) {
+  rbindlist(lapply(names(RESOLUTIONS), function(r) read_one(s, r)))
+}))
+```
+
+# Summary
+
+```{r message=FALSE, warning=FALSE}
+summary_dt <- all_sites[, .(n_sites = .N, n_loci = uniqueN(mirna_name)), by = .(sample, resolution)]
+kable(summary_dt) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=7}
+ggplot(summary_dt, aes(x = resolution, y = n_sites, fill = sample)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_text(aes(label = n_sites), position = position_dodge(width = 0.7), vjust = -0.4, size = 3.5) +
+  scale_fill_manual(values = c(JLK07 = "#2a78d6", JLK08 = "#eb6834", JLK09 = "#1baf7a")) +
+  labs(x = NULL, y = "m6A sites called", fill = NULL, title = "m6A sites in miRNA loci, round 5") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  theme_classic(base_size = 13)
+```
+
+# Sites shared across samples
+
+Same site (chrom, pos, strand) called in more than one sample -- worth a
+second look, since agreement across independent samples is stronger
+evidence than any single call.
+
+```{r message=FALSE, warning=FALSE}
+shared <- all_sites[, .(n_samples = uniqueN(sample), samples = paste(unique(sample), collapse = ",")),
+                     by = .(chrom, pos, strand, motif, mirna_name, resolution)][n_samples > 1]
+kable(shared[order(-n_samples)]) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+# Published reference: HSPC d9 sites in miRNA loci
+
+For context (not our data): the same miRNA-loci intersection applied to
+[m6A RNA modifications are measured at single-base resolution across the mammalian transcriptome, PMID: 35288668](https://pubmed.ncbi.nlm.nih.gov/35288668/)'s HSPC d9 dataset (PMID 35288668,
+single-nucleotide resolution, 23,833 total sites) -- a rough check of how
+often *any* published m6A site falls in a miRNA locus at all.
+
+```{r message=FALSE, warning=FALSE}
+source("/project/xinhe/xsun/website/camseq-m6a/code/compare_db_helpers.R")
+
+paper1_d9 <- load_paper1_sheet("/project/xinhe/xsun/camseq/pipeline/data/m6a_PMID35288668.xlsx", 8)
+mirna <- load_mirna_loci("/project/xinhe/xsun/camseq/data/reference/mirna/hsa.gff3")
+
+p1_chrom <- sub("-.*", "", paper1_d9$site)
+p1_pos <- as.integer(sub(".*-", "", paper1_d9$site))
+gr_p1 <- GRanges(seqnames = p1_chrom, ranges = IRanges(p1_pos, p1_pos))
+
+hp_hits <- suppressWarnings(findOverlaps(gr_p1, mirna$precursor, ignore.strand = TRUE))
+mt_hits <- suppressWarnings(findOverlaps(gr_p1, mirna$mature, ignore.strand = TRUE))
+
+paper1_mirna <- rbind(
+  cbind(paper1_d9[queryHits(hp_hits)], mirna_name = mcols(mirna$precursor)$name[subjectHits(hp_hits)], resolution = "Pre-miRNA hairpin"),
+  cbind(paper1_d9[queryHits(mt_hits)], mirna_name = mcols(mirna$mature)$name[subjectHits(mt_hits)], resolution = "Mature miRNA (5p/3p)")
+)
+setnames(paper1_mirna, "m6a_pct", "methylation_pct")
+
+kable(paper1_mirna, caption = "Paper 1 HSPC d9 sites overlapping a miRNA locus") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+# cross-check against round5's own cross-sample-shared miRNA loci above
+p1_loci <- sub("-5p$|-3p$", "", paper1_mirna$mirna_name)
+p1_loci <- unique(sub("^hsa-miR-", "hsa-mir-", p1_loci))
+shared_loci <- unique(sub("-5p$|-3p$", "", shared$mirna_name))
+shared_loci <- unique(sub("^hsa-miR-", "hsa-mir-", shared_loci))
+in_both <- intersect(p1_loci, shared_loci)
+if (length(in_both) > 0) {
+  cat(sprintf(
+    "%d of Paper 1's miRNA-overlapping loci (%s) also appear in round 5's own cross-sample-shared list above.\n",
+    length(in_both), paste(in_both, collapse = ", ")
+  ))
+}
+```
+
+# All sites
+
+Searchable/sortable -- filter by sample, resolution, or miRNA name.
+
+```{r message=FALSE, warning=FALSE}
+DT::datatable(
+  all_sites[, .(sample, resolution, mirna_name, chrom, pos, strand, motif, Depth, Uncon, methylation_pct, pval)],
+  caption = htmltools::tags$caption(
+    style = "caption-side: left; text-align: left; color:black; font-size:150%;",
+    "m6A sites in miRNA loci, round 5"
+  ),
+  options = list(pageLength = 15),
+  filter = "top"
+) %>%
+  DT::formatRound(columns = "methylation_pct", digits = 1) %>%
+  DT::formatSignif(columns = "pval", digits = 3)
+```

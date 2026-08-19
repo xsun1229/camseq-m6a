@@ -66,6 +66,29 @@ load_atlas2_peaks <- function(path) {
   GRanges(seqnames = df$seqnames, ranges = IRanges(df$start, df$end), strand = df$strand)
 }
 
+#' miRBase GFF3 (e.g. hsa.gff3, v23, GRCh38), split into the two available
+#' resolutions -- see analysis/round5_mirna_sites.Rmd for why there is no
+#' third "pri-miRNA" level: miRBase's "miRNA_primary_transcript" feature is
+#' actually the pre-miRNA hairpin (~60-100bp), not the true full-length
+#' primary Pol II transcript, which isn't systematically annotated anywhere.
+#' strip_chr=TRUE (default) drops the "chr" prefix to match our own site
+#' tables and Paper1's site convention; set FALSE to match REPIC/Atlas2,
+#' which keep "chr".
+load_mirna_loci <- function(gff3_path, strip_chr = TRUE) {
+  parse_attr <- function(attr, key) sub(paste0(".*", key, "=([^;]+).*"), "\\1", attr)
+  gff <- fread(gff3_path, header = FALSE, sep = "\t", skip = "chr", quote = "")
+  setnames(gff, c("chrom", "source", "feature", "start", "end", "score", "strand", "frame", "attr"))
+  if (strip_chr) gff[, chrom := sub("^chr", "", chrom)]
+  gff[strand == ".", strand := "*"] # GFF3 "unstranded" -> GRanges' convention
+  gff[, name := parse_attr(attr, "Name")]
+
+  as_gr <- function(feature_type) {
+    d <- gff[feature == feature_type]
+    GRanges(seqnames = d$chrom, ranges = IRanges(d$start, d$end), strand = d$strand, name = d$name)
+  }
+  list(precursor = as_gr("miRNA_primary_transcript"), mature = as_gr("miRNA"))
+}
+
 ## ---- Comparisons -----------------------------------------------------
 
 #' Site-level comparison (our sites vs. a single-nucleotide-resolution
