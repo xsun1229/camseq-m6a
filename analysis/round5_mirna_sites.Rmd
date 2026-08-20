@@ -87,6 +87,74 @@ ggplot(summary_dt, aes(x = resolution, y = n_sites, fill = sample)) +
   theme_classic(base_size = 13)
 ```
 
+# Stricter cutoff: p<0.001, methylation ratio >=10%
+
+Same intersection, but on a more stringent cutoff than the pipeline default
+above (`min_uncon=1`, `min_depth=10` held fixed, `min_pval<0.001`,
+`min_ratio>=0.10`), reading from the pre-computed
+[QC sweep](QC_round5_JL_v3.html) output instead of the canonical filtered
+file. JLK09's excess over JLK07/JLK08 persists at this stricter cutoff --
+not just an artifact of the lenient default threshold picking up more
+marginal/noisy calls.
+
+```{r message=FALSE, warning=FALSE}
+source("/project/xinhe/xsun/website/camseq-m6a/code/qc_v3_helpers.R")
+source("/project/xinhe/xsun/website/camseq-m6a/code/compare_db_helpers.R")
+
+BASE <- "/project/xinhe/xsun/camseq/processed_new/round5_JL_merged"
+P_STRICT <- "0.001"
+R_STRICT <- "0.10"
+
+mirna <- load_mirna_loci("/project/xinhe/xsun/camseq/data/reference/mirna/hsa.gff3")
+dt_strict <- qc_read_sweep(BASE, "genome", "persample", P_STRICT, R_STRICT)
+gr_strict <- GRanges(seqnames = dt_strict$chrom, ranges = IRanges(dt_strict$pos, dt_strict$pos), strand = dt_strict$strand)
+
+strict_sites <- rbindlist(lapply(names(mirna), function(res_key) {
+  gr_ref <- mirna[[res_key]]
+  hits <- findOverlaps(gr_strict, gr_ref, ignore.strand = FALSE)
+  overlap_dt <- cbind(dt_strict[queryHits(hits)], mirna_name = mcols(gr_ref)$name[subjectHits(hits)])
+  rbindlist(lapply(SAMPLES, function(s) {
+    passing <- qc_sample_passing(overlap_dt, s, as.numeric(R_STRICT), as.numeric(P_STRICT))
+    passing <- unique(passing[, .(
+      chrom, pos, strand, motif, mirna_name,
+      Depth = get(paste0("Depth_", s)), Uncon = get(paste0("Uncon_", s)),
+      methylation_pct = get(paste0("Ratio_", s)) * 100, pval = get(paste0("pval_", s))
+    )])
+    if (nrow(passing) == 0) return(NULL)
+    passing[, `:=`(sample = s, resolution = if (res_key == "precursor") "Pre-miRNA hairpin" else "Mature miRNA (5p/3p)")]
+    passing
+  }))
+}))
+
+strict_summary <- strict_sites[, .(n_sites = .N, n_loci = uniqueN(mirna_name)), by = .(sample, resolution)]
+kable(strict_summary) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+```{r message=FALSE, warning=FALSE, fig.height=4, fig.width=7}
+ggplot(strict_summary, aes(x = resolution, y = n_sites, fill = sample)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_text(aes(label = n_sites), position = position_dodge(width = 0.7), vjust = -0.4, size = 3.5) +
+  scale_fill_manual(values = c(JLK07 = "#2a78d6", JLK08 = "#eb6834", JLK09 = "#1baf7a")) +
+  labs(x = NULL, y = "m6A sites called", fill = NULL, title = "m6A sites in miRNA loci, round 5 (p<0.001, methylation>=10%)") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  theme_classic(base_size = 13)
+```
+
+```{r message=FALSE, warning=FALSE}
+DT::datatable(
+  strict_sites[, .(sample, resolution, mirna_name, chrom, pos, strand, motif, Depth, Uncon, methylation_pct, pval)],
+  caption = htmltools::tags$caption(
+    style = "caption-side: left; text-align: left; color:black; font-size:150%;",
+    "m6A sites in miRNA loci, round 5, p<0.001 & methylation>=10%"
+  ),
+  options = list(pageLength = 15),
+  filter = "top"
+) %>%
+  DT::formatRound(columns = "methylation_pct", digits = 1) %>%
+  DT::formatSignif(columns = "pval", digits = 3)
+```
+
 # Sites shared across samples
 
 Same site (chrom, pos, strand) called in more than one sample -- worth a
