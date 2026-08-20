@@ -262,6 +262,26 @@ qc_common_sites <- function(dt, sample_a, sample_b, r, p, u = 1, d = 10) {
   )
 }
 
+#' Every position BOTH samples cover at usable depth, with no significance
+#' filter at all (unlike qc_common_sites, which restricts to sites each
+#' sample individually calls significant). This is the unbiased genome-wide
+#' comparison: qc_common_sites only shows the two samples' agreement on the
+#' high-confidence subset they both flag as real; this shows the full
+#' relationship, dominated by low/background-level agreement everywhere
+#' else. Depth is the only restriction, so this doesn't depend on any (p, r)
+#' cutoff -- compute once per sample pair, not per cutoff block.
+#'
+#' Reads a pre-computed file (report_sites/all_covered_<a>_<b>.tsv.gz)
+#' rather than filtering the joined arrow table in R directly: the R
+#' `arrow` package can't read this project's polars-written IPC files
+#' ("Unrecognized type" error -- a version/encoding mismatch), so the
+#' filtering is done once in Python/polars (see
+#' 2.qc/precompute_all_covered_sites.py) and this just reads the result.
+qc_all_covered_sites <- function(base_dir, sample_a, sample_b) {
+  f <- file.path(base_dir, "report_sites", sprintf("all_covered_%s_%s.tsv.gz", sample_a, sample_b))
+  fread(f)
+}
+
 #' 2D-density plot of methylation level at sites both samples call, with a
 #' Pearson correlation annotated in the title -- do sites confidently called
 #' in both samples actually agree on how methylated they are, not just on
@@ -287,4 +307,63 @@ qc_methylation_scatter <- function(common_dt, label_a, label_b, title) {
       title = sprintf("%s\nn=%s common sites, Pearson r=%.2f", title, format(nrow(common_dt), big.mark = ","), r)
     ) +
     theme_classic(base_size = 13)
+}
+
+#' Site positions along the 45S precursor rRNA (18S/5.8S/28S, in biological
+#' order), for the shaded gene-background rects in qc_rrna_lollipop_plot().
+#' Lengths from data/reference/gene/Human_rRNA_5S_250123.fa.fai. Our "genes"
+#' reference also has 17 copies of 5S rRNA, excluded here since 5S is
+#' Pol III-transcribed and not part of the 45S precursor.
+qc_rrna_gene_positions <- function() {
+  genes <- data.table(
+    chrom = c("NR_003286.4", "NR_003285.3", "NR_003287.4"),
+    name = c("18S", "5.8S", "28S"),
+    length = c(1869, 157, 5070)
+  )
+  genes[, xmax := cumsum(length)]
+  genes[, xmin := xmax - length]
+  genes
+}
+
+#' Lollipop plot of methylation fraction (%) along the 45S precursor rRNA,
+#' one panel per sample, points colored by whether that sample individually
+#' calls the site significant vs background -- the same idea as
+#' ~/xsun.xin3/pumseq/percl_pipeline/bin/R0_Sites_on_Ribosome_250125.R (a
+#' different project's pseudouridine/m1A-on-rRNA plot), adapted for m6A:
+#' color is our own pipeline's significance call instead of an external
+#' known-site annotation, since there's no independent m6A-on-rRNA
+#' reference to color against.
+qc_rrna_lollipop_plot <- function(dt, title = "rRNA sites, 45S precursor") {
+  gene_pos <- qc_rrna_gene_positions()
+  offset <- setNames(gene_pos$xmin, gene_pos$chrom)
+  dt <- copy(dt)
+  dt[, x := pos + offset[chrom]]
+  dt[, called_label := factor(ifelse(called, "called", "background"), levels = c("called", "background"))]
+
+  mean_frac <- dt[, .(mean = mean(Fraction)), by = .(sample, called_label)]
+  mean_frac <- mean_frac[CJ(sample = unique(dt$sample), called_label = levels(dt$called_label), unique = TRUE), on = c("sample", "called_label")]
+  mean_frac[is.na(mean), mean := 0]
+  # CJ()'s join drops the factor class (called_label becomes plain character),
+  # so index by name explicitly rather than relying on factor-integer coercion
+  mean_frac[, text_x := ifelse(called_label == "called", -Inf, Inf)]
+  mean_frac[, text_hjust := ifelse(called_label == "called", -0.1, 1.1)]
+
+  ggplot(dt, aes(x = x, y = Fraction, color = called_label)) +
+    geom_rect(
+      data = gene_pos, aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = 100),
+      fill = "grey", alpha = 0.1, inherit.aes = FALSE
+    ) +
+    geom_segment(aes(xend = x, yend = 0), alpha = 0.4) +
+    geom_point() +
+    geom_text(
+      data = mean_frac, aes(x = text_x, y = Inf, label = sprintf("%s=%.2f%%", called_label, mean), color = called_label, hjust = text_hjust),
+      vjust = 1.3, inherit.aes = FALSE, size = 3.2, show.legend = FALSE
+    ) +
+    scale_color_manual(values = c(called = "#31a354", background = "grey60"), breaks = c("called", "background")) +
+    scale_x_continuous(breaks = gene_pos$xmin + gene_pos$length / 2, labels = gene_pos$name) +
+    scale_y_continuous(breaks = seq(0, 100, 20), limits = c(0, 108)) +
+    facet_wrap(~sample, ncol = 1) +
+    labs(x = "45S precursor rRNA (18S / 5.8S / 28S)", y = "Methylation fraction (%)", color = NULL, title = title) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
 }

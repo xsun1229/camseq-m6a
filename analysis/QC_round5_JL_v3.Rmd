@@ -74,6 +74,22 @@ qc_heatmap_plot(
 )
 ```
 
+### Methylation agreement: all covered sites (no significance filter)
+
+The per-cutoff sections below only compare sites both samples individually
+call significant -- a biased, high-confidence subset. This instead shows
+*every* position both samples cover at usable depth (>=10x), regardless of
+whether either calls it significant -- the full, unbiased genome-wide
+relationship, dominated by low/background-level agreement everywhere
+outside the real signal.
+
+```{r warning=FALSE, message=FALSE, fig.height=4, fig.width=6}
+for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs <- qc_all_covered_sites(BASE, pr[1], pr[2])
+  print(qc_methylation_scatter(cs, pr[1], pr[2], "all covered sites, depth>=10 (no significance filter)"))
+}
+```
+
 ### p < 0.05, methylation ratio >= 5%
 
 ```{r warning=FALSE, message=FALSE, fig.height=4, fig.width=7}
@@ -216,4 +232,21 @@ qc_heatmap_plot(
   qc_sweep_counts(BASE, "genes", SAMPLES, c("0.05", "0.001"), c("0.05", "0.10", "0.20")),
   "Genes (rRNA) sites called, round 5"
 )
+```
+
+### Sites along the 45S precursor rRNA (18S / 5.8S / 28S)
+
+Same idea as a plot used in a different project
+(`~/xsun.xin3/pumseq/percl_pipeline/bin/R0_Sites_on_Ribosome_250125.R`,
+pseudouridine/m1A sites along the 45S rRNA), adapted for our own m6A calls:
+every covered position (depth>=10) plotted along the concatenated 45S
+precursor, colored by whether that sample individually calls it significant
+at the pipeline's default cutoffs (green) vs background (grey). Our "genes"
+reference also has 17 copies of 5S rRNA (Pol III-transcribed, not part of
+the 45S precursor), excluded here since there's no single linear coordinate
+they share with 18S/5.8S/28S.
+
+```{r warning=FALSE, message=FALSE, fig.height=8, fig.width=8}
+rrna_dt <- fread("/project/xinhe/xsun/camseq/processed_new/round5_JL_merged/report_sites/rrna_45S_sites.tsv")
+qc_rrna_lollipop_plot(rrna_dt, "Round 5: m6A sites on the 45S precursor rRNA")
 ```

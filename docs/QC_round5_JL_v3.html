@@ -413,7 +413,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-08-12
+<strong>Last updated:</strong> 2026-08-20
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -573,15 +573,15 @@ code/qc_v3_helpers.R
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreecc3644f58eb506ab7f29b8f6103156face9a7ed6targetblankcc3644fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree72ea779b97b6e41a2fae1f433d9143995c1e3878targetblank72ea779a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/camseq-m6a/tree/cc3644f58eb506ab7f29b8f6103156face9a7ed6" target="_blank">cc3644f</a>
+<a href="https://github.com/xsun1229/camseq-m6a/tree/72ea779b97b6e41a2fae1f433d9143995c1e3878" target="_blank">72ea779</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atreecc3644f58eb506ab7f29b8f6103156face9a7ed6targetblankcc3644fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229camseqm6atree72ea779b97b6e41a2fae1f433d9143995c1e3878targetblank72ea779a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -591,7 +591,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/camseq-m6a/tree/cc3644f58eb506ab7f29b8f6103156face9a7ed6" target="_blank">cc3644f</a>.
+<a href="https://github.com/xsun1229/camseq-m6a/tree/72ea779b97b6e41a2fae1f433d9143995c1e3878" target="_blank">72ea779</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -656,6 +656,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/analysis/QC_round5_JL_v3.Rmd" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/camseq-m6a/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/QC_round5_JL_v3.html" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -886,6 +920,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-2-1.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-2-1.png" target="_blank">6ed219c</a>
 </td>
 <td>
@@ -921,14 +966,21 @@ XSun
 </table>
 </div>
 </div>
-<div id="p-0.05-methylation-ratio-5" class="section level3">
-<h3>p &lt; 0.05, methylation ratio &gt;= 5%</h3>
-<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.05&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
-              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<div id="methylation-agreement-all-covered-sites-no-significance-filter"
+class="section level3">
+<h3>Methylation agreement: all covered sites (no significance
+filter)</h3>
+<p>The per-cutoff sections below only compare sites both samples
+individually call significant – a biased, high-confidence subset. This
+instead shows <em>every</em> position both samples cover at usable depth
+(&gt;=10x), regardless of whether either calls it significant – the
+full, unbiased genome-wide relationship, dominated by
+low/background-level agreement everywhere outside the real signal.</p>
+<pre class="r"><code>for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
+  cs &lt;- qc_all_covered_sites(BASE, pr[1], pr[2])
+  print(qc_methylation_scatter(cs, pr[1], pr[2], &quot;all covered sites, depth&gt;=10 (no significance filter)&quot;))
+}</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-1.png" alt="" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
 Past versions of unnamed-chunk-3-1.png
@@ -951,6 +1003,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-1.png" target="_blank">6ed219c</a>
@@ -988,9 +1051,7 @@ XSun
 </table>
 </div>
 </div>
-<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
-              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" alt="" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-2">
 Past versions of unnamed-chunk-3-2.png
@@ -1013,6 +1074,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">6ed219c</a>
@@ -1038,6 +1110,196 @@ XSun
 <tr>
 <td>
 <a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-2.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-3.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-3">
+Past versions of unnamed-chunk-3-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-3.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="p-0.05-methylation-ratio-5" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 5%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.05&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">2a83c70</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
+              title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
+Past versions of unnamed-chunk-4-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1123,22 +1385,13 @@ JLK09
   cs &lt;- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
   print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf(&quot;p&lt;%s, methylation&gt;=%s%%&quot;, p, as.numeric(r) * 100)))
 }</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-3-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="p-0.05-methylation-ratio-10" class="section level3">
-<h3>p &lt; 0.05, methylation ratio &gt;= 10%</h3>
-<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.10&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
-              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
-Past versions of unnamed-chunk-4-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-3">
+Past versions of unnamed-chunk-4-3.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div id="fig-unnamed-chunk-4-3" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1157,7 +1410,129 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-3.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-4">
+Past versions of unnamed-chunk-4-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-4.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-5">
+Past versions of unnamed-chunk-4-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-5.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="p-0.05-methylation-ratio-10" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 10%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.10&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1168,7 +1543,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1179,7 +1554,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-1.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1194,13 +1580,13 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
               title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
-Past versions of unnamed-chunk-4-2.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
+Past versions of unnamed-chunk-5-2.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-4-2" class="collapse">
+<div id="fig-unnamed-chunk-5-2" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1219,7 +1605,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1230,7 +1616,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1241,7 +1627,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-2.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1327,22 +1724,13 @@ JLK09
   cs &lt;- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
   print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf(&quot;p&lt;%s, methylation&gt;=%s%%&quot;, p, as.numeric(r) * 100)))
 }</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-4-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="p-0.05-methylation-ratio-20" class="section level3">
-<h3>p &lt; 0.05, methylation ratio &gt;= 20%</h3>
-<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.20&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
-              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
-Past versions of unnamed-chunk-5-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-3">
+Past versions of unnamed-chunk-5-3.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div id="fig-unnamed-chunk-5-3" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1361,7 +1749,129 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-3.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-4">
+Past versions of unnamed-chunk-5-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-4.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-5">
+Past versions of unnamed-chunk-5-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-5.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="p-0.05-methylation-ratio-20" class="section level3">
+<h3>p &lt; 0.05, methylation ratio &gt;= 20%</h3>
+<pre class="r"><code>p &lt;- &quot;0.05&quot;; r &lt;- &quot;0.20&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1372,7 +1882,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1383,7 +1893,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-1.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1398,13 +1919,13 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
               title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
-Past versions of unnamed-chunk-5-2.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
+Past versions of unnamed-chunk-6-2.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-5-2" class="collapse">
+<div id="fig-unnamed-chunk-6-2" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1423,7 +1944,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1434,7 +1955,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1445,7 +1966,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-2.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1531,22 +2063,13 @@ JLK09
   cs &lt;- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
   print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf(&quot;p&lt;%s, methylation&gt;=%s%%&quot;, p, as.numeric(r) * 100)))
 }</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-5-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="p-0.001-methylation-ratio-5" class="section level3">
-<h3>p &lt; 0.001, methylation ratio &gt;= 5%</h3>
-<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.05&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
-              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
-Past versions of unnamed-chunk-6-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-3">
+Past versions of unnamed-chunk-6-3.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div id="fig-unnamed-chunk-6-3" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1565,7 +2088,129 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-3.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-4">
+Past versions of unnamed-chunk-6-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-4.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-5">
+Past versions of unnamed-chunk-6-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-5.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="p-0.001-methylation-ratio-5" class="section level3">
+<h3>p &lt; 0.001, methylation ratio &gt;= 5%</h3>
+<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.05&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1576,7 +2221,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1587,7 +2232,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-1.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1602,13 +2258,13 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
               title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
-Past versions of unnamed-chunk-6-2.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-2">
+Past versions of unnamed-chunk-7-2.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-6-2" class="collapse">
+<div id="fig-unnamed-chunk-7-2" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1627,7 +2283,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1638,7 +2294,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1649,7 +2305,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-2.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">7d7f975</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">2a83c70</a>
 </td>
 <td>
 XSun
@@ -1735,22 +2402,13 @@ JLK09
   cs &lt;- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
   print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf(&quot;p&lt;%s, methylation&gt;=%s%%&quot;, p, as.numeric(r) * 100)))
 }</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-6-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="p-0.001-methylation-ratio-10" class="section level3">
-<h3>p &lt; 0.001, methylation ratio &gt;= 10%</h3>
-<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.10&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
-              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
-Past versions of unnamed-chunk-7-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-3">
+Past versions of unnamed-chunk-7-3.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div id="fig-unnamed-chunk-7-3" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1769,7 +2427,129 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-3.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-4">
+Past versions of unnamed-chunk-7-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-4.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-5">
+Past versions of unnamed-chunk-7-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-5.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="p-0.001-methylation-ratio-10" class="section level3">
+<h3>p &lt; 0.001, methylation ratio &gt;= 10%</h3>
+<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.10&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1780,7 +2560,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1791,7 +2571,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-1.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
 XSun
@@ -1806,13 +2586,13 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
               title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-2">
-Past versions of unnamed-chunk-7-2.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-2">
+Past versions of unnamed-chunk-8-2.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-7-2" class="collapse">
+<div id="fig-unnamed-chunk-8-2" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1831,7 +2611,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1842,7 +2622,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">6ed219c</a>
 </td>
 <td>
 XSun
@@ -1853,7 +2633,7 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/2a83c70d620f0f6d538964e906d67c8cc05027f7/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-2.png" target="_blank">2a83c70</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">7d7f975</a>
 </td>
 <td>
 XSun
@@ -1939,22 +2719,13 @@ JLK09
   cs &lt;- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
   print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf(&quot;p&lt;%s, methylation&gt;=%s%%&quot;, p, as.numeric(r) * 100)))
 }</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-7-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="p-0.001-methylation-ratio-20" class="section level3">
-<h3>p &lt; 0.001, methylation ratio &gt;= 20%</h3>
-<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.20&quot;
-dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
-
-qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
-              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
-Past versions of unnamed-chunk-8-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-3">
+Past versions of unnamed-chunk-8-3.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div id="fig-unnamed-chunk-8-3" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1973,7 +2744,129 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">6ed219c</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-3.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-4">
+Past versions of unnamed-chunk-8-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-4.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-5">
+Past versions of unnamed-chunk-8-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-5.png" target="_blank">e196959</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="p-0.001-methylation-ratio-20" class="section level3">
+<h3>p &lt; 0.001, methylation ratio &gt;= 20%</h3>
+<pre class="r"><code>p &lt;- &quot;0.001&quot;; r &lt;- &quot;0.20&quot;
+dt_persample &lt;- qc_read_sweep(BASE, &quot;genome&quot;, &quot;persample&quot;, p, r)
+
+qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 5),
+              title = paste0(&quot;5-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/e196959d8cb58e7c08d3e54e3563663ed0fad3f3/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">e196959</a>
 </td>
 <td>
 XSun
@@ -1984,7 +2877,18 @@ XSun
 </tr>
 <tr>
 <td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-1.png" target="_blank">7d7f975</a>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">6ed219c</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-08-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">7d7f975</a>
 </td>
 <td>
 XSun
@@ -1999,55 +2903,7 @@ XSun
 </div>
 <pre class="r"><code>qc_motif_plot(qc_motif_table(dt_persample, SAMPLES, as.numeric(r), as.numeric(p), width = 3),
               title = paste0(&quot;3-mer, p&lt;&quot;, p, &quot;, methylation&gt;=&quot;, as.numeric(r) * 100, &quot;%&quot;))</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-2">
-Past versions of unnamed-chunk-8-2.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-8-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">6ed219c</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-08-12
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-2.png" target="_blank">7d7f975</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-08-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ov &lt;- qc_overlap(dt_persample, SAMPLES, as.numeric(r), as.numeric(p))
 cat(sprintf(&quot;All-way overlap (site called in every sample): %d\n&quot;, ov$all_way))</code></pre>
 <pre><code>All-way overlap (site called in every sample): 25372</code></pre>
@@ -2121,7 +2977,7 @@ JLK09
   cs &lt;- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
   print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf(&quot;p&lt;%s, methylation&gt;=%s%%&quot;, p, as.numeric(r) * 100)))
 }</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-8-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-3.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-4.png" alt="" width="672" style="display: block; margin: auto;" /><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="genes-rrna-reference-sites" class="section level2">
@@ -2132,55 +2988,23 @@ across the same cutoff grid:</p>
   qc_sweep_counts(BASE, &quot;genes&quot;, SAMPLES, c(&quot;0.05&quot;, &quot;0.001&quot;), c(&quot;0.05&quot;, &quot;0.10&quot;, &quot;0.20&quot;)),
   &quot;Genes (rRNA) sites called, round 5&quot;
 )</code></pre>
-<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
-Past versions of unnamed-chunk-9-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-9-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/6ed219c7409a87a441958de6a747acb965db6453/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">6ed219c</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-08-12
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/xsun1229/camseq-m6a/blob/7d7f9751da41495f4d9e26ad440c0fd8c16630ff/docs/figure/QC_round5_JL_v3.Rmd/unnamed-chunk-9-1.png" target="_blank">7d7f975</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-08-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-10-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
+<div id="sites-along-the-45s-precursor-rrna-18s-5.8s-28s"
+class="section level3">
+<h3>Sites along the 45S precursor rRNA (18S / 5.8S / 28S)</h3>
+<p>Same idea as a plot used in a different project
+(<code>~/xsun.xin3/pumseq/percl_pipeline/bin/R0_Sites_on_Ribosome_250125.R</code>,
+pseudouridine/m1A sites along the 45S rRNA), adapted for our own m6A
+calls: every covered position (depth&gt;=10) plotted along the
+concatenated 45S precursor, colored by whether that sample individually
+calls it significant at the pipeline’s default cutoffs (green) vs
+background (grey). Our “genes” reference also has 17 copies of 5S rRNA
+(Pol III-transcribed, not part of the 45S precursor), excluded here
+since there’s no single linear coordinate they share with
+18S/5.8S/28S.</p>
+<pre class="r"><code>rrna_dt &lt;- fread(&quot;/project/xinhe/xsun/camseq/processed_new/round5_JL_merged/report_sites/rrna_45S_sites.tsv&quot;)
+qc_rrna_lollipop_plot(rrna_dt, &quot;Round 5: m6A sites on the 45S precursor rRNA&quot;)</code></pre>
+<p><img src="figure/QC_round5_JL_v3.Rmd/unnamed-chunk-11-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -2192,7 +3016,7 @@ Session information
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.2.0 (2022-04-22)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Red Hat Enterprise Linux 8.10 (Ootpa)
+Running under: Red Hat Enterprise Linux 8.4 (Ootpa)
 
 Matrix products: default
 BLAS/LAPACK: /software/openblas-0.3.13-el8-x86_64/lib/libopenblas_skylakexp-r0.3.13.so
@@ -2227,6 +3051,7 @@ loaded via a namespace (and not attached):
 [53] whisker_0.4       pkgconfig_2.0.3   ellipsis_0.3.2    xml2_1.3.3       
 [57] svglite_2.1.0     rmarkdown_2.31    httr_1.4.8        rstudioapi_0.14  
 [61] R6_2.5.1          git2r_0.30.1      compiler_4.2.0   </code></pre>
+</div>
 </div>
 </div>
 </div>
