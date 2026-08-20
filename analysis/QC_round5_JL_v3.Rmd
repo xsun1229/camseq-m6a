@@ -74,22 +74,6 @@ qc_heatmap_plot(
 )
 ```
 
-### Methylation agreement: all covered sites (no significance filter)
-
-The per-cutoff sections below only compare sites both samples individually
-call significant -- a biased, high-confidence subset. This instead shows
-*every* position both samples cover at usable depth (>=10x), regardless of
-whether either calls it significant -- the full, unbiased genome-wide
-relationship, dominated by low/background-level agreement everywhere
-outside the real signal.
-
-```{r warning=FALSE, message=FALSE, fig.height=4, fig.width=6}
-for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
-  cs <- qc_all_covered_sites(BASE, pr[1], pr[2])
-  print(qc_methylation_scatter(cs, pr[1], pr[2], "all covered sites, depth>=10 (no significance filter)"))
-}
-```
-
 ### p < 0.05, methylation ratio >= 5%
 
 ```{r warning=FALSE, message=FALSE, fig.height=4, fig.width=7}
@@ -108,7 +92,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 
 for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
   cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
-  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("common (intersection), p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  us <- qc_union_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(us, pr[1], pr[2], sprintf("union, p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
 }
 ```
 
@@ -130,7 +116,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 
 for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
   cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
-  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("common (intersection), p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  us <- qc_union_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(us, pr[1], pr[2], sprintf("union, p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
 }
 ```
 
@@ -152,7 +140,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 
 for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
   cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
-  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("common (intersection), p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  us <- qc_union_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(us, pr[1], pr[2], sprintf("union, p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
 }
 ```
 
@@ -174,7 +164,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 
 for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
   cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
-  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("common (intersection), p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  us <- qc_union_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(us, pr[1], pr[2], sprintf("union, p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
 }
 ```
 
@@ -196,7 +188,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 
 for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
   cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
-  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("common (intersection), p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  us <- qc_union_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(us, pr[1], pr[2], sprintf("union, p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
 }
 ```
 
@@ -218,7 +212,9 @@ kable(ov$pairwise, caption = "Pairwise overlap (row/col: n sites shared)") %>%
 
 for (pr in combn(SAMPLES, 2, simplify = FALSE)) {
   cs <- qc_common_sites(dt_persample, pr[1], pr[2], r, p)
-  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  print(qc_methylation_scatter(cs, pr[1], pr[2], sprintf("common (intersection), p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
+  us <- qc_union_sites(dt_persample, pr[1], pr[2], r, p)
+  print(qc_methylation_scatter(us, pr[1], pr[2], sprintf("union, p<%s, methylation>=%s%%", p, as.numeric(r) * 100)))
 }
 ```
 

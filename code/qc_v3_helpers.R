@@ -239,22 +239,24 @@ qc_overlap <- function(dt, samples, r, p, u = 1, d = 10) {
   list(all_way = all_way, pairwise = pm, n_sites = lengths(site_sets))
 }
 
-#' Sites where BOTH sample_a and sample_b individually pass the cutoff (a
-#' pairwise special case of qc_overlap's site sets), with each sample's own
+#' TRUE/FALSE per row of `dt` for whether `sample` individually passes the
+#' cutoff -- shared by qc_common_sites (intersection) and qc_union_sites.
+qc_passes_mask <- function(dt, sample, r, p, u = 1, d = 10) {
+  dt[[paste0("Depth_", sample)]] >= d &
+    dt[[paste0("Uncon_", sample)]] >= u &
+    dt[[paste0("Ratio_", sample)]] >= r &
+    dt[[paste0("pval_", sample)]] <= p
+}
+
+#' Sites where BOTH sample_a and sample_b individually pass the cutoff --
+#' the *intersection* of the two samples' called-site sets (a pairwise
+#' special case of qc_overlap's site sets), with each sample's own
 #' methylation level (Ratio*100) at those sites -- the input to
-#' qc_methylation_scatter(). Computed with boolean masks directly (not by
-#' intersecting two qc_sample_passing() subsets) since we need each sample's
-#' own Ratio value at the shared rows, not just the shared row count.
+#' qc_methylation_scatter().
 qc_common_sites <- function(dt, sample_a, sample_b, r, p, u = 1, d = 10) {
   r <- as.numeric(r)
   p <- as.numeric(p)
-  passes <- function(s) {
-    dt[[paste0("Depth_", s)]] >= d &
-      dt[[paste0("Uncon_", s)]] >= u &
-      dt[[paste0("Ratio_", s)]] >= r &
-      dt[[paste0("pval_", s)]] <= p
-  }
-  keep <- passes(sample_a) & passes(sample_b)
+  keep <- qc_passes_mask(dt, sample_a, r, p, u, d) & qc_passes_mask(dt, sample_b, r, p, u, d)
   data.table(
     chrom = dt$chrom[keep], pos = dt$pos[keep], strand = dt$strand[keep], motif = dt$motif[keep],
     methylation_a = dt[[paste0("Ratio_", sample_a)]][keep] * 100,
@@ -262,24 +264,29 @@ qc_common_sites <- function(dt, sample_a, sample_b, r, p, u = 1, d = 10) {
   )
 }
 
-#' Every position BOTH samples cover at usable depth, with no significance
-#' filter at all (unlike qc_common_sites, which restricts to sites each
-#' sample individually calls significant). This is the unbiased genome-wide
-#' comparison: qc_common_sites only shows the two samples' agreement on the
-#' high-confidence subset they both flag as real; this shows the full
-#' relationship, dominated by low/background-level agreement everywhere
-#' else. Depth is the only restriction, so this doesn't depend on any (p, r)
-#' cutoff -- compute once per sample pair, not per cutoff block.
-#'
-#' Reads a pre-computed file (report_sites/all_covered_<a>_<b>.tsv.gz)
-#' rather than filtering the joined arrow table in R directly: the R
-#' `arrow` package can't read this project's polars-written IPC files
-#' ("Unrecognized type" error -- a version/encoding mismatch), so the
-#' filtering is done once in Python/polars (see
-#' 2.qc/precompute_all_covered_sites.py) and this just reads the result.
-qc_all_covered_sites <- function(base_dir, sample_a, sample_b) {
-  f <- file.path(base_dir, "report_sites", sprintf("all_covered_%s_%s.tsv.gz", sample_a, sample_b))
-  fread(f)
+#' Sites where EITHER sample_a or sample_b individually passes the cutoff --
+#' the *union* of the two samples' called-site sets (qc_common_sites is the
+#' intersection of the same two sets). Includes sites where only one sample
+#' cleared the bar; the other sample's own depth there is often too low to
+#' trust (or literally zero -- no coverage at all) -- those get set to
+#' `na_sentinel` (default -10, off the real 0-100% axis) instead of either
+#' being silently dropped or plotted as if they were a real low value.
+#' `is_na_a`/`is_na_b` flag which rows got the sentinel, so downstream
+#' consumers (e.g. correlation) can exclude them.
+qc_union_sites <- function(dt, sample_a, sample_b, r, p, u = 1, d = 10, na_sentinel = -10) {
+  r <- as.numeric(r)
+  p <- as.numeric(p)
+  keep <- qc_passes_mask(dt, sample_a, r, p, u, d) | qc_passes_mask(dt, sample_b, r, p, u, d)
+  depth_a <- dt[[paste0("Depth_", sample_a)]][keep]
+  depth_b <- dt[[paste0("Depth_", sample_b)]][keep]
+  is_na_a <- depth_a < d
+  is_na_b <- depth_b < d
+  data.table(
+    chrom = dt$chrom[keep], pos = dt$pos[keep], strand = dt$strand[keep], motif = dt$motif[keep],
+    methylation_a = ifelse(is_na_a, na_sentinel, dt[[paste0("Ratio_", sample_a)]][keep] * 100),
+    methylation_b = ifelse(is_na_b, na_sentinel, dt[[paste0("Ratio_", sample_b)]][keep] * 100),
+    is_na_a = is_na_a, is_na_b = is_na_b
+  )
 }
 
 #' 2D-density plot of methylation level at sites both samples call, with a
@@ -289,6 +296,14 @@ qc_all_covered_sites <- function(base_dir, sample_a, sample_b) {
 #' typical here, so this bins into a 2D histogram (geom_bin2d) rather than
 #' plotting individual points -- a plain scatter at this n is just an
 #' overplotted blob and the density pattern is the actually useful signal.
+#'
+#' If `common_dt` has is_na_a/is_na_b columns (qc_union_sites' sentinel
+#' flags -- qc_common_sites' output never has them, since every row there
+#' already has real depth>=d on both sides), sentinel rows are excluded from
+#' the Pearson correlation -- a -10 placeholder is not a real data point and
+#' would corrupt it -- but still shown in the plot, in a shaded "no data
+#' (depth<d)" band below the real 0-100% axis range, separated by a dashed
+#' boundary line.
 qc_methylation_scatter <- function(common_dt, label_a, label_b, title) {
   if (nrow(common_dt) == 0) {
     return(
@@ -297,16 +312,33 @@ qc_methylation_scatter <- function(common_dt, label_a, label_b, title) {
         theme_void()
     )
   }
-  r <- cor(common_dt$methylation_a, common_dt$methylation_b, method = "pearson")
-  ggplot(common_dt, aes(x = methylation_a, y = methylation_b)) +
+  has_sentinel <- all(c("is_na_a", "is_na_b") %in% names(common_dt))
+  is_real <- if (has_sentinel) !common_dt$is_na_a & !common_dt$is_na_b else rep(TRUE, nrow(common_dt))
+  r <- cor(common_dt$methylation_a[is_real], common_dt$methylation_b[is_real], method = "pearson")
+
+  p <- ggplot(common_dt, aes(x = methylation_a, y = methylation_b)) +
     geom_bin2d(bins = 60) +
     scale_fill_gradient(low = "#cde2fb", high = "#0d366b", trans = "log10", name = "n sites") +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
     labs(
       x = paste0(label_a, " methylation (%)"), y = paste0(label_b, " methylation (%)"),
-      title = sprintf("%s\nn=%s common sites, Pearson r=%.2f", title, format(nrow(common_dt), big.mark = ","), r)
+      title = sprintf(
+        "%s\nn=%s (%s both sides depth>=d)\nPearson r=%.2f",
+        title, format(nrow(common_dt), big.mark = ","), format(sum(is_real), big.mark = ","), r
+      )
     ) +
     theme_classic(base_size = 13)
+
+  if (has_sentinel) {
+    p <- p +
+      annotate("rect", xmin = -Inf, xmax = -5, ymin = -Inf, ymax = Inf, fill = "grey85", alpha = 0.5) +
+      annotate("rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = -5, fill = "grey85", alpha = 0.5) +
+      geom_vline(xintercept = -5, linetype = "dashed", color = "grey60") +
+      geom_hline(yintercept = -5, linetype = "dashed", color = "grey60") +
+      scale_x_continuous(breaks = c(-10, 0, 25, 50, 75, 100), labels = c("no data\n(depth<d)", "0", "25", "50", "75", "100")) +
+      scale_y_continuous(breaks = c(-10, 0, 25, 50, 75, 100), labels = c("no data\n(depth<d)", "0", "25", "50", "75", "100"))
+  }
+  p
 }
 
 #' Site positions along the 45S precursor rRNA (18S/5.8S/28S, in biological
