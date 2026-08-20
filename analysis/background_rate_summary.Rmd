@@ -1,0 +1,177 @@
+---
+title: "Background conversion rate (Bg) across all rounds"
+author: "XSun"
+date: "2026-08-19"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+# What this is
+
+`Bg_<sample>` is the pipeline's own per-sample estimate of background
+(non-m6A) unconverted-read rate -- the mean per-site methylation ratio
+(`Uncon/Depth`) across every covered genomic position for that sample, NaNs
+dropped (see
+[Pipeline overview](pipeline_overview.html#how-bg-background-and-the-binomial-p-value-are-actually-computed)
+for the exact formula from `filter_sites.py`). It's the null rate every
+site's binomial significance test is measured against.
+
+This page pulls `Bg` for every sample across all 4 rounds into one place, to
+check whether the JLK09 elevation we found while investigating round 5
+([QC -- round 5](QC_round5_JL_v3.html)) is an isolated case or part of a
+broader pattern.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(data.table)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+
+bg_dt <- fread("/project/xinhe/xsun/camseq/2.qc/background_rate_summary.tsv")
+bg_dt[, sample := factor(sample, levels = sample[order(round, -Bg)])]
+```
+
+# All samples, all rounds
+
+```{r message=FALSE, warning=FALSE, fig.height=5, fig.width=9}
+ggplot(bg_dt, aes(x = sample, y = Bg, fill = round)) +
+  geom_col(width = 0.7) +
+  geom_hline(yintercept = 0.02, linetype = "dashed", color = "grey40") +
+  scale_fill_manual(values = c(
+    round1_2_PW = "#2a78d6", round3_JL = "#eb6834", round4_JL = "#1baf7a", round5_JL = "#e34948"
+  )) +
+  labs(
+    x = NULL, y = "Bg (background unconverted-read rate)", fill = "Round",
+    title = "Background conversion rate by sample",
+    caption = "Dashed line at 0.02 for visual reference -- most samples sit just under it."
+  ) +
+  theme_classic(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r message=FALSE, warning=FALSE}
+kable(bg_dt[order(round, -Bg)], digits = c(NA, NA, 5, 0, 0)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+Most samples across all 4 rounds cluster tightly in the 0.013-0.020 range.
+Four samples stand out, for three different reasons:
+
+# Case 1: 12-1-3 -- not a real measurement (data failure)
+
+```{r message=FALSE, warning=FALSE}
+kable(bg_dt[sample == "12-1-3"]) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+`Bg=0` looks clean but isn't -- this sample had only **997 raw reads total**
+(vs. tens of millions for every other sample), and only **2 total mapped
+positions across the entire 39.4M-position genome table** (max depth at
+either position: 1). This is a sequencing/library failure, not a
+conversion-rate measurement. Every downstream number for this sample
+(including its earlier-reported "0 called sites") is uninterpretable, not
+evidence of anything. **Needs its own investigation** -- worth checking
+whether the correct FASTQ files were used for this sample, or whether it
+needs re-sequencing.
+
+# Case 2 & 3: JL-CAM-01 and 12-1-4 -- input/untreated controls, genuinely elevated
+
+Both have plenty of supporting reads (35.2M and 3.8M deduped genome reads
+respectively) -- this is a real signal, not a data artifact. Both are
+**input/untreated control samples**, not treated experimental samples.
+
+```{r message=FALSE, warning=FALSE}
+kable(bg_dt[sample %in% c("JL-CAM-01", "12-1-4")]) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+Checking `Bg` on the rRNA (`genes`) reference too -- a heavily structured
+RNA class -- shows the two behave differently, suggesting they may not share
+the same root cause despite the similar surface pattern:
+
+```{r message=FALSE, warning=FALSE}
+rrna_check <- data.table(
+  sample = c("12-1-4", "JL-CAM-01"),
+  Bg_genome = c(0.06309, 0.09236),
+  Bg_rRNA_genes = c(0.05941, 0.15682)
+)
+kable(rrna_check, digits = 5) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+- **12-1-4**: similar magnitude in genome vs. rRNA (0.063 vs 0.059) --
+  doesn't specifically implicate RNA structure; more consistent with a
+  general whole-sample/reaction-level effect.
+- **JL-CAM-01**: notably *more* elevated in the structured rRNA reference
+  than in the genome (0.157 vs 0.092) -- consistent with secondary structure
+  partially blocking chemical conversion access, on top of an already
+  elevated baseline.
+
+**Open question for the wet-lab side**: are input/untreated control samples
+supposed to skip the chemical A->G conversion treatment step (in which case
+elevated background is expected and correct), or should they go through the
+same treatment as experimental samples (in which case this indicates a real
+technical issue)? That single question resolves whether this pattern is by
+design or a problem -- and it's more robust than the JLK09 case below, since
+it's consistent across two independent rounds.
+
+# Case 4: JLK09 -- a treated sample, modest but real elevation
+
+```{r message=FALSE, warning=FALSE}
+kable(bg_dt[sample %in% c("JLK07", "JLK08", "JLK09")]) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+Unlike cases 2-3, JLK09 is a treated experimental sample (Mfs_LPS/RIH007),
+not an input/control -- so the "input samples skip conversion" explanation
+doesn't apply here. Its elevation is smaller in absolute terms (0.024 vs.
+0.06-0.09) but happens in a sample where no obvious protocol difference is
+expected, which makes it harder to explain than cases 2-3. See
+[QC -- round 5](QC_round5_JL_v3.html) and
+[Round 5 miRNA sites](round5_mirna_sites.html) for where this shows up
+downstream (JLK09 consistently calls more sites than JLK07/JLK08 across
+every cutoff checked, including at miRNA loci specifically).
+
+Debugging directions discussed so far, none of which require new wet-lab
+work:
+
+1. **Structured vs. open regions** -- compare `Bg` on `genes` (rRNA) vs
+   `genome` for JLK09 specifically, same check as cases 2-3 above (not yet
+   run for this sample).
+2. **Motif specificity** -- does the excess unconverted signal concentrate
+   on real DRACH-like motifs (more consistent with biology) or spread
+   uniformly across all A contexts (more consistent with non-specific
+   technical noise)? Not yet checked.
+3. **Other QC axes** -- base quality, GC content, duplication rate, insert
+   size (already in the [MultiQC report](multiqc_round5_JL_v3.html)) for
+   JLK09 specifically, to look for any other anomaly pointing to a
+   run/lane-specific issue.
+4. **A synthetic spike-in control** would resolve this directly and
+   definitively, but this experiment doesn't include one -- see the
+   discussion in [Pipeline overview](pipeline_overview.html) for what a
+   spike-in-based correction would and wouldn't buy us.
+
+# Reference: how Bg is computed
+
+From `filter_sites.py` (see
+[Pipeline overview](pipeline_overview.html#how-bg-background-and-the-binomial-p-value-are-actually-computed)
+for the full derivation):
+
+```python
+df_input.with_columns(
+    (pl.col(f"Uncon_{name}") / pl.col(f"Depth_{name}")).alias(f"Ratio_{name}")
+    for name in names
+).with_columns(
+    pl.col(f"Ratio_{name}").drop_nans().mean().alias(f"Bg_{name}")
+    for name in names
+)
+```
+
+An unweighted mean of per-site ratios across every position that sample
+covers at all (`Depth > 0`) -- every site counts equally regardless of its
+own depth. This is why case 1 (12-1-3) breaks: with only 2 total covered
+positions, the "mean" is computed over almost nothing.
